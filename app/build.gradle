@@ -1,10 +1,11 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
     defaultConfig {
-        applicationId "android.loloof64.com.basic_chess_endgames_trainer"
+        applicationId "com.loloof64.android.basicchessendgamestrainer"
         minSdkVersion 15
         targetSdkVersion 25
         versionCode 1
@@ -37,4 +38,8 @@ dependencies {
     compile 'com.android.support:appcompat-v7:25.3.1'
     compile 'com.android.support:design:25.3.1'
     testCompile 'junit:junit:4.12'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+}
+repositories {
+    mavenCentral()
 }

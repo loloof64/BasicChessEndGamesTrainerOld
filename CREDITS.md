@@ -1,0 +1,1 @@
+Using sources from the StockFish 8 chess engine project.

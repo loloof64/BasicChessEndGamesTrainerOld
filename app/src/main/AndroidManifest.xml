@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="android.loloof64.com.basic_chess_endgames_trainer">
+    package="com.loloof64.android.basicchessendgamestrainer">
 
     <application
         android:allowBackup="true"
@@ -10,7 +10,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ExerciseChooserActivity"
-            android:label="@string/title_activity_exercise_chooser"
+            android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

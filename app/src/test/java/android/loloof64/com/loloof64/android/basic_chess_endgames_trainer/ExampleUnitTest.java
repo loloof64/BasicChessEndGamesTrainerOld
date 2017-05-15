@@ -1,4 +1,4 @@
-package android.loloof64.com.basic_chess_endgames_trainer;
+package android.loloof64.com.loloof64.android.basic_chess_endgames_trainer;
 
 import org.junit.Test;
 

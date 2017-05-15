@@ -18,11 +18,16 @@
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/* Modified by Laurent Bernabe (2017)
+ * Replaced loop() with three methods
+ * */
+
 #ifndef UCI_H_INCLUDED
 #define UCI_H_INCLUDED
 
 #include <map>
 #include <string>
+#include <sstream>
 
 #include "types.h"
 
@@ -66,7 +71,12 @@ private:
 };
 
 void init(OptionsMap&);
-void loop(int argc, char* argv[]);
+
+// Laurent Bernabe : replaced loop with those three methods
+void startCommandReader();
+std::string readCommand(const std::string &cmd);
+void endCommandReader();
+
 std::string value(Value v);
 std::string square(Square s);
 std::string move(Move m, bool chess960);

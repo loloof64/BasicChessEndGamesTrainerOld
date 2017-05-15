@@ -17,10 +17,11 @@
   You should have received a copy of the GNU General Public License
   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+/* Modified by Laurent Bernabe (2017)
+* */
 
 #include <iostream>
 #include <sstream>
-#include <string>
 
 #include "evaluate.h"
 #include "movegen.h"
@@ -137,28 +138,37 @@ namespace {
 
 } // namespace
 
+/// By Laurent Bernabe
+static Position pos;
+static string token;
+static ostringstream result;
 
-/// UCI::loop() waits for a command from stdin, parses it and calls the appropriate
-/// function. Also intercepts EOF from stdin to ensure gracefully exiting if the
-/// GUI dies unexpectedly. When called with some command line arguments, e.g. to
-/// run 'bench', once the command is executed the function returns immediately.
-/// In addition to the UCI ones, also some additional debug commands are supported.
+enum SyncResult {RES_LOCK, RES_UNLOCK};
+std::ostream& operator<<(std::ostream& os, SyncResult sc) {
 
-void UCI::loop(int argc, char* argv[]) {
+    static Mutex m;
 
-  Position pos;
-  string token, cmd;
+    if (sc == RES_LOCK)
+        m.lock();
 
-  pos.set(StartFEN, false, &States->back(), Threads.main());
+    if (sc == RES_UNLOCK)
+        m.unlock();
 
-  for (int i = 1; i < argc; ++i)
-      cmd += std::string(argv[i]) + " ";
+    return os;
+}
 
-  do {
-      if (argc == 1 && !getline(cin, cmd)) // Block here waiting for input or EOF
-          cmd = "quit";
+#define lock_res result << RES_LOCK
+#define unlock_res std::endl << RES_UNLOCK
+// Laurent Bernabe
+
+void UCI::startCommandReader() {
+    pos.set(StartFEN, false, &States->back(), Threads.main());
+}
+
+string UCI::readCommand(const string &cmd) {
 
       istringstream is(cmd);
+      result.str(string());
 
       token.clear(); // getline() could return empty or blank line
       is >> skipws >> token;
@@ -179,16 +189,16 @@ void UCI::loop(int argc, char* argv[]) {
           Search::Limits.ponder = 0; // Switch to normal search
 
       else if (token == "uci")
-          sync_cout << "id name " << engine_info(true)
+          lock_res << "id name " << engine_info(true)
                     << "\n"       << Options
-                    << "\nuciok"  << sync_endl;
+                    << "\nuciok"  << unlock_res;
 
       else if (token == "ucinewgame")
       {
           Search::clear();
           Time.availableNodes = 0;
       }
-      else if (token == "isready")    sync_cout << "readyok" << sync_endl;
+      else if (token == "isready")    lock_res << "readyok" << unlock_res;
       else if (token == "go")         go(pos, is);
       else if (token == "position")   position(pos, is);
       else if (token == "setoption")  setoption(is);
@@ -196,8 +206,8 @@ void UCI::loop(int argc, char* argv[]) {
       // Additional custom non-UCI commands, useful for debugging
       else if (token == "flip")       pos.flip();
       else if (token == "bench")      benchmark(pos, is);
-      else if (token == "d")          sync_cout << pos << sync_endl;
-      else if (token == "eval")       sync_cout << Eval::trace(pos) << sync_endl;
+      else if (token == "d")          lock_res << pos << unlock_res;
+      else if (token == "eval")       lock_res << Eval::trace(pos) << unlock_res;
       else if (token == "perft")
       {
           int depth;
@@ -210,11 +220,13 @@ void UCI::loop(int argc, char* argv[]) {
           benchmark(pos, ss);
       }
       else
-          sync_cout << "Unknown command: " << cmd << sync_endl;
+          lock_res << "Unknown command: " << cmd << unlock_res;
 
-  } while (token != "quit" && argc == 1); // Passed args have one-shot behaviour
+    return result.str();
+}
 
-  Threads.main()->wait_for_search_finished();
+void UCI::endCommandReader() {
+    Threads.main()->wait_for_search_finished();
 }
 
 
