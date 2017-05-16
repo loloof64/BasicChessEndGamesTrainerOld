@@ -17,17 +17,17 @@ namespace PSQT {
 
 extern "C"{
 JNIEXPORT void JNICALL
-Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_00024Companion_uciStart(JNIEnv *env, jobject obj);
+Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciStart(JNIEnv *env, jobject obj);
 
 JNIEXPORT jstring JNICALL
-Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_uciInteract(JNIEnv *env, jobject obj, jstring uciCmd);
+Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciInteract(JNIEnv *env, jobject obj, jstring uciCmd);
 
 JNIEXPORT void JNICALL
-Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_uciEnd(JNIEnv *env, jobject obj);
+Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciEnd(JNIEnv *env, jobject obj);
 }
 
 JNIEXPORT void JNICALL
-Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_00024Companion_uciStart(JNIEnv *env, jobject obj) {
+Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciStart(JNIEnv *env, jobject obj) {
     UCI::init(Options);
     PSQT::init();
     Bitboards::init();
@@ -44,7 +44,7 @@ Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_0002
 }
 
 JNIEXPORT jstring JNICALL
-Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_uciInteract(JNIEnv *env, jobject obj, jstring uciCmd){
+Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciInteract(JNIEnv *env, jobject obj, jstring uciCmd){
     const char *uciCmdStr = env->GetStringUTFChars(uciCmd, JNI_FALSE);
     string uciCmdString(uciCmdStr);
 
@@ -57,7 +57,7 @@ Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_uciI
 }
 
 JNIEXPORT void JNICALL
-Java_com_loloof64_android_basicchessendgamestrainer_ExerciseChooserActivity_uciEnd(JNIEnv *env, jobject obj){
+Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciEnd(JNIEnv *env, jobject obj){
     UCI::endCommandReader();
 
     Threads.exit();
