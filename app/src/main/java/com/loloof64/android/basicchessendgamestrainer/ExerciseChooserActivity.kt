@@ -22,10 +22,12 @@ class ExerciseChooserActivity : AppCompatActivity() {
                     .setAction("Action", null).show()
         }
 
+        (application as MyApplication).uciSetup()
+
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        (application as MyApplication).uciEnd()
+    override fun onStop() {
+        super.onStop()
+        if (isFinishing) (application as MyApplication).uciEnd()
     }
 }

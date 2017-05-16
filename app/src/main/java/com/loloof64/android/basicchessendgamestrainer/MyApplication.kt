@@ -18,7 +18,6 @@ class MyApplication: Application(){
     override fun onCreate() {
         super.onCreate()
         uciStart()
-        uciSetup()
     }
 
     fun uciSetup(){
