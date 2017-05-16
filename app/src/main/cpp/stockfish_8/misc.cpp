@@ -139,22 +139,38 @@ void dbg_print() {
 }
 
 
-/// Used to serialize access to std::cout to avoid multiple threads writing at
-/// the same time.
+// By Laurent Bernabe
+static AnswerCallback _cmdAnswerCallBack = nullptr;
 
-std::ostream& operator<<(std::ostream& os, SyncCout sc) {
-
-  static Mutex m;
-
-  if (sc == IO_LOCK)
-      m.lock();
-
-  if (sc == IO_UNLOCK)
-      m.unlock();
-
-  return os;
+void setCommandAnswerCallback(AnswerCallback callback){
+    _cmdAnswerCallBack = callback;
 }
 
+void executeCommandAnswerCallback(const std::string &answer){
+    if (_cmdAnswerCallBack != nullptr) _cmdAnswerCallBack(answer);
+}
+
+std::ostringstream result;
+
+std::ostringstream& getResult(){
+    return result;
+}
+
+/// Used to serialize access to result to avoid multiple threads writing at
+/// the same time.
+std::ostream& operator<<(std::ostream& os, SyncResult sc) {
+
+    static Mutex m;
+
+    if (sc == RES_LOCK)
+        m.lock();
+
+    if (sc == RES_UNLOCK)
+        m.unlock();
+
+    return os;
+}
+// Laurent Bernabe
 
 /// Trampoline helper to avoid moving Logger to misc.h
 void start_logger(const std::string& fname) { Logger::start(fname); }

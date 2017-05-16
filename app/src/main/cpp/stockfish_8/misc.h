@@ -26,6 +26,7 @@
 #include <ostream>
 #include <string>
 #include <vector>
+#include <sstream>
 
 #include "types.h"
 
@@ -53,12 +54,17 @@ private:
   std::vector<Entry> table = std::vector<Entry>(Size);
 };
 
+/// By Laurent Bernabe
+std::ostringstream& getResult();
+enum SyncResult {RES_LOCK, RES_UNLOCK};
+std::ostream& operator<<(std::ostream& os, SyncResult sc);
+#define lock_res getResult() << RES_LOCK
+#define unlock_res std::endl << RES_UNLOCK
 
-enum SyncCout { IO_LOCK, IO_UNLOCK };
-std::ostream& operator<<(std::ostream&, SyncCout);
-
-#define sync_cout std::cout << IO_LOCK
-#define sync_endl std::endl << IO_UNLOCK
+typedef void (*AnswerCallback) (const std::string &answer);
+void setCommandAnswerCallback(AnswerCallback callback);
+void executeCommandAnswerCallback(const std::string &answer);
+// Laurent Bernabe
 
 
 /// xorshift64star Pseudo-Random Number Generator

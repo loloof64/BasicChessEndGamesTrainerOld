@@ -31,8 +31,10 @@ add_library(
 # default, you only need to specify the name of the public NDK library
 # you want to add. CMake verifies that the library exists before
 # completing its build.
+find_library(log-lib log)
 
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
+target_link_libraries(stockfish_8 ${log-lib})

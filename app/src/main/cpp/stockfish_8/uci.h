@@ -72,9 +72,10 @@ private:
 
 void init(OptionsMap&);
 
-// Laurent Bernabe : replaced loop with those three methods
+// Laurent Bernabe : replaced loop with those four methods
 void startCommandReader();
 std::string readCommand(const std::string &cmd);
+void setCommandAnswerCallback(AnswerCallback callback);
 void endCommandReader();
 
 std::string value(Value v);

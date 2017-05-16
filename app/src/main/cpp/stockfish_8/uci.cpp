@@ -101,7 +101,7 @@ namespace {
     if (Options.count(name))
         Options[name] = value;
     else
-        sync_cout << "No such option: " << name << sync_endl;
+        lock_res << "No such option: " << name << unlock_res;
   }
 
 
@@ -140,26 +140,7 @@ namespace {
 
 /// By Laurent Bernabe
 static Position pos;
-static string token;
-static ostringstream result;
-
-enum SyncResult {RES_LOCK, RES_UNLOCK};
-std::ostream& operator<<(std::ostream& os, SyncResult sc) {
-
-    static Mutex m;
-
-    if (sc == RES_LOCK)
-        m.lock();
-
-    if (sc == RES_UNLOCK)
-        m.unlock();
-
-    return os;
-}
-
-#define lock_res result << RES_LOCK
-#define unlock_res std::endl << RES_UNLOCK
-// Laurent Bernabe
+static std::string token;
 
 void UCI::startCommandReader() {
     pos.set(StartFEN, false, &States->back(), Threads.main());
@@ -168,7 +149,7 @@ void UCI::startCommandReader() {
 string UCI::readCommand(const string &cmd) {
 
       istringstream is(cmd);
-      result.str(string());
+      getResult().str(string());
 
       token.clear(); // getline() could return empty or blank line
       is >> skipws >> token;
@@ -222,12 +203,14 @@ string UCI::readCommand(const string &cmd) {
       else
           lock_res << "Unknown command: " << cmd << unlock_res;
 
-    return result.str();
+    return getResult().str();
 }
 
 void UCI::endCommandReader() {
     Threads.main()->wait_for_search_finished();
 }
+
+// Laurent Bernabe
 
 
 /// UCI::value() converts a Value to a string suitable for use with the UCI

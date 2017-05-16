@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="main_menu_select_exercise">Veuillez choisir votre exercice</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="title_activity_exercise_chooser">Sélecteur d\'exercice</string>
+    <string name="exercise_kq_k">Roi+Dame/Roi</string>
+    <string name="exercise_krr_k">Roi+2Tours/Roi</string>
+    <string name="exercise_kbb_k">Roi+2Fous/Roi</string>
+</resources>

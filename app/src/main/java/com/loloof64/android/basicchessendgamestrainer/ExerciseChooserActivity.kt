@@ -1,11 +1,17 @@
 package com.loloof64.android.basicchessendgamestrainer
 
 import android.os.Bundle
-import android.support.design.widget.FloatingActionButton
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.Toolbar
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExerciseRow
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
 import java.util.logging.Logger
+import kotlinx.android.synthetic.main.activity_exercise_chooser.*
+
+class MyUCICommandAnswerCallback : UCICommandAnswerCallback {
+    override fun execute(answer: String) {
+        answer.split("\n").filter{ it.isNotEmpty() }.forEachIndexed { index, s ->  Logger.getLogger("loloof64").info("Late uci result line is ($index) => $s") }
+    }
+}
 
 class ExerciseChooserActivity : AppCompatActivity() {
 
@@ -13,16 +19,12 @@ class ExerciseChooserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_exercise_chooser)
-        val toolbar = findViewById(R.id.toolbar) as Toolbar
-        setSupportActionBar(toolbar)
-
-        val fab = findViewById(R.id.fab) as FloatingActionButton
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
 
         (application as MyApplication).uciSetup()
+        (application as MyApplication).uciSetAnswerCallback(MyUCICommandAnswerCallback())
+        (application as MyApplication).uciInteract("go")
+
+        exercisesListView.adapter = ExercisesListAdapter(this, generateExercises())
 
     }
 
@@ -30,4 +32,13 @@ class ExerciseChooserActivity : AppCompatActivity() {
         super.onStop()
         if (isFinishing) (application as MyApplication).uciEnd()
     }
+
+    private fun generateExercises() : List<ExerciseRow>{
+        return listOf(
+                ExerciseRow(R.string.exercise_kq_k),
+                ExerciseRow(R.string.exercise_krr_k),
+                ExerciseRow(R.string.exercise_kbb_k)
+        )
+    }
+
 }
