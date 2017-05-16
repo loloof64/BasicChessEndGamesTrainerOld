@@ -6,4 +6,10 @@
     <string name="exercise_kq_k">King+Queen/King</string>
     <string name="exercise_krr_k">King+2Rooks/King</string>
     <string name="exercise_kbb_k">King+2Bishops/King</string>
+    <string name="illegal_move">Illegal move !</string>
+    <string name="promotion_chooser_title">Choosing the promotion piece</string>
+    <string name="promotion_chooser_knight_button">Knight button</string>
+    <string name="promotion_chooser_bishop_button">Bishop button</string>
+    <string name="promotion_chooser_rook_button">Rook button</string>
+    <string name="promotion_chooser_queen_button">Queen button</string>
 </resources>

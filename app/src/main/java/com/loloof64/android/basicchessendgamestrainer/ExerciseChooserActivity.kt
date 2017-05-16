@@ -1,7 +1,9 @@
 package com.loloof64.android.basicchessendgamestrainer
 
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.AdapterView
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExerciseRow
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
 import java.util.logging.Logger
@@ -25,6 +27,10 @@ class ExerciseChooserActivity : AppCompatActivity() {
         (application as MyApplication).uciInteract("go")
 
         exercisesListView.adapter = ExercisesListAdapter(this, generateExercises())
+        exercisesListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, _ ->
+            val intent = Intent(this, PlayingActivity::class.java)
+            startActivity(intent)
+        }
 
     }
 

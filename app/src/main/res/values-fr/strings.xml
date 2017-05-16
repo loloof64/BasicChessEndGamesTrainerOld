@@ -6,4 +6,10 @@
     <string name="exercise_kq_k">Roi+Dame/Roi</string>
     <string name="exercise_krr_k">Roi+2Tours/Roi</string>
     <string name="exercise_kbb_k">Roi+2Fous/Roi</string>
+    <string name="illegal_move">Coup illégal !</string>
+    <string name="promotion_chooser_title">Choix de la pièce de promotion</string>
+    <string name="promotion_chooser_knight_button">Bouton cavalier</string>
+    <string name="promotion_chooser_bishop_button">Bouton fou</string>
+    <string name="promotion_chooser_rook_button">Bouton tour</string>
+    <string name="promotion_chooser_queen_button">Bouton dame</string>
 </resources>

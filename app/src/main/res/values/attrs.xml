@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+   <declare-styleable name="board_component">
+      <attr name="available_space_min_dimension_percentage" format="integer" />
+    </declare-styleable>
+
+</resources>
