@@ -72,7 +72,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     override var _pendingPromotionInfo:PromotionInfo? = null
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val notPlayerTurn = playerHasWhite == _relatedBoard.isBlackMove
+        val notPlayerTurn = _playerHasWhite == _relatedBoard.isBlackMove
         if (notPlayerTurn) return true
 
         val x = event.x
@@ -102,15 +102,20 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         _highlightedCell = Pair(highlightedCellFile, highlightedCellRank)
     }
 
-    fun new_game(startFen: String) {
+    fun playerHasWhite() = _playerHasWhite
+
+    fun new_game(startFen: String, playerHasWhite: Boolean ?) {
         try {
             _relatedBoard = FEN.stringToBoard(startFen) as ChessBoard
-            playerHasWhite = ! _relatedBoard.isBlackMove // player is the first to play (the fen must be chosen wisely)
+            _playerHasWhite = if (playerHasWhite == null) ! _relatedBoard.isBlackMove /*player is the first to play (the fen must be chosen wisely)*/
+                             else playerHasWhite
             invalidate()
         }
         catch (e:IllegalArgumentException) {
             java.util.logging.Logger.getLogger("ChessExercisesTool").severe("Position $startFen is invalid and could not be load.")
         }
+        val isComputerToMove = _playerHasWhite == relatedBoard().isBlackMove
+        if (isComputerToMove) makeComputerPlay()
     }
 
     fun isWhiteToPlay() : Boolean {
@@ -119,7 +124,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     fun makeComputerPlay(){
-        val isComputerToMove = playerHasWhite == relatedBoard().isBlackMove
+        val isComputerToMove = _playerHasWhite == relatedBoard().isBlackMove
         if (isComputerToMove) {
             val myApp = context.applicationContext as MyApplication
             myApp.uciInteract("position fen ${FEN.boardToString(_relatedBoard)}")
@@ -141,6 +146,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         handler.post { invalidate() }
     }
 
-    private var playerHasWhite = true
+    private var _playerHasWhite = true
 
 }

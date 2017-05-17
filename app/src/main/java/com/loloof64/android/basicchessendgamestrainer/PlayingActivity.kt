@@ -2,12 +2,18 @@ package com.loloof64.android.basicchessendgamestrainer
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.os.PersistableBundle
 import android.view.View
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.graphic_board.PromotionPieceChooserDialogFragment
 import kotlinx.android.synthetic.main.activity_playing.*
 
 class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment.Companion.Listener {
+
+    companion object {
+        val currentPositionkey = "CurrentPosition"
+        val playerHasWhiteKey = "PlayerHasWhite"
+    }
 
     override fun reactToPromotionPieceSelection(piece: Int) {
         playingBoard.validatePromotionMove(piece)
@@ -21,6 +27,20 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         /////////////////
         newGame()
         ////////////////////////
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?) {
+        super.onSaveInstanceState(outState)
+        outState?.putString(currentPositionkey, playingBoard.toFEN())
+        outState?.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if (savedInstanceState != null) {
+            newGame(savedInstanceState.getString(currentPositionkey),
+                    savedInstanceState.getBoolean(playerHasWhiteKey))
+        }
     }
 
     fun askForPromotionPiece() {
@@ -37,8 +57,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playingBoard.reverse()
     }
 
-    fun newGame(fen: String = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"){
-        playingBoard.new_game(fen)
+    fun newGame(fen: String = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", playerHasWhite: Boolean? = null){
+        playingBoard.new_game(fen, playerHasWhite)
         (applicationContext as MyApplication).uciNewGame(fen)
     }
 }
