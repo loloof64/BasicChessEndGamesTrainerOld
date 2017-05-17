@@ -1,6 +1,7 @@
 #include <jni.h>
 #include <iostream>
 #include <android/log.h>
+#include <sstream>
 
 #include "bitboard.h"
 #include "position.h"
@@ -28,7 +29,7 @@ void uciCommandCallback(const string &answer){
     JNIEnv *env;
     jint assignRes = callbackWrapper.javaVm->AttachCurrentThread(&env, NULL);
     if (assignRes != JNI_OK){
-        __android_log_print(ANDROID_LOG_DEBUG, "BasicEndgamesTraining", "Failed to get jni env pointer !");
+        __android_log_print(ANDROID_LOG_DEBUG, "BasicEndgamesTraining", "Failed to attach current thread !");
         return;
     }
     jstring nativeString = env->NewStringUTF(answer.c_str());
@@ -38,6 +39,11 @@ void uciCommandCallback(const string &answer){
     if (env->ExceptionOccurred()){
         __android_log_print(ANDROID_LOG_DEBUG, "BasicEndgamesTraining", "Failed to execute the callback !");
         env->ExceptionClear();
+    }
+
+    jint detachSuccess = callbackWrapper.javaVm->DetachCurrentThread();
+    if (detachSuccess != JNI_OK){
+        __android_log_print(ANDROID_LOG_DEBUG, "BasicEndgamesTraining", "Failed to detach current thread !");
     }
 }
 

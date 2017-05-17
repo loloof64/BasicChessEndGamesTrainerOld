@@ -8,13 +8,19 @@ import com.loloof64.android.basicchessendgamestrainer.graphic_board.PromotionPie
 import kotlinx.android.synthetic.main.activity_playing.*
 
 class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment.Companion.Listener {
+
     override fun reactToPromotionPieceSelection(piece: Int) {
         playingBoard.validatePromotionMove(piece)
+        playingBoard.makeComputerPlay()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
+
+        /////////////////
+        newGame()
+        ////////////////////////
     }
 
     fun askForPromotionPiece() {
@@ -29,5 +35,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
 
     fun reverseBoard(view: View) {
         playingBoard.reverse()
+    }
+
+    fun newGame(fen: String = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"){
+        playingBoard.new_game(fen)
+        (applicationContext as MyApplication).uciNewGame(fen)
     }
 }

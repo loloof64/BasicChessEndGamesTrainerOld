@@ -3,14 +3,42 @@ package com.loloof64.android.basicchessendgamestrainer.graphic_board
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
-import ictk.boardgame.chess.ChessBoard
+import com.loloof64.android.basicchessendgamestrainer.UCICommandAnswerCallback
+import ictk.boardgame.chess.*
+import java.lang.ref.WeakReference
+
+class MyUciCommandCallback(playingComponent: PlayableAgainstComputerBoardComponent) : UCICommandAnswerCallback {
+    private val playingComponentRef:WeakReference<PlayableAgainstComputerBoardComponent> = WeakReference(playingComponent)
+
+    override fun execute(answer: String) {
+        playingComponentRef.get()?.processComponentAnswer(answer)
+    }
+}
 
 class PlayableAgainstComputerBoardComponent(context: Context, override val attrs: AttributeSet?,
                              defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr), PieceMoveInteraction {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
+
+    fun Char.toPromotionPiece():ChessPiece {
+        return ChessPiece.toChessPiece(when(this) {
+            'p', 'P' -> Pawn.INDEX
+            'n', 'N' -> Knight.INDEX
+            'b', 'B' -> Bishop.INDEX
+            'r', 'R' -> Rook.INDEX
+            'q', 'Q' -> Queen.INDEX
+            'k', 'K' -> King.INDEX
+            else -> throw RuntimeException("Unrecognized piece char $this")
+        }.toInt())
+    }
+
+    init {
+        (context.applicationContext as MyApplication).setCallbackForUciCommandAnswer(
+                MyUciCommandCallback(this))
+    }
 
     override fun relatedBoard(): ChessBoard {
         return _relatedBoard
@@ -44,6 +72,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     override var _pendingPromotionInfo:PromotionInfo? = null
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        val notPlayerTurn = playerHasWhite == _relatedBoard.isBlackMove
+        if (notPlayerTurn) return true
+
         val x = event.x
         val y = event.y
         val action = event.action
@@ -54,6 +85,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
         if (action == MotionEvent.ACTION_DOWN && file >= 0 && file < 8 && rank >= 0 && rank < 8) {
             if (reversed) reactOnClick(7-file, 7-rank) else reactOnClick(file, rank)
+            invalidate()
+            makeComputerPlay()
         }
 
         return true
@@ -69,9 +102,10 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         _highlightedCell = Pair(highlightedCellFile, highlightedCellRank)
     }
 
-    fun new_game(startFen: String = startPosition) {
+    fun new_game(startFen: String) {
         try {
             _relatedBoard = FEN.stringToBoard(startFen) as ChessBoard
+            playerHasWhite = ! _relatedBoard.isBlackMove // player is the first to play (the fen must be chosen wisely)
             invalidate()
         }
         catch (e:IllegalArgumentException) {
@@ -84,8 +118,29 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         return _relatedBoard.playerToMove == WHITE_PLAYER
     }
 
-    companion object {
-        val startPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+    fun makeComputerPlay(){
+        val isComputerToMove = playerHasWhite == relatedBoard().isBlackMove
+        if (isComputerToMove) {
+            val myApp = context.applicationContext as MyApplication
+            myApp.uciInteract("position fen ${FEN.boardToString(_relatedBoard)}")
+            myApp.uciInteract("go")
+        }
     }
+
+    fun processComponentAnswer(answer: String) {
+        val moveStr = answer.split("\n").filter { it.isNotEmpty() }.last().split(" ")[1]
+        val chessMove = if (moveStr.length > 4) {
+            val (sFile, sRank, eFile, eRank, promotion) = moveStr.toCharArray()
+            ChessMove(_relatedBoard, _relatedBoard.getSquare(sFile, sRank), _relatedBoard.getSquare(eFile, eRank), promotion.toPromotionPiece())
+        }
+        else {
+            val (sFile, sRank, eFile, eRank) = moveStr.toCharArray()
+            ChessMove(_relatedBoard, _relatedBoard.getSquare(sFile, sRank), _relatedBoard.getSquare(eFile, eRank))
+        }
+        _relatedBoard.playMove(chessMove)
+        handler.post { invalidate() }
+    }
+
+    private var playerHasWhite = true
 
 }
