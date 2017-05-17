@@ -12,4 +12,7 @@
     <string name="promotion_chooser_bishop_button">Bouton fou</string>
     <string name="promotion_chooser_rook_button">Bouton tour</string>
     <string name="promotion_chooser_queen_button">Bouton dame</string>
+    <string name="checkmate">Echec et mat !</string>
+    <string name="stalemate">Pat !</string>
+    <string name="fiftyMoveDraw">Nulle par la règle des 50 coups !</string>
 </resources>

@@ -3,8 +3,10 @@ package com.loloof64.android.basicchessendgamestrainer.graphic_board
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
+import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.UCICommandAnswerCallback
 import ictk.boardgame.chess.*
 import java.lang.ref.WeakReference
@@ -73,7 +75,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val notPlayerTurn = _playerHasWhite == _relatedBoard.isBlackMove
-        if (notPlayerTurn) return true
+        if (notPlayerTurn || _gameFinished) return true
 
         val x = event.x
         val y = event.y
@@ -86,7 +88,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         if (action == MotionEvent.ACTION_DOWN && file >= 0 && file < 8 && rank >= 0 && rank < 8) {
             if (reversed) reactOnClick(7-file, 7-rank) else reactOnClick(file, rank)
             invalidate()
-            makeComputerPlay()
+            checkIfGameFinished()
+            if (!_gameFinished) makeComputerPlay()
         }
 
         return true
@@ -104,8 +107,13 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     fun playerHasWhite() = _playerHasWhite
 
+    fun setFinishedState(finished: Boolean){
+        _gameFinished = finished
+    }
+
     fun new_game(startFen: String, playerHasWhite: Boolean ?) {
         try {
+            _gameFinished = false
             _relatedBoard = FEN.stringToBoard(startFen) as ChessBoard
             _playerHasWhite = if (playerHasWhite == null) ! _relatedBoard.isBlackMove /*player is the first to play (the fen must be chosen wisely)*/
                              else playerHasWhite
@@ -142,10 +150,31 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             val (sFile, sRank, eFile, eRank) = moveStr.toCharArray()
             ChessMove(_relatedBoard, _relatedBoard.getSquare(sFile, sRank), _relatedBoard.getSquare(eFile, eRank))
         }
-        _relatedBoard.playMove(chessMove)
-        handler.post { invalidate() }
+        handler.post {
+            _relatedBoard.playMove(chessMove)
+            invalidate()
+            checkIfGameFinished()
+        }
     }
 
+    fun checkIfGameFinished() {
+        if (_relatedBoard.isCheckmate) {
+            Toast.makeText(context, R.string.checkmate, Toast.LENGTH_LONG).show()
+            _gameFinished = true
+        }
+        if (_relatedBoard.isStalemate){
+            Toast.makeText(context, R.string.stalemate, Toast.LENGTH_LONG).show()
+            _gameFinished = true
+        }
+        else if (_relatedBoard.is50MoveRuleApplicible){
+            Toast.makeText(context, R.string.fiftyMoveDraw, Toast.LENGTH_LONG).show()
+            _gameFinished = true
+        }
+    }
+
+    fun gameFinished() = _gameFinished
+
     private var _playerHasWhite = true
+    private var _gameFinished = false
 
 }

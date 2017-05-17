@@ -12,11 +12,13 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     companion object {
         val currentPositionkey = "CurrentPosition"
         val playerHasWhiteKey = "PlayerHasWhite"
+        val gameFinishedKey = "GameFinished"
     }
 
     override fun reactToPromotionPieceSelection(piece: Int) {
         playingBoard.validatePromotionMove(piece)
-        playingBoard.makeComputerPlay()
+        playingBoard.checkIfGameFinished()
+        if (!playingBoard.gameFinished()) playingBoard.makeComputerPlay()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,6 +34,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         super.onSaveInstanceState(outState)
         outState?.putString(currentPositionkey, playingBoard.toFEN())
         outState?.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
+        outState?.putBoolean(gameFinishedKey, playingBoard.gameFinished())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -39,6 +42,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         if (savedInstanceState != null) {
             newGame(savedInstanceState.getString(currentPositionkey),
                     savedInstanceState.getBoolean(playerHasWhiteKey))
+            playingBoard.setFinishedState(savedInstanceState.getBoolean(gameFinishedKey))
         }
     }
 

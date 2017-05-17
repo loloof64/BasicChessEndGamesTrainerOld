@@ -12,4 +12,7 @@
     <string name="promotion_chooser_bishop_button">Bishop button</string>
     <string name="promotion_chooser_rook_button">Rook button</string>
     <string name="promotion_chooser_queen_button">Queen button</string>
+    <string name="checkmate">Checkmate !</string>
+    <string name="stalemate">Stalemate !</string>
+    <string name="fiftyMoveDraw">Draw by the 50 moves rule !</string>
 </resources>
