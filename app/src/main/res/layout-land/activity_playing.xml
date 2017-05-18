@@ -19,6 +19,9 @@
         android:layout_height="wrap_content"
         android:src="@android:drawable/ic_menu_revert"
         android:layout_alignParentRight="true"
+        android:layout_toEndOf="@id/playingBoard"
+        android:layout_toRightOf="@id/playingBoard"
+        android:layout_alignParentEnd="true"
         android:onClick="reverseBoard"/>
 
 </RelativeLayout>
