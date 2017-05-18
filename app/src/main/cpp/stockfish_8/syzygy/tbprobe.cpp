@@ -16,6 +16,7 @@
 #include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <cctype>
 #ifndef _WIN32
 #include <unistd.h>
 #include <sys/mman.h>
@@ -112,7 +113,8 @@ static char *map_file(const char *name, const char *suffix, uint64 *mapping)
                               MAP_SHARED, fd, 0);
     if (data == (char *)(-1)) {
         lock_res << "Could not mmap()"<< name << ".\n" << unlock_res;
-        exit(1);
+        // Laurent Bernabe : replace exit by return
+        return nullptr;
     }
 #else
     DWORD size_low, size_high;
@@ -128,7 +130,8 @@ static char *map_file(const char *name, const char *suffix, uint64 *mapping)
   char *data = (char *)MapViewOfFile(map, FILE_MAP_READ, 0, 0, 0);
   if (data == NULL) {
     lock_res << "MapViewOfFile() failed, name = "<< name << suffix << ", error = "<< GetLastError() <<".\n" << unlock_res;
-    exit(1);
+    // Laurent Bernabe : replace exit by return
+    return;
   }
 #endif
     close_tb(fd);
@@ -160,7 +163,8 @@ static void add_to_hash(struct TBEntry *ptr, uint64 key)
         i++;
     if (i == HSHMAX) {
         lock_res << "HSHMAX too low!\n" << unlock_res;
-        exit(1);
+        // Laurent Bernabe : replace exit by return
+        return;
     } else {
         TB_hash[hshidx][i].key = key;
         TB_hash[hshidx][i].ptr = ptr;
@@ -179,30 +183,32 @@ static void init_tb(char *str)
     char *s;
 
     fd = open_tb(str, WDLSUFFIX);
-    if (fd == FD_ERR) return;
+    if (fd == FD_ERR) {
+        return;
+    }
     close_tb(fd);
 
     for (i = 0; i < 16; i++)
         pcs[i] = 0;
     color = 0;
     for (s = str; *s; s++)
-        switch (*s) {
-            case 'P':
+        switch (*s) { // Laurent Bernabe : using lowercase
+            case 'p':
                 pcs[TB_PAWN | color]++;
                 break;
-            case 'N':
+            case 'n':
                 pcs[TB_KNIGHT | color]++;
                 break;
-            case 'B':
+            case 'b':
                 pcs[TB_BISHOP | color]++;
                 break;
-            case 'R':
+            case 'r':
                 pcs[TB_ROOK | color]++;
                 break;
-            case 'Q':
+            case 'q':
                 pcs[TB_QUEEN | color]++;
                 break;
-            case 'K':
+            case 'k':
                 pcs[TB_KING | color]++;
                 break;
             case 'v':
@@ -217,13 +223,15 @@ static void init_tb(char *str)
     if (pcs[TB_WPAWN] + pcs[TB_BPAWN] == 0) {
         if (TBnum_piece == TBMAX_PIECE) {
             lock_res << "TBMAX_PIECE limit too low!\n" << unlock_res;
-            exit(1);
+            // Laurent Bernabe : replace exit by return
+            return;
         }
         entry = (struct TBEntry *)&TB_piece[TBnum_piece++];
     } else {
         if (TBnum_pawn == TBMAX_PAWN) {
             lock_res << "TBMAX_PAWN limit too low!\n" << unlock_res;
-            exit(1);
+            // Laurent Bernabe : replace exit by return
+            return;
         }
         entry = (struct TBEntry *)&TB_pawn[TBnum_pawn++];
     }
@@ -324,33 +332,33 @@ void Tablebases::init(const std::string& path)
         DTZ_table[i].entry = NULL;
 
     for (i = 1; i < 6; i++) {
-        sprintf(str, "K%cvK", pchr[i]);
+        sprintf(str, "k%cvk", tolower(pchr[i])); // Laurent Bernabe : using lowercase
         init_tb(str);
     }
 
     for (i = 1; i < 6; i++)
         for (j = i; j < 6; j++) {
-            sprintf(str, "K%cvK%c", pchr[i], pchr[j]);
+            sprintf(str, "k%cvk%c", tolower(pchr[i]), tolower(pchr[j])); // Laurent Bernabe : using lowercase
             init_tb(str);
         }
 
     for (i = 1; i < 6; i++)
         for (j = i; j < 6; j++) {
-            sprintf(str, "K%c%cvK", pchr[i], pchr[j]);
+            sprintf(str, "k%c%cvk", tolower(pchr[i]), tolower(pchr[j])); // Laurent Bernabe : using lowercase
             init_tb(str);
         }
 
     for (i = 1; i < 6; i++)
         for (j = i; j < 6; j++)
             for (k = 1; k < 6; k++) {
-                sprintf(str, "K%c%cvK%c", pchr[i], pchr[j], pchr[k]);
+                sprintf(str, "k%c%cvk%c", tolower(pchr[i]), tolower(pchr[j]), tolower(pchr[k])); // Laurent Bernabe : using lowercase
                 init_tb(str);
             }
 
     for (i = 1; i < 6; i++)
         for (j = i; j < 6; j++)
             for (k = j; k < 6; k++) {
-                sprintf(str, "K%c%c%cvK", pchr[i], pchr[j], pchr[k]);
+                sprintf(str, "k%c%c%cvk", tolower(pchr[i]), tolower(pchr[j]), tolower(pchr[k]));  // Laurent Bernabe : using lowercase
                 init_tb(str);
             }
 
@@ -358,7 +366,7 @@ void Tablebases::init(const std::string& path)
         for (j = i; j < 6; j++)
             for (k = i; k < 6; k++)
                 for (l = (i == k) ? j : k; l < 6; l++) {
-                    sprintf(str, "K%c%cvK%c%c", pchr[i], pchr[j], pchr[k], pchr[l]);
+                    sprintf(str, "k%c%cvk%c%c", tolower(pchr[i]), tolower(pchr[j]), tolower(pchr[k]), tolower(pchr[l]));  // Laurent Bernabe : using lowercase
                     init_tb(str);
                 }
 
@@ -366,7 +374,7 @@ void Tablebases::init(const std::string& path)
         for (j = i; j < 6; j++)
             for (k = j; k < 6; k++)
                 for (l = 1; l < 6; l++) {
-                    sprintf(str, "K%c%c%cvK%c", pchr[i], pchr[j], pchr[k], pchr[l]);
+                    sprintf(str, "k%c%c%cvk%c", tolower(pchr[i]), tolower(pchr[j]), tolower(pchr[k]), tolower(pchr[l]));  // Laurent Bernabe : using lowercase
                     init_tb(str);
                 }
 
@@ -374,7 +382,7 @@ void Tablebases::init(const std::string& path)
         for (j = i; j < 6; j++)
             for (k = j; k < 6; k++)
                 for (l = k; l < 6; l++) {
-                    sprintf(str, "K%c%c%c%cvK", pchr[i], pchr[j], pchr[k], pchr[l]);
+                    sprintf(str, "k%c%c%c%cvk", tolower(pchr[i]), tolower(pchr[j]), tolower(pchr[k]), tolower(pchr[l]));  // Laurent Bernabe : using lowercase
                     init_tb(str);
                 }
 

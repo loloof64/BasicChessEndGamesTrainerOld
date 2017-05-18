@@ -125,7 +125,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             invalidate()
         }
         catch (e:IllegalArgumentException) {
-            java.util.logging.Logger.getLogger("ChessExercisesTool").severe("Position $startFen is invalid and could not be load.")
+            java.util.logging.Logger.getLogger("BasicChessEndgamesTrainer").severe("Position $startFen is invalid and could not be load.")
         }
         val isComputerToMove = _playerHasWhite == relatedBoard().isBlackMove
         if (isComputerToMove) makeComputerPlay()

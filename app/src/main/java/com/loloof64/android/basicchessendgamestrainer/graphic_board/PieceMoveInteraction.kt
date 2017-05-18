@@ -95,10 +95,10 @@ interface PieceMoveInteraction {
                     _relatedBoard.playMove(move)
                 } catch (e: IllegalMoveException) {
                     // should not happen
-                    Logger.getLogger("ChessExercisesManager").severe("Illegal move ! (When validating promotion)")
+                    Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
                 } catch (e: OutOfTurnException) {
                     // should not happen
-                    Logger.getLogger("ChessExercisesManager").severe("Out of turn ! (When validating promotion)")
+                    Logger.getLogger("BasicChessEndgamesTrainer").severe("Out of turn ! (When validating promotion)")
                 } finally {
                     _pendingPromotionInfo = null
                     _highlightedCell = null
