@@ -108,7 +108,8 @@ Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciSetAnswerCa
         __android_log_print(ANDROID_LOG_DEBUG, "BasicEndgamesTraining", "Failed to get java vm pointer !");
         return;
     }
-    callbackWrapper.callbackPtr = env->NewGlobalRef(callback);
+    if (callback != nullptr) callbackWrapper.callbackPtr = env->NewGlobalRef(callback);
+    else callbackWrapper.callbackPtr = nullptr;
 
     setCommandAnswerCallback(uciCommandCallback);
 }
