@@ -13,6 +13,9 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val currentPositionkey = "CurrentPosition"
         val playerHasWhiteKey = "PlayerHasWhite"
         val gameFinishedKey = "GameFinished"
+        val positionToSetupKey = "PositionToSetup"
+
+        val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
 
     override fun reactToPromotionPieceSelection(piece: Int) {
@@ -25,9 +28,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
 
-        /////////////////
-        newGame()
-        ////////////////////////
+        newGame(intent.extras?.getString(positionToSetupKey) ?: standardFEN)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
@@ -60,7 +61,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playingBoard.reverse()
     }
 
-    fun newGame(fen: String = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1", playerHasWhite: Boolean? = null){
+    /**
+     * If playerHasWhite is given null, it will be set to the turn of the given fen
+     */
+    fun newGame(fen: String = standardFEN, playerHasWhite: Boolean? = null){
         playingBoard.new_game(fen, playerHasWhite)
         (applicationContext as MyApplication).uciNewGame(fen)
     }

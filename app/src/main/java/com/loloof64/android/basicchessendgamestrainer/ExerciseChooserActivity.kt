@@ -4,8 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.widget.AdapterView
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExerciseRow
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.*
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
 
 class ExerciseChooserActivity : AppCompatActivity() {
@@ -16,8 +15,14 @@ class ExerciseChooserActivity : AppCompatActivity() {
         setContentView(R.layout.activity_exercise_chooser)
 
         exercisesListView.adapter = ExercisesListAdapter(this, generateExercises())
-        exercisesListView.onItemClickListener = AdapterView.OnItemClickListener { _, _, _, _ ->
+        exercisesListView.onItemClickListener = AdapterView.OnItemClickListener { adapter, _, position, _ ->
             val intent = Intent(this, PlayingActivity::class.java)
+            val item = adapter.getItemAtPosition(position) as ExerciseRow
+
+            val bundle = Bundle()
+            bundle.putString(PlayingActivity.positionToSetupKey, item.positionGenerator.generatePosition())
+            intent.putExtras(bundle)
+
             startActivity(intent)
         }
 
@@ -30,9 +35,9 @@ class ExerciseChooserActivity : AppCompatActivity() {
 
     private fun generateExercises() : List<ExerciseRow>{
         return listOf(
-                ExerciseRow(R.string.exercise_kq_k),
-                ExerciseRow(R.string.exercise_krr_k),
-                ExerciseRow(R.string.exercise_kbb_k)
+                ExerciseRow(R.string.exercise_krr_k, KRRvK_PositionGenerator()),
+                ExerciseRow(R.string.exercise_kq_k, KQvK_PositionGenerator()),
+                ExerciseRow(R.string.exercise_kbb_k, KBBvK_PositionGenerator())
         )
     }
 
