@@ -10,12 +10,17 @@ import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.UCICommandAnswerCallback
 import ictk.boardgame.chess.*
 import java.lang.ref.WeakReference
+import java.util.logging.Logger
 
 class MyUciCommandCallback(playingComponent: PlayableAgainstComputerBoardComponent) : UCICommandAnswerCallback {
     private val playingComponentRef:WeakReference<PlayableAgainstComputerBoardComponent> = WeakReference(playingComponent)
 
     override fun execute(answer: String) {
-        playingComponentRef.get()?.processComponentAnswer(answer)
+        if (playingComponentRef.get()?.isReadyToPlay() ?: false) {
+            playingComponentRef.get()?.processComponentMove(answer)
+        } else {
+            playingComponentRef.get()?.notifyPlayerGoal(answer)
+        }
     }
 }
 
@@ -140,8 +145,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
-    fun processComponentAnswer(answer: String) {
-        val moveStr = answer.split("\n").filter { it.isNotEmpty() }.last().split(" ")[1]
+    fun processComponentMove(longUCICommandAnswer: String) {
+        val moveStr = longUCICommandAnswer.split("\n").filter { it.isNotEmpty() }.last().split(" ")[1]
         val chessMove = if (moveStr.length > 4) {
             val (sFile, sRank, eFile, eRank, promotion) = moveStr.toCharArray()
             ChessMove(_relatedBoard, _relatedBoard.getSquare(sFile, sRank), _relatedBoard.getSquare(eFile, eRank), promotion.toPromotionPiece())
@@ -157,24 +162,35 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
+    fun isReadyToPlay() = _readyToPlay
+
     fun checkIfGameFinished() {
         if (_relatedBoard.isCheckmate) {
             Toast.makeText(context, R.string.checkmate, Toast.LENGTH_LONG).show()
             _gameFinished = true
+            _readyToPlay = false
         }
         if (_relatedBoard.isStalemate){
             Toast.makeText(context, R.string.stalemate, Toast.LENGTH_LONG).show()
             _gameFinished = true
+            _readyToPlay = false
         }
         else if (_relatedBoard.is50MoveRuleApplicible){
             Toast.makeText(context, R.string.fiftyMoveDraw, Toast.LENGTH_LONG).show()
             _gameFinished = true
+            _readyToPlay = false
         }
+    }
+    fun notifyPlayerGoal(longUCICommandAnswer: String){
+        val infoLine = longUCICommandAnswer.split("\n").filter { it.isNotEmpty() && it.startsWith("info")}.last()
+        Logger.getLogger("loloof64").info("Position info is : $infoLine")
+        _readyToPlay = true
     }
 
     fun gameFinished() = _gameFinished
 
     private var _playerHasWhite = true
     private var _gameFinished = false
+    private var _readyToPlay = false
 
 }

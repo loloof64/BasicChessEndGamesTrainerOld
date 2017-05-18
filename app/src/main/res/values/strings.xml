@@ -15,4 +15,6 @@
     <string name="checkmate">Checkmate !</string>
     <string name="stalemate">Stalemate !</string>
     <string name="fiftyMoveDraw">Draw by the 50 moves rule !</string>
+    <string name="white_play_for_mate">White play for mate</string>
+    <string name="black_play_for_mate">Black play for mate</string>
 </resources>

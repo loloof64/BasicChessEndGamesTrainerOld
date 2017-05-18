@@ -15,4 +15,6 @@
     <string name="checkmate">Echec et mat !</string>
     <string name="stalemate">Pat !</string>
     <string name="fiftyMoveDraw">Nulle par la règle des 50 coups !</string>
+    <string name="white_play_for_mate">Les Blancs jouent pour le mat</string>
+    <string name="black_play_for_mate">Les Noirs jouent pour le mat</string>
 </resources>

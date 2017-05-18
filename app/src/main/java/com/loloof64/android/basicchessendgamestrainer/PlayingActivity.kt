@@ -67,5 +67,6 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     fun newGame(fen: String = standardFEN, playerHasWhite: Boolean? = null){
         playingBoard.new_game(fen, playerHasWhite)
         (applicationContext as MyApplication).uciNewGame(fen)
+        (applicationContext as MyApplication).uciInteract("go")
     }
 }

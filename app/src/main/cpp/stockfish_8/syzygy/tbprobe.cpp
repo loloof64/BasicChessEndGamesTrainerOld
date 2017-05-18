@@ -111,7 +111,7 @@ static char *map_file(const char *name, const char *suffix, uint64 *mapping)
     char *data = (char *)mmap(NULL, statbuf.st_size, PROT_READ,
                               MAP_SHARED, fd, 0);
     if (data == (char *)(-1)) {
-        printf("Could not mmap() %s.\n", name);
+        lock_res << "Could not mmap()"<< name << ".\n" << unlock_res;
         exit(1);
     }
 #else
@@ -121,13 +121,13 @@ static char *map_file(const char *name, const char *suffix, uint64 *mapping)
   HANDLE map = CreateFileMapping(fd, NULL, PAGE_READONLY, size_high, size_low,
                                   NULL);
   if (map == NULL) {
-    printf("CreateFileMapping() failed.\n");
+    lock_res << "CreateFileMapping() failed.\n" << unlock_res;
     exit(1);
   }
   *mapping = (uint64)map;
   char *data = (char *)MapViewOfFile(map, FILE_MAP_READ, 0, 0, 0);
   if (data == NULL) {
-    printf("MapViewOfFile() failed, name = %s%s, error = %lu.\n", name, suffix, GetLastError());
+    lock_res << "MapViewOfFile() failed, name = "<< name << suffix << ", error = "<< GetLastError() <<".\n" << unlock_res;
     exit(1);
   }
 #endif
@@ -159,7 +159,7 @@ static void add_to_hash(struct TBEntry *ptr, uint64 key)
     while (i < HSHMAX && TB_hash[hshidx][i].ptr)
         i++;
     if (i == HSHMAX) {
-        printf("HSHMAX too low!\n");
+        lock_res << "HSHMAX too low!\n" << unlock_res;
         exit(1);
     } else {
         TB_hash[hshidx][i].key = key;
@@ -216,13 +216,13 @@ static void init_tb(char *str)
     key2 = calc_key_from_pcs(pcs, 1);
     if (pcs[TB_WPAWN] + pcs[TB_BPAWN] == 0) {
         if (TBnum_piece == TBMAX_PIECE) {
-            printf("TBMAX_PIECE limit too low!\n");
+            lock_res << "TBMAX_PIECE limit too low!\n" << unlock_res;
             exit(1);
         }
         entry = (struct TBEntry *)&TB_piece[TBnum_piece++];
     } else {
         if (TBnum_pawn == TBMAX_PAWN) {
-            printf("TBMAX_PAWN limit too low!\n");
+            lock_res << "TBMAX_PAWN limit too low!\n" << unlock_res;
             exit(1);
         }
         entry = (struct TBEntry *)&TB_pawn[TBnum_pawn++];
@@ -378,7 +378,7 @@ void Tablebases::init(const std::string& path)
                     init_tb(str);
                 }
 
-    printf("info string Found %d tablebases.\n", TBnum_piece + TBnum_pawn);
+    lock_res << "info string Found " << TBnum_piece + TBnum_pawn << " tablebases.\n" << unlock_res;
 }
 
 static const signed char offdiag[] = {
@@ -1031,7 +1031,7 @@ static int init_table_wdl(struct TBEntry *entry, char *str)
 
     entry->data = map_file(str, WDLSUFFIX, &entry->mapping);
     if (!entry->data) {
-        printf("Could not find %s" WDLSUFFIX, str);
+        lock_res << "Could not find " << str << WDLSUFFIX << unlock_res;
         return 0;
     }
 
@@ -1040,7 +1040,7 @@ static int init_table_wdl(struct TBEntry *entry, char *str)
         data[1] != WDL_MAGIC[1] ||
         data[2] != WDL_MAGIC[2] ||
         data[3] != WDL_MAGIC[3]) {
-        printf("Corrupted table.\n");
+        lock_res << "Corrupted table.\n" << unlock_res;
         unmap_file(entry->data, entry->mapping);
         entry->data = 0;
         return 0;
@@ -1153,7 +1153,7 @@ static int init_table_dtz(struct TBEntry *entry)
         data[1] != DTZ_MAGIC[1] ||
         data[2] != DTZ_MAGIC[2] ||
         data[3] != DTZ_MAGIC[3]) {
-        printf("Corrupted table.\n");
+        lock_res << "Corrupted table.\n" << unlock_res;
         return 0;
     }
 
