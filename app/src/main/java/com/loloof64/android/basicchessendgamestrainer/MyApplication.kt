@@ -1,6 +1,7 @@
 package com.loloof64.android.basicchessendgamestrainer
 
 import android.app.Application
+import android.content.Context
 import android.content.res.AssetManager
 import java.io.*
 import java.util.logging.Logger
@@ -15,6 +16,13 @@ class MyApplication: Application(){
         init {
             System.loadLibrary("stockfish_8")
         }
+
+        fun getApplicationContext() = appContext
+        fun setApplicationContext(ctx: Context){
+            appContext = ctx
+        }
+
+        lateinit var appContext: Context
     }
 
     private external fun uciStart()
@@ -24,6 +32,7 @@ class MyApplication: Application(){
 
     override fun onCreate() {
         super.onCreate()
+        setApplicationContext(this)
         uciStart()
         uciSetup()
     }

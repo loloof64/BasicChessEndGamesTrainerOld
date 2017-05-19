@@ -30,6 +30,29 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
 
+    companion object {
+        /**
+         * Gets the expected game result from a uci position info line (line starting with info).
+         * @param positionInfoLine - String - the info line to convert.
+         * @return Int - ChessResult constant.
+         */
+        fun positionResultFromPositionInfo(positionInfoLine: String): Int {
+            val infoLineStartingAtScore = positionInfoLine.split("cp ").last()
+            val positionResult = if (infoLineStartingAtScore.startsWith("mate")) {
+                val movesCount = Integer.parseInt(infoLineStartingAtScore.split("\\s+")[1])
+                if (movesCount > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
+            } else {
+                val score = Integer.parseInt(infoLineStartingAtScore.split(" ").first())
+                if (Math.abs(score) > 1000){
+                    if (score > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
+                } else {
+                    if (Math.abs(score) < 50) ChessResult.DRAW else ChessResult.UNDECIDED
+                }
+            }
+            return positionResult
+        }
+    }
+
     fun Char.toPromotionPiece():ChessPiece {
         return ChessPiece.toChessPiece(when(this) {
             'p', 'P' -> Pawn.INDEX
@@ -181,10 +204,18 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             _readyToPlay = false
         }
     }
+
     fun notifyPlayerGoal(longUCICommandAnswer: String){
         val infoLine = longUCICommandAnswer.split("\n").filter { it.isNotEmpty() && it.startsWith("info")}.last()
-        Logger.getLogger("loloof64").info("Position info is : $infoLine")
-        _readyToPlay = true
+        handler.post {
+            when (positionResultFromPositionInfo(infoLine)){
+                ChessResult.WHITE_WIN -> Toast.makeText(MyApplication.getApplicationContext(), R.string.white_play_for_mate, Toast.LENGTH_SHORT).show()
+                ChessResult.BLACK_WIN -> Toast.makeText(MyApplication.getApplicationContext(), R.string.black_play_for_mate, Toast.LENGTH_SHORT).show()
+                ChessResult.DRAW -> Toast.makeText(MyApplication.getApplicationContext(), R.string.should_be_draw, Toast.LENGTH_SHORT).show()
+                ChessResult.UNDECIDED -> {}
+            }
+            _readyToPlay = true
+        }
     }
 
     fun gameFinished() = _gameFinished
