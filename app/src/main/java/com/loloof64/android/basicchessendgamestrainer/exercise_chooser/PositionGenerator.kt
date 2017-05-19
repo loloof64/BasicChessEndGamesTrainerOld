@@ -13,6 +13,24 @@ fun NO_CONSTRAINT(file: Int, rank: Int, board: ChessBoard): Boolean {
     return true
 }
 
+val FILE_A = 0
+val FILE_B = 1
+val FILE_C = 2
+val FILE_D = 3
+val FILE_E = 4
+val FILE_F = 5
+val FILE_G = 6
+val FILE_H = 7
+
+val RANK_1 = 0
+val RANK_2 = 1
+val RANK_3 = 2
+val RANK_4 = 3
+val RANK_5 = 4
+val RANK_6 = 5
+val RANK_7 = 6
+val RANK_8 = 7
+
 class PieceConstraint(val pieceKind: PieceKind, val constraint: Constraint)
 
 class PositionGenerator(val playerKingConstraint: Constraint,
@@ -77,20 +95,26 @@ class PositionGenerator(val playerKingConstraint: Constraint,
 
 val KRRvK_PositionGenerator = PositionGenerator(
      playerKingConstraint = ::NO_CONSTRAINT,
-     oppositeKingConstraint = ::NO_CONSTRAINT,
+     oppositeKingConstraint = {file, rank, board ->
+         (file >= FILE_C && file <= FILE_F) && (rank >= RANK_3 && rank <= RANK_6)
+     },
      otherConstraint = arrayOf()
 )
 
 val KQvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
-        oppositeKingConstraint = ::NO_CONSTRAINT,
+        oppositeKingConstraint = {file, rank, board ->
+            (file >= FILE_C && file <= FILE_F) && (rank >= RANK_3 && rank <= RANK_6)
+        },
         otherConstraint = arrayOf()
 )
 
 
 val KBBvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
-        oppositeKingConstraint = ::NO_CONSTRAINT,
+        oppositeKingConstraint = {file, rank, board ->
+            (file >= FILE_C && file <= FILE_F) && (rank >= RANK_3 && rank <= RANK_6)
+        },
         otherConstraint = arrayOf()
 )
 
