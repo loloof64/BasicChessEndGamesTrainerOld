@@ -35,9 +35,9 @@ class ExerciseChooserActivity : AppCompatActivity() {
 
     private fun generateExercises() : List<ExerciseRow>{
         return listOf(
-                ExerciseRow(R.string.exercise_krr_k, KRRvK_PositionGenerator()),
-                ExerciseRow(R.string.exercise_kq_k, KQvK_PositionGenerator()),
-                ExerciseRow(R.string.exercise_kbb_k, KBBvK_PositionGenerator())
+                ExerciseRow(R.string.exercise_krr_k, KRRvK_PositionGenerator),
+                ExerciseRow(R.string.exercise_kq_k, KQvK_PositionGenerator),
+                ExerciseRow(R.string.exercise_kbb_k, KBBvK_PositionGenerator)
         )
     }
 
