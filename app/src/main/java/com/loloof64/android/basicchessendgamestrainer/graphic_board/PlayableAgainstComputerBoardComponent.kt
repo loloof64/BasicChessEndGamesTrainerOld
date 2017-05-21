@@ -4,11 +4,14 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.Toast
+import chesspresso.Chess
+import chesspresso.move.Move
+import chesspresso.position.FEN
+import chesspresso.position.Position
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.UCICommandAnswerCallback
-import ictk.boardgame.chess.*
 import java.lang.ref.WeakReference
 import java.util.logging.Logger
 
@@ -31,20 +34,37 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     constructor(context: Context) : this(context, null, 0)
 
     companion object {
+
+        enum class ChessResult {
+            WHITE_WIN, BLACK_WIN, DRAW, UNDECIDED
+        }
+
         /**
          * Gets the expected game result from a uci position info line (line starting with info).
          * @param positionInfoLine - String - the info line to convert.
-         * @return Int - ChessResult constant.
+         * @param whiteToMove - Boolean - true if was white to move when the evaluation was done, false otherwise.
+         * @return ChessResult - ChessResult constant.
          */
-        fun positionResultFromPositionInfo(positionInfoLine: String): Int {
-            val infoLineStartingAtScore = positionInfoLine.split("cp ").last()
+        fun positionResultFromPositionInfo(positionInfoLine: String, whiteToMove: Boolean): ChessResult {
+            val infoLineStartingAtScore = positionInfoLine.split("score ").last()
             val positionResult = if (infoLineStartingAtScore.startsWith("mate")) {
-                val movesCount = Integer.parseInt(infoLineStartingAtScore.split("\\s+")[1])
-                if (movesCount > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
+                val movesCount = Integer.parseInt(infoLineStartingAtScore.split(" ")[1])
+                if (whiteToMove) {
+                    if (movesCount > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
+                }
+                else {
+                    if (movesCount > 0) ChessResult.BLACK_WIN else ChessResult.WHITE_WIN
+                }
             } else {
-                val score = Integer.parseInt(infoLineStartingAtScore.split(" ").first())
+                val score = Integer.parseInt(infoLineStartingAtScore.split(" ")[1])
                 if (Math.abs(score) > 1000){
-                    if (score > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
+                    if (whiteToMove) {
+                        if (score > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
+                    }
+                    else {
+                        if (score > 0) ChessResult.BLACK_WIN else ChessResult.WHITE_WIN
+                    }
+
                 } else {
                     if (Math.abs(score) < 50) ChessResult.DRAW else ChessResult.UNDECIDED
                 }
@@ -53,16 +73,28 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
-    fun Char.toPromotionPiece():ChessPiece {
-        return ChessPiece.toChessPiece(when(this) {
-            'p', 'P' -> Pawn.INDEX
-            'n', 'N' -> Knight.INDEX
-            'b', 'B' -> Bishop.INDEX
-            'r', 'R' -> Rook.INDEX
-            'q', 'Q' -> Queen.INDEX
-            'k', 'K' -> King.INDEX
+    fun Char.toFile(): Int {
+        val intValue = this.toInt()
+        if (intValue < 97 || intValue > 104) throw IllegalArgumentException("ToFile() no applicable for $this")
+        return intValue - 97
+    }
+
+    fun Char.toRank(): Int {
+        val intValue = this.toInt()
+        if (intValue < 49 || intValue > 56) throw IllegalArgumentException("ToRank() no applicable for $this")
+        return intValue - 49
+    }
+
+    fun Char.toPromotionPiece():Int {
+        return when(this) {
+            'p', 'P' -> Chess.PAWN
+            'n', 'N' -> Chess.KNIGHT
+            'b', 'B' -> Chess.BISHOP
+            'r', 'R' -> Chess.ROOK
+            'q', 'Q' -> Chess.QUEEN
+            'k', 'K' -> Chess.KING
             else -> throw RuntimeException("Unrecognized piece char $this")
-        }.toInt())
+        }.toInt()
     }
 
     init {
@@ -70,12 +102,12 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                 MyUciCommandCallback(this))
     }
 
-    override fun relatedBoard(): ChessBoard {
-        return _relatedBoard
+    override fun relatedPosition(): Position {
+        return _relatedPosition
     }
 
-    override fun replaceBoardWith(board: ChessBoard) {
-        _relatedBoard = board
+    override fun replacePositionWith(board: Position) {
+        _relatedPosition = board
     }
 
     override fun highlightedCell(): Pair<Int, Int>? {
@@ -97,12 +129,13 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     // Fields from PieceMoveInteraction interface
-    override var _relatedBoard = ChessBoard()
+    override var _relatedPosition = Position()
     override var _highlightedCell:Pair<Int, Int>? = null
     override var _pendingPromotionInfo:PromotionInfo? = null
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val notPlayerTurn = _playerHasWhite == _relatedBoard.isBlackMove
+        val whiteTurn = _relatedPosition.toPlay == Chess.WHITE
+        val notPlayerTurn = _playerHasWhite != whiteTurn
         if (notPlayerTurn || _gameFinished) return true
 
         val x = event.x
@@ -142,44 +175,66 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     fun new_game(startFen: String, playerHasWhite: Boolean ?) {
         try {
             _gameFinished = false
-            _relatedBoard = FEN.stringToBoard(startFen) as ChessBoard
-            _playerHasWhite = if (playerHasWhite == null) ! _relatedBoard.isBlackMove /*player is the first to play (the fen must be chosen wisely)*/
-                             else playerHasWhite
+            _relatedPosition = Position(startFen)
+            _playerHasWhite = if (playerHasWhite == null) isWhiteToPlay()
+            else playerHasWhite
             invalidate()
         }
         catch (e:IllegalArgumentException) {
             java.util.logging.Logger.getLogger("BasicChessEndgamesTrainer").severe("Position $startFen is invalid and could not be load.")
         }
-        val isComputerToMove = _playerHasWhite == relatedBoard().isBlackMove
+        val isComputerToMove = _playerHasWhite != isWhiteToPlay()
         if (isComputerToMove) makeComputerPlay()
     }
 
     fun isWhiteToPlay() : Boolean {
-        val WHITE_PLAYER = 0
-        return _relatedBoard.playerToMove == WHITE_PLAYER
+        return _relatedPosition.toPlay == Chess.WHITE
     }
 
     fun makeComputerPlay(){
-        val isComputerToMove = _playerHasWhite == relatedBoard().isBlackMove
+        val isComputerToMove = _playerHasWhite != isWhiteToPlay()
         if (isComputerToMove) {
             val myApp = context.applicationContext as MyApplication
-            myApp.uciInteract("position fen ${FEN.boardToString(_relatedBoard)}")
+            myApp.uciInteract("position fen ${FEN.getFEN(_relatedPosition)}")
             myApp.uciInteract("go")
         }
     }
 
     fun processComponentMove(longUCICommandAnswer: String) {
         val moveStr = longUCICommandAnswer.split("\n").filter { it.isNotEmpty() }.last().split(" ")[1]
-        val chessMove = if (moveStr.length > 4) {
+        val chessMovePossibilities = if (moveStr.length > 4) {
             val (sFile, sRank, eFile, eRank, promotion) = moveStr.toCharArray()
-            ChessMove(_relatedBoard, _relatedBoard.getSquare(sFile, sRank), _relatedBoard.getSquare(eFile, eRank), promotion.toPromotionPiece())
+            _relatedPosition.allMoves.filter { currentMove ->
+                val currentMoveIsPromotion = Move.isPromotion(currentMove)
+                val currentMoveFrom = Move.getFromSqi(currentMove)
+                val currentMoveTo = Move.getToSqi(currentMove)
+                val currentMovePromotionPiece = Move.getPromotionPiece(currentMove)
+
+                val commandMoveFrom = Chess.coorToSqi(sFile.toFile(), sRank.toRank())
+                val commandMoveTo = Chess.coorToSqi(eFile.toFile(), eRank.toRank())
+
+                currentMoveIsPromotion
+                        && commandMoveFrom == currentMoveFrom
+                        && commandMoveTo == currentMoveTo
+                        && currentMovePromotionPiece == promotion.toPromotionPiece()
+            }
         }
         else {
             val (sFile, sRank, eFile, eRank) = moveStr.toCharArray()
-            ChessMove(_relatedBoard, _relatedBoard.getSquare(sFile, sRank), _relatedBoard.getSquare(eFile, eRank))
+            _relatedPosition.allMoves.filter { currentMove ->
+                val currentMoveFrom = Move.getFromSqi(currentMove)
+                val currentMoveTo = Move.getToSqi(currentMove)
+
+                val commandMoveFrom = Chess.coorToSqi(sFile.toFile(), sRank.toRank())
+                val commandMoveTo = Chess.coorToSqi(eFile.toFile(), eRank.toRank())
+
+                commandMoveFrom == currentMoveFrom
+                        && commandMoveTo == currentMoveTo
+            }
         }
         handler.post {
-            _relatedBoard.playMove(chessMove)
+            if (chessMovePossibilities.isEmpty()) reactForIllegalMove()
+            else _relatedPosition.doMove(chessMovePossibilities.first())
             invalidate()
             checkIfGameFinished()
         }
@@ -188,17 +243,17 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     fun isReadyToPlay() = _readyToPlay
 
     fun checkIfGameFinished() {
-        if (_relatedBoard.isCheckmate) {
+        if (_relatedPosition.isMate) {
             Toast.makeText(context, R.string.checkmate, Toast.LENGTH_LONG).show()
             _gameFinished = true
             _readyToPlay = false
         }
-        if (_relatedBoard.isStalemate){
+        if (_relatedPosition.isStaleMate){
             Toast.makeText(context, R.string.stalemate, Toast.LENGTH_LONG).show()
             _gameFinished = true
             _readyToPlay = false
         }
-        else if (_relatedBoard.is50MoveRuleApplicible){
+        else if (_relatedPosition.halfMoveClock >= 100){
             Toast.makeText(context, R.string.fiftyMoveDraw, Toast.LENGTH_LONG).show()
             _gameFinished = true
             _readyToPlay = false
@@ -208,7 +263,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     fun notifyPlayerGoal(longUCICommandAnswer: String){
         val infoLine = longUCICommandAnswer.split("\n").filter { it.isNotEmpty() && it.startsWith("info")}.last()
         handler.post {
-            when (positionResultFromPositionInfo(infoLine)){
+            Logger.getLogger("BasicChessEndgamesTrainer").info("UCI info is '$infoLine'")
+            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
+            when (positionResultFromPositionInfo(infoLine, isWhiteTurn)){
                 ChessResult.WHITE_WIN -> Toast.makeText(MyApplication.getApplicationContext(), R.string.white_play_for_mate, Toast.LENGTH_SHORT).show()
                 ChessResult.BLACK_WIN -> Toast.makeText(MyApplication.getApplicationContext(), R.string.black_play_for_mate, Toast.LENGTH_SHORT).show()
                 ChessResult.DRAW -> Toast.makeText(MyApplication.getApplicationContext(), R.string.should_be_draw, Toast.LENGTH_SHORT).show()

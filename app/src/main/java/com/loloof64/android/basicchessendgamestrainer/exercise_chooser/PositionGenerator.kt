@@ -1,15 +1,28 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
-import ictk.boardgame.chess.ChessBoard
-import ictk.boardgame.chess.ChessPiece
-import ictk.boardgame.chess.Square
-import ictk.boardgame.chess.io.FEN
+import chesspresso.Chess
+import chesspresso.position.FEN
+import chesspresso.position.Position
 import java.util.*
+import java.util.logging.Logger
 
-data class PieceKind(val pieceClass:Class<out ChessPiece>, val ofPlayerSide: Boolean)
-typealias Constraint = (file: Int, rank: Int, board: ChessBoard) -> Boolean
+data class PieceKind(val pieceType: Short, val ofPlayerSide: Boolean)
+data class PieceKindCount(val pieceKind: PieceKind, val count: Int)
+data class BoardCoordinate(val file: Int, val rank: Int)
+/*
+ * Constraint based on the piece coordinate and general position consideration
+ */
+typealias Constraint = (coord: BoardCoordinate, position: Position) -> Boolean
 
-fun NO_CONSTRAINT(file: Int, rank: Int, board: ChessBoard): Boolean {
+/*
+ * Constraint based on 2 pieces of the same kind (so taking into account the piece class and
+ * the fact that they belong or not to player) and general position consideration
+ */
+typealias MutualConstraint = (firstBoardCoord: BoardCoordinate,
+                              secondBoardCoord: BoardCoordinate,
+                              position: Position) -> Boolean
+
+fun NO_CONSTRAINT(coord: BoardCoordinate, position: Position): Boolean {
     return true
 }
 
@@ -31,39 +44,65 @@ val RANK_6 = 5
 val RANK_7 = 6
 val RANK_8 = 7
 
-class PieceConstraint(val pieceKind: PieceKind, val constraint: Constraint)
+fun Int.loops(callback : (Int) -> Unit) {
+    for (i in 0 until this) callback(i)
+}
+
+/**
+ * Builds a PieceKind of player from 'P', 'N', 'B', 'R', 'Q' or 'K'.
+ * Other character will throw exception !
+ */
+val Char.p: PieceKind
+        get() = when (this){
+            'P' -> PieceKind(pieceType = Chess.PAWN, ofPlayerSide = true)
+            'N' -> PieceKind(pieceType = Chess.KNIGHT, ofPlayerSide = true)
+            'B' -> PieceKind(pieceType = Chess.BISHOP, ofPlayerSide = true)
+            'R' -> PieceKind(pieceType = Chess.ROOK, ofPlayerSide = true)
+            'Q' -> PieceKind(pieceType = Chess.QUEEN, ofPlayerSide = true)
+            'K' -> PieceKind(pieceType = Chess.KING, ofPlayerSide = true)
+            else -> throw IllegalArgumentException("p() not usable for char $this.")
+        }
+
+/**
+ * Builds a PieceKind of enemy from 'P', 'N', 'B', 'R', 'Q' or 'K'.
+ * Other character will throw exception !
+ */
+val Char.e : PieceKind
+        get() = when (this){
+            'P' -> PieceKind(pieceType = Chess.PAWN, ofPlayerSide = false)
+            'N' -> PieceKind(pieceType = Chess.KNIGHT, ofPlayerSide = false)
+            'B' -> PieceKind(pieceType = Chess.BISHOP, ofPlayerSide = false)
+            'R' -> PieceKind(pieceType = Chess.ROOK, ofPlayerSide = false)
+            'Q' -> PieceKind(pieceType = Chess.QUEEN, ofPlayerSide = false)
+            'K' -> PieceKind(pieceType = Chess.KING, ofPlayerSide = false)
+            else -> throw IllegalArgumentException("e() not usable for char $this.")
+        }
 
 class PositionGenerator(val playerKingConstraint: Constraint,
                         val oppositeKingConstraint: Constraint,
-                        val otherConstraint: Array<Constraint>) {
+                        val otherPiecesCount: Array<PieceKindCount>,
+                        val otherPiecesGlobalConstraint: Map<PieceKind, Constraint>,
+                        val otherPiecesMutualConstraint: Map<PieceKind, MutualConstraint>) {
 
     fun generatePosition(playerHasWhite: Boolean = true): String {
-        _boardPieces = Array(8, {_ -> kotlin.CharArray(8, {_ -> ' '})})
+        _position = Position()
         placeKings(playerHasWhite)
         placeOtherPieces(playerHasWhite)
-        val board = ChessBoard()
-        board.setPosition(_boardPieces)
-        return FEN().boardToString(board)
-    }
-
-    private fun cloneBoardPieces(refToClone: Array<CharArray>):Array<CharArray> {
-        val arrayToReturn = Array(8, {_ -> kotlin.CharArray(8,  {_ -> ' '})})
-        refToClone.forEachIndexed{index, chars -> arrayToReturn[index] = chars.clone()}
-        return arrayToReturn
+        _position.plyNumber = 1
+        Logger.getLogger("BasicChessEndgamesTrainer").info("Generated position is '${FEN.getFEN(_position)}'")
+        return FEN.getFEN(_position)
     }
 
     private fun placeKings(playerHasWhite: Boolean){
-        val board = ChessBoard()
         while (true){ // setting up player king
             val kingFile = _random.nextInt(8)
             val kingRank = _random.nextInt(8)
 
-            val boardPiecesClone = cloneBoardPieces(_boardPieces)
-            if (boardPiecesClone[kingFile][kingRank] in "PNBRQKpnbrqk") continue
-            boardPiecesClone[kingFile][kingRank] = if (playerHasWhite) 'K' else 'k'
-            board.setPosition(boardPiecesClone)
-            if (playerKingConstraint(kingFile, kingRank, board)) {
-                _boardPieces = cloneBoardPieces(boardPiecesClone)
+            val tempPosition = Position(_position)
+            tempPosition.setStone(kingFile + 8*kingRank,
+                    (if (playerHasWhite) Chess.WHITE_KING else Chess.BLACK_KING).toInt())
+            if (playerKingConstraint(BoardCoordinate(kingFile, kingRank), tempPosition)) {
+                _position = Position(tempPosition)
                 break
             }
         }
@@ -71,50 +110,109 @@ class PositionGenerator(val playerKingConstraint: Constraint,
             val kingFile = _random.nextInt(8)
             val kingRank = _random.nextInt(8)
 
-            val boardPiecesClone = cloneBoardPieces(_boardPieces)
-            if (boardPiecesClone[kingFile][kingRank] in "PNBRQKpnbrqk") continue
-            boardPiecesClone[kingFile][kingRank] = if (!playerHasWhite) 'K' else 'k'
-            board.setPosition(boardPiecesClone)
-            // If the new placed king is threatened by the other
-            if (board.isThreatened(Square((kingFile+1).toByte(),
-                    (kingRank+1).toByte()), playerHasWhite)) continue
-            if (oppositeKingConstraint(kingFile, kingRank, board)) {
-                _boardPieces = cloneBoardPieces(boardPiecesClone)
+            val tempPosition = Position(_position)
+            val cellNotEmpty = tempPosition.getStone(kingFile + 8*kingRank).toShort() != Chess.NO_STONE
+            if (cellNotEmpty) continue
+            tempPosition.setStone(kingFile + 8*kingRank,
+                    (if (playerHasWhite) Chess.BLACK_KING else Chess.WHITE_KING).toInt())
+            // If the enemy king is threatened, will go into another try
+            tempPosition.toPlay = if (playerHasWhite) Chess.WHITE else Chess.BLACK
+            val enemyKingInChess = tempPosition.isCheck
+            tempPosition.toPlay = if (playerHasWhite) Chess.BLACK else Chess.WHITE
+            if (enemyKingInChess) continue
+
+            if (oppositeKingConstraint(BoardCoordinate(kingFile, kingRank), tempPosition)) {
+                _position = Position(tempPosition)
                 break
             }
         }
     }
 
     private fun placeOtherPieces(playerHasWhite: Boolean){
+        otherPiecesCount.forEach { pieceKindCount ->
+            val savedCoordinates = arrayListOf<BoardCoordinate>()
+            val pieceKindConstraint = otherPiecesGlobalConstraint[pieceKindCount.pieceKind]
+            val pieceKindMutualConstraint = otherPiecesMutualConstraint[pieceKindCount.pieceKind]
+            pieceKindCount.count.loops { i ->
+                while (true) {
+                    val pieceFile = _random.nextInt(8)
+                    val pieceRank = _random.nextInt(8)
+                    val currentCoordinate = BoardCoordinate(pieceFile, pieceRank)
 
+                    val tempPosition = _position.clone
+                    val cellNotEmpty = tempPosition.getStone(pieceFile + 8*pieceRank).toShort() != Chess.NO_STONE
+                    if (cellNotEmpty) continue
+                    val isWhitePiece = (pieceKindCount.pieceKind.ofPlayerSide && playerHasWhite)
+                    || (!pieceKindCount.pieceKind.ofPlayerSide && !playerHasWhite)
+                    tempPosition.setStone(pieceFile + 8*pieceRank, pieceToStone(pieceKindCount.pieceKind, isWhitePiece))
+                    // If the enemy king is threatened, will go into another try
+                    tempPosition.toPlay = if (playerHasWhite) Chess.BLACK else Chess.WHITE
+                    val enemyKingInChess = tempPosition.isCheck
+                    tempPosition.toPlay = if (playerHasWhite) Chess.WHITE else Chess.BLACK
+                    if (enemyKingInChess) continue
+
+                    // If for any previous piece of same kind, mutual constraint is not respected, will go into another try
+                    if (pieceKindMutualConstraint != null &&
+                            savedCoordinates.any { !pieceKindMutualConstraint(it, currentCoordinate, tempPosition) }) continue
+
+                    if (pieceKindConstraint == null || pieceKindConstraint(currentCoordinate, tempPosition)){
+                        _position = tempPosition.clone
+                        savedCoordinates += BoardCoordinate(pieceFile, pieceRank)
+                        break
+                    }
+                }
+            }
+        }
     }
 
-    private var _boardPieces:Array<CharArray> = Array(8, {_ -> kotlin.CharArray(8,  {_ -> ' '})})
+    private fun pieceToStone(pieceKind: PieceKind, whitePiece: Boolean): Int {
+        return when(pieceKind.pieceType){
+            Chess.PAWN -> if (whitePiece) Chess.WHITE_PAWN else Chess.BLACK_PAWN
+            Chess.KNIGHT -> if (whitePiece) Chess.WHITE_KNIGHT else Chess.BLACK_KNIGHT
+            Chess.BISHOP -> if (whitePiece) Chess.WHITE_BISHOP else Chess.BLACK_BISHOP
+            Chess.ROOK -> if (whitePiece) Chess.WHITE_ROOK else Chess.BLACK_ROOK
+            Chess.QUEEN -> if (whitePiece) Chess.WHITE_QUEEN else Chess.BLACK_QUEEN
+            Chess.KING -> if (whitePiece) Chess.WHITE_KING else Chess.BLACK_KING
+            else -> Chess.NO_STONE
+        }.toInt()
+    }
+
+    private var _position = Position()
     private val _random = Random()
 }
 
 val KRRvK_PositionGenerator = PositionGenerator(
      playerKingConstraint = ::NO_CONSTRAINT,
-     oppositeKingConstraint = {file, rank, board ->
-         (file >= FILE_C && file <= FILE_F) && (rank >= RANK_3 && rank <= RANK_6)
+     oppositeKingConstraint = {(file, rank), position ->
+         (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
      },
-     otherConstraint = arrayOf()
+     otherPiecesCount = arrayOf(PieceKindCount('R'.p, 2)),
+     otherPiecesGlobalConstraint = mapOf<PieceKind, Constraint>(),
+     otherPiecesMutualConstraint = mapOf()
 )
 
 val KQvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
-        oppositeKingConstraint = {file, rank, board ->
-            (file >= FILE_C && file <= FILE_F) && (rank >= RANK_3 && rank <= RANK_6)
+        oppositeKingConstraint = {(file, rank), position ->
+            (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
         },
-        otherConstraint = arrayOf()
+        otherPiecesCount = arrayOf(PieceKindCount('Q'.p, 1)),
+        otherPiecesGlobalConstraint = mapOf<PieceKind, Constraint>(),
+        otherPiecesMutualConstraint = mapOf()
 )
 
 
 val KBBvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
-        oppositeKingConstraint = {file, rank, board ->
-            (file >= FILE_C && file <= FILE_F) && (rank >= RANK_3 && rank <= RANK_6)
+        oppositeKingConstraint = {(file, rank), position ->
+            (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
         },
-        otherConstraint = arrayOf()
+        otherPiecesCount = arrayOf(PieceKindCount('B'.p, 2)),
+        otherPiecesGlobalConstraint = mapOf<PieceKind, Constraint>(),
+        otherPiecesMutualConstraint = mapOf('B'.p to {first, second, position ->
+            val firstSquareIsBlack = (first.file + first.rank) % 2 > 0
+            val secondSquareIsBlack = (second.file + second.rank) % 2 > 0
+            firstSquareIsBlack != secondSquareIsBlack
+        })
 )
 

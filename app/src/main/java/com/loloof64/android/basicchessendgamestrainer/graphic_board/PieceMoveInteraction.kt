@@ -1,9 +1,9 @@
 package com.loloof64.android.basicchessendgamestrainer.graphic_board
 
-import ictk.boardgame.IllegalMoveException
-import ictk.boardgame.OutOfTurnException
-import ictk.boardgame.chess.ChessBoard
-import ictk.boardgame.chess.ChessMove
+import chesspresso.Chess
+import chesspresso.move.Move
+import chesspresso.position.Position
+import java.util.*
 import java.util.logging.Logger
 
 data class PromotionInfo(val startFile: Int, val startRank: Int,
@@ -13,7 +13,7 @@ interface PieceMoveInteraction {
 
     var _highlightedCell: Pair<Int, Int>?
 
-    var _relatedBoard: ChessBoard
+    var _relatedPosition: Position
     var _pendingPromotionInfo: PromotionInfo?
 
     fun reactForIllegalMove() : Unit
@@ -24,57 +24,44 @@ interface PieceMoveInteraction {
         require(cellFileIndex >= 0 && cellFileIndex < 8)
         require(cellRankIndex >= 0 && cellRankIndex < 8)
 
-        val realFile = cellFileIndex + 1
-        val realRank = cellRankIndex + 1
-
         if (_highlightedCell != null) {
             // move validation
             val startFile = _highlightedCell!!.first
             val startRank = _highlightedCell!!.second
 
-            val realStartFile = startFile + 1
-            val realStartRank = startRank + 1
-
-            val pieceAtStartCellIsPawn = _relatedBoard.toCharArray()[startFile][startRank].toLowerCase() == 'p'
-            val isWhiteTurn = _relatedBoard.playerToMove == 0
+            val pieceAtStartCellIsPawn = _relatedPosition.getPiece(Chess.coorToSqi(startFile, startRank)).toShort() == Chess.PAWN
+            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
             val isPromotionMove = pieceAtStartCellIsPawn && (if (isWhiteTurn) cellRankIndex == 7 else cellRankIndex == 0)
 
-            val pieceAtStartCellIsKing = _relatedBoard.toCharArray()[startFile][startRank].toLowerCase() == 'k'
-
-            val deltaFile = cellFileIndex - startFile
-            val deltaRank = cellRankIndex - startRank
-            val isKingSideCastlingMove = pieceAtStartCellIsKing && deltaFile == 2 && deltaRank == 0
-            val isQueenSideCastlingMove = pieceAtStartCellIsKing && deltaFile == -2 && deltaRank == 0
-
             if (isPromotionMove) {
-                _pendingPromotionInfo = PromotionInfo(realStartFile, realStartRank, realFile, realRank)
+                _pendingPromotionInfo = PromotionInfo(startFile, startRank, cellFileIndex, cellRankIndex)
                 askForPromotionPiece()
             }
             else {
-                try {
-                    val move = if (isKingSideCastlingMove) ChessMove(_relatedBoard, ChessMove.CASTLE_KINGSIDE)
-                    else if(isQueenSideCastlingMove) ChessMove(_relatedBoard, ChessMove.CASTLE_QUEENSIDE)
-                    else ChessMove(_relatedBoard, realStartFile, realStartRank, realFile, realRank)
-                    _relatedBoard.playMove(move)
+                val matchMoves = _relatedPosition.allMoves.filter { currentMove ->
+                    val currentMoveFrom = Move.getFromSqi(currentMove)
+                    val currentMoveTo = Move.getToSqi(currentMove)
+
+                    val commandMoveFrom = Chess.coorToSqi(startFile, startRank)
+                    val commandMoveTo = Chess.coorToSqi(cellFileIndex, cellRankIndex)
+
+                    (commandMoveFrom == currentMoveFrom)
+                            && (commandMoveTo == currentMoveTo)
                 }
-                catch (e: IllegalMoveException) {
-                    if (realStartFile != realFile || realStartRank != realRank) reactForIllegalMove()
+                if (matchMoves.isEmpty()) reactForIllegalMove()
+                else {
+                    _relatedPosition.doMove(matchMoves.first())
                 }
-                catch (e: OutOfTurnException) {
-                    if (realStartFile != realFile || realStartRank != realRank) reactForIllegalMove()
-                } finally {
-                    _highlightedCell = null
-                }
+                _highlightedCell = null
             }
         } else {
             // move start
-            val NO_PIECE = null
-            val movedPiece = _relatedBoard.toCharArray()[cellFileIndex][cellRankIndex]
-            val isOccupiedSquare = movedPiece != NO_PIECE
-            val isWhiteTurn = _relatedBoard.playerToMove == 0
-            val isBlackTurn = _relatedBoard.playerToMove > 0
-            val isWhitePiece = movedPiece.isUpperCase()
-            val isBlackPiece = movedPiece.isLowerCase()
+            val movedPiece = _relatedPosition.getStone(Chess.coorToSqi(cellFileIndex, cellRankIndex)).toShort()
+            val isOccupiedSquare = movedPiece != Chess.NO_PIECE
+            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
+            val isBlackTurn = _relatedPosition.toPlay != Chess.WHITE
+            val isWhitePiece = movedPiece < 0
+            val isBlackPiece = movedPiece > 0
             val isOneOfOurPiece = (isWhiteTurn && isWhitePiece) || (isBlackTurn && isBlackPiece)
 
             _highlightedCell = if (isOccupiedSquare && isOneOfOurPiece) Pair(cellFileIndex, cellRankIndex) else null
@@ -83,27 +70,18 @@ interface PieceMoveInteraction {
         invalidate()
     }
 
-    fun validatePromotionMove(promotedPieceType: Int) {
+    fun validatePromotionMove(promotedPieceType: Short) {
         when(_pendingPromotionInfo) {
             null -> {}
             else -> {
-                try {
-                    val move = ChessMove(_relatedBoard,
-                            _pendingPromotionInfo!!.startFile, _pendingPromotionInfo!!.startRank,
-                            _pendingPromotionInfo!!.endFile, _pendingPromotionInfo!!.endRank,
-                            promotedPieceType)
-                    _relatedBoard.playMove(move)
-                } catch (e: IllegalMoveException) {
-                    // should not happen
-                    Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
-                } catch (e: OutOfTurnException) {
-                    // should not happen
-                    Logger.getLogger("BasicChessEndgamesTrainer").severe("Out of turn ! (When validating promotion)")
-                } finally {
-                    _pendingPromotionInfo = null
-                    _highlightedCell = null
-                    invalidate()
-                }
+                val move = _relatedPosition.getPawnMove(_pendingPromotionInfo!!.startFile,
+                        Chess.coorToSqi(_pendingPromotionInfo!!.endFile, _pendingPromotionInfo!!.endRank),
+                        promotedPieceType.toInt())
+                if (move == Move.ILLEGAL_MOVE) Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
+                else _relatedPosition.doMove(move)
+                _pendingPromotionInfo = null
+                _highlightedCell = null
+                invalidate()
             }
         }
     }
