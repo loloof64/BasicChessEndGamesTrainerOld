@@ -14,6 +14,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val playerHasWhiteKey = "PlayerHasWhite"
         val gameFinishedKey = "GameFinished"
         val positionToSetupKey = "PositionToSetup"
+        val lastExerciseKey = "LastExercise"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -36,14 +37,16 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putString(currentPositionkey, playingBoard.toFEN())
         outState?.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
         outState?.putBoolean(gameFinishedKey, playingBoard.gameFinished())
+        outState?.putString(lastExerciseKey, lastExercise)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
         if (savedInstanceState != null) {
-            newGame(savedInstanceState.getString(currentPositionkey),
-                    savedInstanceState.getBoolean(playerHasWhiteKey))
-            playingBoard.setFinishedState(savedInstanceState.getBoolean(gameFinishedKey))
+            playingBoard.reloadPosition(fen = savedInstanceState.getString(currentPositionkey),
+                    playerHasWhite = savedInstanceState.getBoolean(playerHasWhiteKey),
+                    gameFinished = savedInstanceState.getBoolean(gameFinishedKey))
+            lastExercise = savedInstanceState.getString(lastExerciseKey)
         }
     }
 
@@ -64,9 +67,16 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     /**
      * If playerHasWhite is given null, it will be set to the turn of the given fen
      */
-    fun newGame(fen: String = standardFEN, playerHasWhite: Boolean? = null){
-        playingBoard.new_game(fen, playerHasWhite)
+    fun newGame(fen: String = standardFEN){
+        lastExercise = fen
+        playingBoard.new_game(fen)
         (applicationContext as MyApplication).uciNewGame(fen)
         (applicationContext as MyApplication).uciInteract("go")
     }
+
+    fun restartLastExercise(view: View){
+        playingBoard.new_game(lastExercise)
+    }
+
+    private lateinit var lastExercise:String
 }

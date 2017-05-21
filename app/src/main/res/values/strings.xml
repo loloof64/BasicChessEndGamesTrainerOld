@@ -20,4 +20,5 @@
     <string name="should_be_draw">It should be draw</string>
     <string name="exercise_kr_k">King+Rook/King</string>
     <string name="custom_generator">Custom generator</string>
+    <string name="position_generation_error">Failed to generate position !</string>
 </resources>

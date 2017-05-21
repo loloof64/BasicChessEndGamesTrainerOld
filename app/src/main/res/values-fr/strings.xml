@@ -20,4 +20,5 @@
     <string name="exercise_kr_k">Roi+Tour/Roi</string>
     <string name="should_be_draw">Cela devrait être nulle !</string>
     <string name="custom_generator">Générateur personnel</string>
+    <string name="position_generation_error">Echec de génération de position !</string>
 </resources>

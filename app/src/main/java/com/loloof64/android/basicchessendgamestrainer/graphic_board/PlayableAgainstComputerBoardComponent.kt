@@ -150,41 +150,44 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             if (reversed) reactOnClick(7-file, 7-rank) else reactOnClick(file, rank)
             invalidate()
             checkIfGameFinished()
-            if (!_gameFinished) makeComputerPlay()
+            if (!_gameFinished) {
+                val computerToPlay = _playerHasWhite != isWhiteToPlay()
+                if (computerToPlay) makeComputerPlay()
+            }
         }
 
         return true
     }
 
-    fun isReversed() : Boolean = reversed
-
-    fun setReversedState(newReversedState: Boolean) {
-        reversed = newReversedState
-    }
-
-    fun activateHighlightedCell(highlightedCellFile : Int, highlightedCellRank : Int) {
-        _highlightedCell = Pair(highlightedCellFile, highlightedCellRank)
-    }
-
     fun playerHasWhite() = _playerHasWhite
 
-    fun setFinishedState(finished: Boolean){
-        _gameFinished = finished
+    fun reloadPosition(fen: String, playerHasWhite: Boolean, gameFinished: Boolean){
+        try {
+            _gameFinished = gameFinished
+            _relatedPosition = Position(fen)
+            _playerHasWhite = playerHasWhite
+            invalidate()
+            val computerToPlay = _playerHasWhite != isWhiteToPlay()
+            if (computerToPlay) makeComputerPlay()
+        }
+        catch (e:IllegalArgumentException) {
+            Logger.getLogger("BasicChessEndgamesTrainer").severe("Position $fen is invalid and could not be load.")
+        }
     }
 
-    fun new_game(startFen: String, playerHasWhite: Boolean ?) {
+    fun new_game(startFen: String) {
+        /////////////////////////////
+        Logger.getLogger("loloof64").info("New game : $startFen")
+        ////////////////////////////////
         try {
             _gameFinished = false
             _relatedPosition = Position(startFen)
-            _playerHasWhite = if (playerHasWhite == null) isWhiteToPlay()
-            else playerHasWhite
+            _playerHasWhite = isWhiteToPlay()
             invalidate()
         }
         catch (e:IllegalArgumentException) {
-            java.util.logging.Logger.getLogger("BasicChessEndgamesTrainer").severe("Position $startFen is invalid and could not be load.")
+            Logger.getLogger("BasicChessEndgamesTrainer").severe("Position $startFen is invalid and could not be load.")
         }
-        val isComputerToMove = _playerHasWhite != isWhiteToPlay()
-        if (isComputerToMove) makeComputerPlay()
     }
 
     fun isWhiteToPlay() : Boolean {
@@ -192,8 +195,14 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     fun makeComputerPlay(){
+        /////////////////////////////
+        Logger.getLogger("loloof64").info("Computer about to move")
+        ////////////////////////////////
         val isComputerToMove = _playerHasWhite != isWhiteToPlay()
         if (isComputerToMove) {
+            /////////////////////////////
+            Logger.getLogger("loloof64").info("Computer can move")
+            ////////////////////////////////
             val myApp = context.applicationContext as MyApplication
             myApp.uciInteract("position fen ${FEN.getFEN(_relatedPosition)}")
             myApp.uciInteract("go")

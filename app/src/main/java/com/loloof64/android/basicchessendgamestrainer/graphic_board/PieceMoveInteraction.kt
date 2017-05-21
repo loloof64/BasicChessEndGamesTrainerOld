@@ -3,7 +3,6 @@ package com.loloof64.android.basicchessendgamestrainer.graphic_board
 import chesspresso.Chess
 import chesspresso.move.Move
 import chesspresso.position.Position
-import java.util.*
 import java.util.logging.Logger
 
 data class PromotionInfo(val startFile: Int, val startRank: Int,

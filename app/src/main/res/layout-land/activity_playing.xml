@@ -17,9 +17,21 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@android:drawable/ic_menu_revert"
-        android:layout_toEndOf="@id/playingBoard"
-        android:layout_toRightOf="@id/playingBoard"
-        android:onClick="reverseBoard"/>
+        android:src="@mipmap/ic_swap_vert"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:onClick="reverseBoard"
+        android:id="@+id/fab_reverse_board" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="restartLastExercise"
+        android:src="@android:drawable/ic_menu_rotate"
+        android:id="@+id/fab_restart_exercise"
+        android:layout_below="@+id/fab_reverse_board"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="27dp" />
 
 </RelativeLayout>
