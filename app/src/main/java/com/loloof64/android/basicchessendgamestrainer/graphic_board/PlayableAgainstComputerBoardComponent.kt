@@ -1,6 +1,7 @@
 package com.loloof64.android.basicchessendgamestrainer.graphic_board
 
 import android.content.Context
+import android.os.Handler
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.widget.Toast
@@ -278,7 +279,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         if (commandAnswerParts.isNotEmpty()) {
             val infoLines = commandAnswerParts.filter { it.isNotEmpty() && it.startsWith("info") }
             if (infoLines.isNotEmpty()) {
-                handler.post {
+                Handler(context.mainLooper).post {
                     Logger.getLogger("BasicChessEndgamesTrainer").info("UCI info is '${infoLines.last()}'")
                     val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
 
