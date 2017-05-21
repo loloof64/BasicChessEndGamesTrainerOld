@@ -201,6 +201,16 @@ val KQvK_PositionGenerator = PositionGenerator(
         otherPiecesMutualConstraint = mapOf()
 )
 
+val KRvK_PositionGenerator = PositionGenerator(
+        playerKingConstraint = ::NO_CONSTRAINT,
+        oppositeKingConstraint = {(file, rank), position ->
+            (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
+        },
+        otherPiecesCount = arrayOf(PieceKindCount('R'.p, 1)),
+        otherPiecesGlobalConstraint = mapOf<PieceKind, Constraint>(),
+        otherPiecesMutualConstraint = mapOf()
+)
+
 
 val KBBvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
