@@ -116,6 +116,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         (context.applicationContext as MyApplication).uciInteract("go")
     }
 
+    fun playerGoal() = _playerGoal
+
     override fun relatedPosition(): Position {
         return _relatedPosition
     }
@@ -195,6 +197,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             _gameFinished = false
             _relatedPosition = Position(startFen)
             _playerHasWhite = isWhiteToPlay()
+            waitForPlayerGoal()
             invalidate()
         }
         catch (e:IllegalArgumentException) {
@@ -270,22 +273,28 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
-    fun notifyPlayerGoal(longUCICommandAnswer: String){
-        val infoLine = longUCICommandAnswer.split("\n").filter { it.isNotEmpty() && it.startsWith("info")}.last()
-        handler.post {
-            Logger.getLogger("BasicChessEndgamesTrainer").info("UCI info is '$infoLine'")
-            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
-            when(context) {
-                is PlayingActivity -> (context as PlayingActivity).label_player_goal.text =
-                        when (positionResultFromPositionInfo(infoLine, isWhiteTurn)) {
-                            ChessResult.WHITE_WIN -> context.getString(R.string.white_play_for_mate)
-                            ChessResult.BLACK_WIN -> context.getString(R.string.black_play_for_mate)
-                            ChessResult.DRAW -> context.getString(R.string.should_be_draw)
-                            ChessResult.UNDECIDED -> ""
-                        }
+    fun notifyPlayerGoal(longUCICommandAnswer: String) {
+        val commandAnswerParts = longUCICommandAnswer.split("\n")
+        if (commandAnswerParts.isNotEmpty()) {
+            val infoLines = commandAnswerParts.filter { it.isNotEmpty() && it.startsWith("info") }
+            if (infoLines.isNotEmpty()) {
+                handler.post {
+                    Logger.getLogger("BasicChessEndgamesTrainer").info("UCI info is '${infoLines.last()}'")
+                    val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
 
+                    _playerGoal = when (positionResultFromPositionInfo(infoLines.last(), isWhiteTurn)) {
+                        ChessResult.WHITE_WIN -> context.getString(R.string.white_play_for_mate)
+                        ChessResult.BLACK_WIN -> context.getString(R.string.black_play_for_mate)
+                        ChessResult.DRAW -> context.getString(R.string.should_be_draw)
+                        ChessResult.UNDECIDED -> ""
+                    }
+
+                    when (context) {
+                        is PlayingActivity -> (context as PlayingActivity).label_player_goal.text = _playerGoal
+                    }
+                    _waitingForPlayerGoal = false
+                }
             }
-            _waitingForPlayerGoal = false
         }
     }
 
@@ -294,5 +303,5 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     private var _playerHasWhite = true
     private var _gameFinished = false
     private var _waitingForPlayerGoal = true
-
+    private var _playerGoal = ""
 }

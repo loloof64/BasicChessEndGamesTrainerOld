@@ -40,7 +40,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
         outState?.putBoolean(gameFinishedKey, playingBoard.gameFinished())
         outState?.putString(lastExerciseKey, lastExercise)
-        outState?.putString(playerGoalKey, playerGoal)
+        outState?.putString(playerGoalKey, playingBoard.playerGoal())
         outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
     }
 
@@ -53,7 +53,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                     waitingForPlayerGoal = savedInstanceState.getBoolean(waitingForPlayerGoalKey)
             )
             lastExercise = savedInstanceState.getString(lastExerciseKey)
-            label_player_goal.text = savedInstanceState.getString(playerGoal)
+            label_player_goal.text = savedInstanceState.getString(playerGoalKey)
         }
     }
 
@@ -77,7 +77,6 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     fun newGame(fen: String = standardFEN){
         lastExercise = fen
         playingBoard.new_game(fen)
-        playingBoard.waitForPlayerGoal()
     }
 
     fun restartLastExercise(view: View){
@@ -85,5 +84,4 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     }
 
     private lateinit var lastExercise:String
-    private var playerGoal = ""
 }

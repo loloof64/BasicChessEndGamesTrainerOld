@@ -47,7 +47,10 @@ interface PieceMoveInteraction {
                     (commandMoveFrom == currentMoveFrom)
                             && (commandMoveTo == currentMoveTo)
                 }
-                if (matchMoves.isEmpty()) reactForIllegalMove()
+                val sameCellSelected = (startFile == cellFileIndex) && (startRank == cellRankIndex)
+                if (matchMoves.isEmpty()) {
+                    if (!sameCellSelected) reactForIllegalMove()
+                }
                 else {
                     _relatedPosition.doMove(matchMoves.first())
                 }
