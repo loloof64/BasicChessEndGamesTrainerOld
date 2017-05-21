@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity
 import android.widget.AdapterView
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.*
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
+import java.util.*
 
 class ExerciseChooserActivity : AppCompatActivity() {
 
@@ -20,7 +21,9 @@ class ExerciseChooserActivity : AppCompatActivity() {
             val item = adapter.getItemAtPosition(position) as ExerciseRow
 
             val bundle = Bundle()
-            bundle.putString(PlayingActivity.positionToSetupKey, item.positionGenerator.generatePosition())
+            bundle.putString(PlayingActivity.positionToSetupKey, item.positionGenerator.generatePosition(
+                _random.nextBoolean()
+            ))
             intent.putExtras(bundle)
 
             startActivity(intent)
@@ -38,8 +41,11 @@ class ExerciseChooserActivity : AppCompatActivity() {
                 ExerciseRow(R.string.exercise_krr_k, KRRvK_PositionGenerator),
                 ExerciseRow(R.string.exercise_kq_k, KQvK_PositionGenerator),
                 ExerciseRow(R.string.exercise_kr_k, KRvK_PositionGenerator),
-                ExerciseRow(R.string.exercise_kbb_k, KBBvK_PositionGenerator)
+                ExerciseRow(R.string.exercise_kbb_k, KBBvK_PositionGenerator),
+                ExerciseRow(R.string.custom_generator, testGenerator)
         )
     }
+
+    private val _random = Random()
 
 }

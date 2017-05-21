@@ -19,4 +19,5 @@
     <string name="black_play_for_mate">Les Noirs jouent pour le mat</string>
     <string name="exercise_kr_k">Roi+Tour/Roi</string>
     <string name="should_be_draw">Cela devrait être nulle !</string>
+    <string name="custom_generator">Générateur personnel</string>
 </resources>

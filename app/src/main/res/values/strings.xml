@@ -19,4 +19,5 @@
     <string name="black_play_for_mate">Black play for mate</string>
     <string name="should_be_draw">It should be draw</string>
     <string name="exercise_kr_k">King+Rook/King</string>
+    <string name="custom_generator">Custom generator</string>
 </resources>
