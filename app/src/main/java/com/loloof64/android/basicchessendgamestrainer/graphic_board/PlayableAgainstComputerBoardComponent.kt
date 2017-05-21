@@ -12,6 +12,7 @@ import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.UCICommandAnswerCallback
+import kotlinx.android.synthetic.main.activity_playing.*
 import java.lang.ref.WeakReference
 import java.util.logging.Logger
 
@@ -19,10 +20,10 @@ class MyUciCommandCallback(playingComponent: PlayableAgainstComputerBoardCompone
     private val playingComponentRef:WeakReference<PlayableAgainstComputerBoardComponent> = WeakReference(playingComponent)
 
     override fun execute(answer: String) {
-        if (playingComponentRef.get()?.isReadyToPlay() ?: false) {
-            playingComponentRef.get()?.processComponentMove(answer)
-        } else {
+        if (playingComponentRef.get()?.isWaitingForPlayerGoal() ?: true) {
             playingComponentRef.get()?.notifyPlayerGoal(answer)
+        } else {
+            playingComponentRef.get()?.processComponentMove(answer)
         }
     }
 }
@@ -102,6 +103,19 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                 MyUciCommandCallback(this))
     }
 
+    fun isWaitingForPlayerGoal() = _waitingForPlayerGoal
+
+    // Mainly used for serialisation purpose
+    fun setWaitingForPlayerGoalFlag(waiting: Boolean){
+        _waitingForPlayerGoal = waiting
+    }
+
+    fun waitForPlayerGoal() {
+        _waitingForPlayerGoal = true
+        (context.applicationContext as MyApplication).uciNewGame(_relatedPosition.fen)
+        (context.applicationContext as MyApplication).uciInteract("go")
+    }
+
     override fun relatedPosition(): Position {
         return _relatedPosition
     }
@@ -161,11 +175,12 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     fun playerHasWhite() = _playerHasWhite
 
-    fun reloadPosition(fen: String, playerHasWhite: Boolean, gameFinished: Boolean){
+    fun reloadPosition(fen: String, playerHasWhite: Boolean, gameFinished: Boolean, waitingForPlayerGoal: Boolean){
         try {
             _gameFinished = gameFinished
             _relatedPosition = Position(fen)
             _playerHasWhite = playerHasWhite
+            setWaitingForPlayerGoalFlag(waitingForPlayerGoal)
             invalidate()
             val computerToPlay = _playerHasWhite != isWhiteToPlay()
             if (computerToPlay) makeComputerPlay()
@@ -176,9 +191,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     fun new_game(startFen: String) {
-        /////////////////////////////
-        Logger.getLogger("loloof64").info("New game : $startFen")
-        ////////////////////////////////
         try {
             _gameFinished = false
             _relatedPosition = Position(startFen)
@@ -195,14 +207,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     fun makeComputerPlay(){
-        /////////////////////////////
-        Logger.getLogger("loloof64").info("Computer about to move")
-        ////////////////////////////////
         val isComputerToMove = _playerHasWhite != isWhiteToPlay()
         if (isComputerToMove) {
-            /////////////////////////////
-            Logger.getLogger("loloof64").info("Computer can move")
-            ////////////////////////////////
             val myApp = context.applicationContext as MyApplication
             myApp.uciInteract("position fen ${FEN.getFEN(_relatedPosition)}")
             myApp.uciInteract("go")
@@ -249,23 +255,18 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
-    fun isReadyToPlay() = _readyToPlay
-
     fun checkIfGameFinished() {
         if (_relatedPosition.isMate) {
             Toast.makeText(context, R.string.checkmate, Toast.LENGTH_LONG).show()
             _gameFinished = true
-            _readyToPlay = false
         }
         if (_relatedPosition.isStaleMate){
             Toast.makeText(context, R.string.stalemate, Toast.LENGTH_LONG).show()
             _gameFinished = true
-            _readyToPlay = false
         }
         else if (_relatedPosition.halfMoveClock >= 100){
             Toast.makeText(context, R.string.fiftyMoveDraw, Toast.LENGTH_LONG).show()
             _gameFinished = true
-            _readyToPlay = false
         }
     }
 
@@ -274,13 +275,17 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         handler.post {
             Logger.getLogger("BasicChessEndgamesTrainer").info("UCI info is '$infoLine'")
             val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
-            when (positionResultFromPositionInfo(infoLine, isWhiteTurn)){
-                ChessResult.WHITE_WIN -> Toast.makeText(MyApplication.getApplicationContext(), R.string.white_play_for_mate, Toast.LENGTH_SHORT).show()
-                ChessResult.BLACK_WIN -> Toast.makeText(MyApplication.getApplicationContext(), R.string.black_play_for_mate, Toast.LENGTH_SHORT).show()
-                ChessResult.DRAW -> Toast.makeText(MyApplication.getApplicationContext(), R.string.should_be_draw, Toast.LENGTH_SHORT).show()
-                ChessResult.UNDECIDED -> {}
+            when(context) {
+                is PlayingActivity -> (context as PlayingActivity).label_player_goal.text =
+                        when (positionResultFromPositionInfo(infoLine, isWhiteTurn)) {
+                            ChessResult.WHITE_WIN -> context.getString(R.string.white_play_for_mate)
+                            ChessResult.BLACK_WIN -> context.getString(R.string.black_play_for_mate)
+                            ChessResult.DRAW -> context.getString(R.string.should_be_draw)
+                            ChessResult.UNDECIDED -> ""
+                        }
+
             }
-            _readyToPlay = true
+            _waitingForPlayerGoal = false
         }
     }
 
@@ -288,6 +293,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     private var _playerHasWhite = true
     private var _gameFinished = false
-    private var _readyToPlay = false
+    private var _waitingForPlayerGoal = true
 
 }

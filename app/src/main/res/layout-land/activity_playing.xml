@@ -34,4 +34,13 @@
         android:layout_alignParentEnd="true"
         android:layout_marginTop="27dp" />
 
+    <TextView
+        android:id="@+id/label_player_goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_toEndOf="@id/playingBoard"
+        android:layout_toRightOf="@id/playingBoard"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
 </RelativeLayout>

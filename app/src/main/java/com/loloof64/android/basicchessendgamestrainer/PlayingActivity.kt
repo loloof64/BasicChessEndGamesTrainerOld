@@ -15,6 +15,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val gameFinishedKey = "GameFinished"
         val positionToSetupKey = "PositionToSetup"
         val lastExerciseKey = "LastExercise"
+        val playerGoalKey = "PlayerGoal"
+        val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -38,6 +40,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
         outState?.putBoolean(gameFinishedKey, playingBoard.gameFinished())
         outState?.putString(lastExerciseKey, lastExercise)
+        outState?.putString(playerGoalKey, playerGoal)
+        outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -45,8 +49,11 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         if (savedInstanceState != null) {
             playingBoard.reloadPosition(fen = savedInstanceState.getString(currentPositionkey),
                     playerHasWhite = savedInstanceState.getBoolean(playerHasWhiteKey),
-                    gameFinished = savedInstanceState.getBoolean(gameFinishedKey))
+                    gameFinished = savedInstanceState.getBoolean(gameFinishedKey),
+                    waitingForPlayerGoal = savedInstanceState.getBoolean(waitingForPlayerGoalKey)
+            )
             lastExercise = savedInstanceState.getString(lastExerciseKey)
+            label_player_goal.text = savedInstanceState.getString(playerGoal)
         }
     }
 
@@ -70,8 +77,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     fun newGame(fen: String = standardFEN){
         lastExercise = fen
         playingBoard.new_game(fen)
-        (applicationContext as MyApplication).uciNewGame(fen)
-        (applicationContext as MyApplication).uciInteract("go")
+        playingBoard.waitForPlayerGoal()
     }
 
     fun restartLastExercise(view: View){
@@ -79,4 +85,5 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     }
 
     private lateinit var lastExercise:String
+    private var playerGoal = ""
 }

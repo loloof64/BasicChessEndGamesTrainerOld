@@ -34,4 +34,12 @@
         android:src="@android:drawable/ic_menu_rotate"
         android:id="@+id/fab_restart_exercise"/>
 
+    <TextView
+        android:id="@+id/label_player_goal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/playingBoard"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+    />
+
 </RelativeLayout>
