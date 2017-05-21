@@ -21,4 +21,8 @@
     <string name="should_be_draw">Cela devrait être nulle !</string>
     <string name="custom_generator">Générateur personnel</string>
     <string name="position_generation_error">Echec de génération de position !</string>
+    <string name="restarting_exercise_alert_title">Recommencer l\'exercice ?</string>
+    <string name="restarting_exercise_alert_message">Sur le point de recommencer l\'exercice : en êtes-vous sûr ?</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
 </resources>

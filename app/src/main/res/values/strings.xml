@@ -21,4 +21,8 @@
     <string name="exercise_kr_k">King+Rook/King</string>
     <string name="custom_generator">Custom generator</string>
     <string name="position_generation_error">Failed to generate position !</string>
+    <string name="restarting_exercise_alert_title" >Restart exercise ?</string>
+    <string name="restarting_exercise_alert_message" >About to restart exercise : are you sure ?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
 </resources>

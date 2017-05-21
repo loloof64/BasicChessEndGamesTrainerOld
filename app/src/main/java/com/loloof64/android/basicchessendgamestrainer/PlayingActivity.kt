@@ -2,6 +2,7 @@ package com.loloof64.android.basicchessendgamestrainer
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.view.View
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.graphic_board.PromotionPieceChooserDialogFragment
@@ -80,7 +81,13 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     }
 
     fun restartLastExercise(view: View){
-        playingBoard.new_game(lastExercise)
+        AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.restarting_exercise_alert_title)
+                .setMessage(R.string.restarting_exercise_alert_message)
+                .setPositiveButton(R.string.yes, {_, _ -> playingBoard.new_game(lastExercise)})
+                .setNegativeButton(R.string.no, null)
+                .show()
     }
 
     private lateinit var lastExercise:String
