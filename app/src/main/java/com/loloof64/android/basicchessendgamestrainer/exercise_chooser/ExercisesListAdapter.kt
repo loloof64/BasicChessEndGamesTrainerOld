@@ -9,7 +9,7 @@ import android.widget.TextView
 import com.loloof64.android.basicchessendgamestrainer.R
 
 class ExerciseRowViewHolder(val textView: TextView)
-class ExerciseRow(val textId: Int, val positionGenerator: PositionGenerator)
+class ExerciseRow(val textId: Int)
 
 class ExercisesListAdapter(context: Context, exercisesList: List<ExerciseRow>) :
         ArrayAdapter<ExerciseRow>(context, 0, exercisesList){

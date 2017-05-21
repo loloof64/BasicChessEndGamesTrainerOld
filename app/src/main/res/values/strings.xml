@@ -25,4 +25,6 @@
     <string name="restarting_exercise_alert_message" >About to restart exercise : are you sure ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="new_exercise_alert_title">New exercise</string>
+    <string name="new_exercise_alert_message">About to start a new exercise : are you sure ?</string>
 </resources>

@@ -16,39 +16,27 @@ class ExerciseChooserActivity : AppCompatActivity() {
 
         setContentView(R.layout.activity_exercise_chooser)
 
-        exercisesListView.adapter = ExercisesListAdapter(this, generateExercises())
+        exercisesListView.adapter = ExercisesListAdapter(this, generateExercisesList())
         exercisesListView.onItemClickListener = AdapterView.OnItemClickListener { adapter, _, position, _ ->
             val intent = Intent(this, PlayingActivity::class.java)
-            val item = adapter.getItemAtPosition(position) as ExerciseRow
-
             val bundle = Bundle()
-            val generatedPosition = item.positionGenerator.generatePosition(_random.nextBoolean())
-
-            if (generatedPosition.isNotEmpty()) {
-                bundle.putString(PlayingActivity.positionToSetupKey, generatedPosition)
-                intent.putExtras(bundle)
-
-                startActivity(intent)
-            } else {
-                Toast.makeText(this@ExerciseChooserActivity, R.string.position_generation_error,
-                        Toast.LENGTH_LONG).show()
-            }
+            bundle.putInt(PlayingActivity.generatorIndexKey, position)
+            intent.putExtras(bundle)
+            startActivity(intent)
         }
 
+    }
+
+    private fun generateExercisesList() : List<ExerciseRow> {
+        return listOf(R.string.exercise_krr_k,
+                R.string.exercise_kq_k,
+                R.string.exercise_kr_k,
+                R.string.exercise_kbb_k).map { ExerciseRow(it) }
     }
 
     override fun onStop() {
         super.onStop()
         if (isFinishing) (application as MyApplication).uciEnd()
-    }
-
-    private fun generateExercises() : List<ExerciseRow>{
-        return listOf(
-                ExerciseRow(R.string.exercise_krr_k, KRRvK_PositionGenerator),
-                ExerciseRow(R.string.exercise_kq_k, KQvK_PositionGenerator),
-                ExerciseRow(R.string.exercise_kr_k, KRvK_PositionGenerator),
-                ExerciseRow(R.string.exercise_kbb_k, KBBvK_PositionGenerator)
-        )
     }
 
     private val _random = Random()

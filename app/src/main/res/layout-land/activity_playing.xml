@@ -29,10 +29,21 @@
         android:onClick="restartLastExercise"
         android:src="@android:drawable/ic_menu_rotate"
         android:id="@+id/fab_restart_exercise"
-        android:layout_below="@+id/fab_reverse_board"
+        android:layout_below="@id/fab_reverse_board"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginTop="27dp" />
+        android:layout_marginTop="16dp" />
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="newExercise"
+        android:src="@mipmap/ic_add"
+        android:id="@+id/fab_new_exercise"
+        android:layout_below="@id/fab_restart_exercise"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="16dp" />
 
     <TextView
         android:id="@+id/label_player_goal"

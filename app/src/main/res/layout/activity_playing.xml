@@ -26,13 +26,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginLeft="36dp"
-        android:layout_marginStart="36dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/fab_reverse_board"
         android:layout_toRightOf="@+id/fab_reverse_board"
         android:onClick="restartLastExercise"
         android:src="@android:drawable/ic_menu_rotate"
         android:id="@+id/fab_restart_exercise"/>
+
+    <android.support.design.widget.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_toEndOf="@+id/fab_restart_exercise"
+        android:layout_toRightOf="@+id/fab_restart_exercise"
+        android:onClick="newExercise"
+        android:src="@mipmap/ic_add"
+        android:id="@+id/fab_new_exercise"/>
 
     <TextView
         android:id="@+id/label_player_goal"

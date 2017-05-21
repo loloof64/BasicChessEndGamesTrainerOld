@@ -3,6 +3,7 @@ package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 import chesspresso.Chess
 import chesspresso.position.FEN
 import chesspresso.position.Position
+import com.loloof64.android.basicchessendgamestrainer.R
 import java.util.*
 import java.util.logging.Logger
 
@@ -264,5 +265,12 @@ val KBBvK_PositionGenerator = PositionGenerator(
             firstSquareIsBlack != secondSquareIsBlack
         }),
         otherPiecesIndexedConstraint = mapOf()
+)
+
+val availableGenerators = arrayOf(
+    R.string.exercise_krr_k to KRRvK_PositionGenerator,
+    R.string.exercise_kq_k to KQvK_PositionGenerator,
+    R.string.exercise_kr_k to KRvK_PositionGenerator,
+    R.string.exercise_kbb_k to KBBvK_PositionGenerator
 )
 
