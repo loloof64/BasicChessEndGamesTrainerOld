@@ -51,8 +51,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
 
-        val gridLayoutColumns = if (resources.configuration.orientation ==
-                Configuration.ORIENTATION_PORTRAIT) 9 else 6
+        val gridLayoutColumns = 6
         val gridLayoutManager = GridLayoutManager(this, gridLayoutColumns)
         moves_list_view.layoutManager = gridLayoutManager
         moves_list_view.adapter = listAdapter
@@ -125,7 +124,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.restarting_exercise_alert_title)
                 .setMessage(R.string.restarting_exercise_alert_message)
-                .setPositiveButton(R.string.yes, {_, _ -> playingBoard.new_game(lastExercise)})
+                .setPositiveButton(R.string.yes, {_, _ ->
+                    listAdapter.clear()
+                    playingBoard.new_game(lastExercise)
+                })
                 .setNegativeButton(R.string.no, null)
                 .show()
     }
