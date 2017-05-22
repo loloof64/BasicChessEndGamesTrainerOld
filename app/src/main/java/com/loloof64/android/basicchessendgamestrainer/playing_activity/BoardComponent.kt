@@ -35,7 +35,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     private val rectPaint = Paint()
     private val fontPaint = Paint()
 
-    abstract fun highlightedCell() : Pair<Int, Int>?
+    abstract fun highlightedStartCell() : Pair<Int, Int>?
+    abstract fun highlightedTargetCell() : Pair<Int, Int>?
 
     fun reverse() {
         reversed = !reversed
@@ -141,11 +142,22 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         canvas.drawRect(location, location, locationEnd, locationEnd, rectPaint)
     }
 
-    private fun drawHighlightedCell(canvas: Canvas, cellSize: Int) {
-        val cellToHighlight = highlightedCell()
-        if (cellToHighlight != null) {
-            val fileIndex = cellToHighlight.first
-            val rankIndex = cellToHighlight.second
+    private fun drawHighlightedCells(canvas: Canvas, cellSize: Int) {
+        val startCellToHighlight = highlightedStartCell()
+        if (startCellToHighlight != null){
+            val fileIndex = startCellToHighlight.first
+            val rankIndex = startCellToHighlight.second
+
+            val x = (cellSize * (0.5 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
+            val y = (cellSize * (0.5 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
+            rectPaint.setARGB(185, 255, 0, 0)
+            canvas.drawRect(x, y, x + cellSize, y + cellSize, rectPaint)
+        }
+
+        val targetCellToHighlight = highlightedTargetCell()
+        if (targetCellToHighlight != null) {
+            val fileIndex = targetCellToHighlight.first
+            val rankIndex = targetCellToHighlight.second
 
             val x = (cellSize * (0.5 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
             val y = (cellSize * (0.5 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
@@ -200,7 +212,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         drawBackground(canvas)
         drawCells(canvas, cellSize)
         drawLetters(canvas, cellSize)
-        if (highlightedCell() != null) drawHighlightedCell(canvas, cellSize)
+        if (highlightedTargetCell() != null) drawHighlightedCells(canvas, cellSize)
         drawPieces(canvas, cellSize)
         drawPlayerTurn(canvas, cellSize)
         drawHighlightedMove(canvas, cellSize)

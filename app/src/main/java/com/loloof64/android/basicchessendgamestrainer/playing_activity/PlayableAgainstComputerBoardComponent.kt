@@ -126,8 +126,12 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         _relatedPosition = board
     }
 
-    override fun highlightedCell(): Pair<Int, Int>? {
-        return _highlightedCell
+    override fun highlightedTargetCell(): Pair<Int, Int>? {
+        return _highlightedTargetCell
+    }
+
+    override fun highlightedStartCell(): Pair<Int, Int>? {
+        return _highlightedStartCell
     }
 
     private fun askForPromotionPiece() {
@@ -146,7 +150,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     // Fields from PieceMoveInteraction interface
     private var _relatedPosition = Position()
-    private var _highlightedCell:Pair<Int, Int>? = null
+    private var _highlightedTargetCell:Pair<Int, Int>? = null
+    private var _highlightedStartCell:Pair<Int, Int>? = null
     private var _pendingPromotionInfo:PromotionInfo? = null
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -159,16 +164,80 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         val action = event.action
 
         val cellSize = (measuredWidth.min(measuredHeight)) / 9
-        val file = ((x-cellSize*0.5) / cellSize).toInt()
-        val rank = 7 - ((y-cellSize*0.5) / cellSize).toInt()
+        val cellX = ((x-cellSize*0.5) / cellSize).toInt()
+        val cellY = ((y-cellSize*0.5) / cellSize).toInt()
+        val file = if (reversed) 7-cellX else cellX
+        val rank = if (reversed) cellY else 7 - cellY
 
-        if (action == MotionEvent.ACTION_DOWN && file >= 0 && file < 8 && rank >= 0 && rank < 8) {
-            if (reversed) reactOnClick(7-file, 7-rank) else reactOnClick(file, rank)
-            invalidate()
-            checkIfGameFinished()
-            if (!_gameFinished) {
-                val computerToPlay = _playerHasWhite != isWhiteToPlay()
-                if (computerToPlay) makeComputerPlay()
+        if (file in 0..7 && rank in 0..7){
+            when (action){
+                MotionEvent.ACTION_UP -> {
+                    val moveSelectionHasStarted = _highlightedTargetCell != null && _highlightedStartCell != null
+                    if (moveSelectionHasStarted){
+                        val startFile = _highlightedStartCell!!.first
+                        val startRank = _highlightedStartCell!!.second
+                        val endFile = _highlightedTargetCell!!.first
+                        val endRank = _highlightedTargetCell!!.second
+
+                        val pieceAtStartCellIsPawn = _relatedPosition.getPiece(Chess.coorToSqi(startFile, startRank)).toShort() == Chess.PAWN
+                        val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
+                        val isPromotionMove = pieceAtStartCellIsPawn && (if (isWhiteTurn) endRank == 7 else endRank == 0)
+
+                        if (isPromotionMove) {
+                            _pendingPromotionInfo = PromotionInfo(startFile, startRank, endFile, endRank)
+                            askForPromotionPiece()
+                        }
+                        else {
+                            val matchMoves = _relatedPosition.allMoves.filter { currentMove ->
+                                val currentMoveFrom = Move.getFromSqi(currentMove)
+                                val currentMoveTo = Move.getToSqi(currentMove)
+
+                                val commandMoveFrom = Chess.coorToSqi(startFile, startRank)
+                                val commandMoveTo = Chess.coorToSqi(endFile, endRank)
+
+                                (commandMoveFrom == currentMoveFrom)
+                                        && (commandMoveTo == currentMoveTo)
+                            }
+                            val sameCellSelected = (startFile == endFile) && (startRank == endRank)
+                            if (matchMoves.isEmpty()) {
+                                if (!sameCellSelected) reactForIllegalMove()
+                            } else {
+                                updateHighlightedMove()
+                                addMoveToList(matchMoves.first())
+                                _relatedPosition.doMove(matchMoves.first())
+                            }
+                        }
+
+                        invalidate()
+                        checkIfGameFinished()
+                        if (!_gameFinished) {
+                            val computerToPlay = _playerHasWhite != isWhiteToPlay()
+                            if (computerToPlay) makeComputerPlay()
+                        }
+                    }
+                    _highlightedStartCell = null
+                    _highlightedTargetCell = null
+                }
+                MotionEvent.ACTION_DOWN -> {
+                    val movedPiece = _relatedPosition.getStone(Chess.coorToSqi(file, rank)).toShort()
+                    val isOccupiedSquare = movedPiece != Chess.NO_PIECE
+                    val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
+                    val isBlackTurn = _relatedPosition.toPlay != Chess.WHITE
+                    val isWhitePiece = movedPiece < 0
+                    val isBlackPiece = movedPiece > 0
+                    val isOneOfOurPiece = (isWhiteTurn && isWhitePiece) || (isBlackTurn && isBlackPiece)
+
+                    _highlightedTargetCell = if (isOccupiedSquare && isOneOfOurPiece) Pair(file, rank) else null
+                    _highlightedStartCell = _highlightedTargetCell
+                    invalidate()
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val moveSelectionHasStarted = _highlightedTargetCell != null && _highlightedStartCell != null
+                    if (moveSelectionHasStarted) {
+                        _highlightedTargetCell = Pair(file, rank)
+                        invalidate()
+                    }
+                }
             }
         }
 
@@ -331,63 +400,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
-    fun reactOnClick(cellFileIndex: Int, cellRankIndex: Int) {
-        require(cellFileIndex >= 0 && cellFileIndex < 8)
-        require(cellRankIndex >= 0 && cellRankIndex < 8)
-
-        if (_highlightedCell != null) {
-            // move validation
-            val startFile = _highlightedCell!!.first
-            val startRank = _highlightedCell!!.second
-
-            val pieceAtStartCellIsPawn = _relatedPosition.getPiece(Chess.coorToSqi(startFile, startRank)).toShort() == Chess.PAWN
-            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
-            val isPromotionMove = pieceAtStartCellIsPawn && (if (isWhiteTurn) cellRankIndex == 7 else cellRankIndex == 0)
-
-            if (isPromotionMove) {
-                _pendingPromotionInfo = PromotionInfo(startFile, startRank, cellFileIndex, cellRankIndex)
-                askForPromotionPiece()
-            }
-            else {
-                val matchMoves = _relatedPosition.allMoves.filter { currentMove ->
-                    val currentMoveFrom = Move.getFromSqi(currentMove)
-                    val currentMoveTo = Move.getToSqi(currentMove)
-
-                    val commandMoveFrom = Chess.coorToSqi(startFile, startRank)
-                    val commandMoveTo = Chess.coorToSqi(cellFileIndex, cellRankIndex)
-
-                    (commandMoveFrom == currentMoveFrom)
-                            && (commandMoveTo == currentMoveTo)
-                }
-                val sameCellSelected = (startFile == cellFileIndex) && (startRank == cellRankIndex)
-                if (matchMoves.isEmpty()) {
-                    if (!sameCellSelected) reactForIllegalMove()
-                }
-                else {
-                    _moveToHighlightFrom = null
-                    _moveToHighlightTo = null
-                    updateHighlightedMove()
-                    addMoveToList(matchMoves.first())
-                    _relatedPosition.doMove(matchMoves.first())
-                }
-                _highlightedCell = null
-            }
-        } else {
-            // move start
-            val movedPiece = _relatedPosition.getStone(Chess.coorToSqi(cellFileIndex, cellRankIndex)).toShort()
-            val isOccupiedSquare = movedPiece != Chess.NO_PIECE
-            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
-            val isBlackTurn = _relatedPosition.toPlay != Chess.WHITE
-            val isWhitePiece = movedPiece < 0
-            val isBlackPiece = movedPiece > 0
-            val isOneOfOurPiece = (isWhiteTurn && isWhitePiece) || (isBlackTurn && isBlackPiece)
-
-            _highlightedCell = if (isOccupiedSquare && isOneOfOurPiece) Pair(cellFileIndex, cellRankIndex) else null
-        }
-
-        invalidate()
-    }
-
     private fun addMoveToList(move: Short) {
         when (context) {
             is PlayingActivity -> {
@@ -423,7 +435,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                     _relatedPosition.doMove(move)
                 }
                 _pendingPromotionInfo = null
-                _highlightedCell = null
+                _highlightedTargetCell = null
                 invalidate()
             }
         }
