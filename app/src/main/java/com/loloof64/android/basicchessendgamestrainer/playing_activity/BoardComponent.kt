@@ -1,4 +1,4 @@
-package com.loloof64.android.basicchessendgamestrainer.graphic_board
+package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
 import android.graphics.Canvas

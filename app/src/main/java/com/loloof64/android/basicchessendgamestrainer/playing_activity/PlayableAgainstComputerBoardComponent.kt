@@ -1,4 +1,4 @@
-package com.loloof64.android.basicchessendgamestrainer.graphic_board
+package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
 import android.os.Handler
@@ -29,8 +29,11 @@ class MyUciCommandCallback(playingComponent: PlayableAgainstComputerBoardCompone
     }
 }
 
+data class PromotionInfo(val startFile: Int, val startRank: Int,
+                         val endFile: Int, val endRank: Int)
+
 class PlayableAgainstComputerBoardComponent(context: Context, override val attrs: AttributeSet?,
-                             defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr), PieceMoveInteraction {
+                             defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
@@ -131,14 +134,14 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         return _highlightedCell
     }
 
-    override fun askForPromotionPiece() {
+    private fun askForPromotionPiece() {
         when(context) {
             is PlayingActivity -> (context as PlayingActivity).askForPromotionPiece()
             else -> {}
         }
     }
 
-    override fun reactForIllegalMove() {
+    private fun reactForIllegalMove() {
         when(context) {
             is PlayingActivity -> (context as PlayingActivity).reactForIllegalMove()
             else -> {}
@@ -146,9 +149,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     // Fields from PieceMoveInteraction interface
-    override var _relatedPosition = Position()
-    override var _highlightedCell:Pair<Int, Int>? = null
-    override var _pendingPromotionInfo:PromotionInfo? = null
+    private var _relatedPosition = Position()
+    private var _highlightedCell:Pair<Int, Int>? = null
+    private var _pendingPromotionInfo:PromotionInfo? = null
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val whiteTurn = _relatedPosition.toPlay == Chess.WHITE
@@ -253,7 +256,10 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
         handler.post {
             if (chessMovePossibilities.isEmpty()) reactForIllegalMove()
-            else _relatedPosition.doMove(chessMovePossibilities.first())
+            else {
+                addMoveToList(chessMovePossibilities.first())
+                _relatedPosition.doMove(chessMovePossibilities.first())
+            }
             invalidate()
             checkIfGameFinished()
         }
@@ -299,7 +305,97 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
+    fun reactOnClick(cellFileIndex: Int, cellRankIndex: Int) {
+        require(cellFileIndex >= 0 && cellFileIndex < 8)
+        require(cellRankIndex >= 0 && cellRankIndex < 8)
+
+        if (_highlightedCell != null) {
+            // move validation
+            val startFile = _highlightedCell!!.first
+            val startRank = _highlightedCell!!.second
+
+            val pieceAtStartCellIsPawn = _relatedPosition.getPiece(Chess.coorToSqi(startFile, startRank)).toShort() == Chess.PAWN
+            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
+            val isPromotionMove = pieceAtStartCellIsPawn && (if (isWhiteTurn) cellRankIndex == 7 else cellRankIndex == 0)
+
+            if (isPromotionMove) {
+                _pendingPromotionInfo = PromotionInfo(startFile, startRank, cellFileIndex, cellRankIndex)
+                askForPromotionPiece()
+            }
+            else {
+                val matchMoves = _relatedPosition.allMoves.filter { currentMove ->
+                    val currentMoveFrom = Move.getFromSqi(currentMove)
+                    val currentMoveTo = Move.getToSqi(currentMove)
+
+                    val commandMoveFrom = Chess.coorToSqi(startFile, startRank)
+                    val commandMoveTo = Chess.coorToSqi(cellFileIndex, cellRankIndex)
+
+                    (commandMoveFrom == currentMoveFrom)
+                            && (commandMoveTo == currentMoveTo)
+                }
+                val sameCellSelected = (startFile == cellFileIndex) && (startRank == cellRankIndex)
+                if (matchMoves.isEmpty()) {
+                    if (!sameCellSelected) reactForIllegalMove()
+                }
+                else {
+                    addMoveToList(matchMoves.first())
+                    _relatedPosition.doMove(matchMoves.first())
+                }
+                _highlightedCell = null
+            }
+        } else {
+            // move start
+            val movedPiece = _relatedPosition.getStone(Chess.coorToSqi(cellFileIndex, cellRankIndex)).toShort()
+            val isOccupiedSquare = movedPiece != Chess.NO_PIECE
+            val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
+            val isBlackTurn = _relatedPosition.toPlay != Chess.WHITE
+            val isWhitePiece = movedPiece < 0
+            val isBlackPiece = movedPiece > 0
+            val isOneOfOurPiece = (isWhiteTurn && isWhitePiece) || (isBlackTurn && isBlackPiece)
+
+            _highlightedCell = if (isOccupiedSquare && isOneOfOurPiece) Pair(cellFileIndex, cellRankIndex) else null
+        }
+
+        invalidate()
+    }
+
+    private fun addMoveToList(move: Short) {
+        when (context) {
+            is PlayingActivity -> {
+                val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
+                if (isWhiteTurn) (context as PlayingActivity)
+                        .addTextInMovesList(getMoveNumber().toString())
+                (context as PlayingActivity).addTextInMovesList(Move.getSAN(
+                        move, _relatedPosition
+                ))
+            }
+        }
+    }
+
+    fun validatePromotionMove(promotedPieceType: Short) {
+        when(_pendingPromotionInfo) {
+            null -> {}
+            else -> {
+                val move = _relatedPosition.getPawnMove(_pendingPromotionInfo!!.startFile,
+                        Chess.coorToSqi(_pendingPromotionInfo!!.endFile, _pendingPromotionInfo!!.endRank),
+                        promotedPieceType.toInt())
+                if (move == Move.ILLEGAL_MOVE) Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
+                else {
+                    addMoveToList(move)
+                    _relatedPosition.doMove(move)
+                }
+                _pendingPromotionInfo = null
+                _highlightedCell = null
+                invalidate()
+            }
+        }
+    }
+
     fun gameFinished() = _gameFinished
+
+    fun getMoveNumber(): Int {
+        return (_relatedPosition.plyNumber / 2) + 1
+    }
 
     private var _playerHasWhite = true
     private var _gameFinished = false

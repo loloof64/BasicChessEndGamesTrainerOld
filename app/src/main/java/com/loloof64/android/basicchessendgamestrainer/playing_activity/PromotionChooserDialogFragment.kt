@@ -1,4 +1,4 @@
-package com.loloof64.android.basicchessendgamestrainer.graphic_board
+package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.app.Dialog
 import android.content.Context

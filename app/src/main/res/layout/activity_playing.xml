@@ -7,7 +7,7 @@
     android:background="#CDCDCD"
     tools:context="com.loloof64.android.basicchessendgamestrainer.PlayingActivity">
 
-    <com.loloof64.android.basicchessendgamestrainer.graphic_board.PlayableAgainstComputerBoardComponent
+    <com.loloof64.android.basicchessendgamestrainer.playing_activity.PlayableAgainstComputerBoardComponent
         android:id="@+id/playingBoard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,14 +18,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_swap_vert"
-        android:layout_alignParentBottom="true"
         android:onClick="reverseBoard"
+        android:layout_below="@+id/label_player_goal"
         android:id="@+id/fab_reverse_board" />
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/label_player_goal"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/fab_reverse_board"
@@ -37,7 +37,7 @@
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_below="@+id/label_player_goal"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/fab_restart_exercise"
@@ -45,6 +45,13 @@
         android:onClick="newExercise"
         android:src="@mipmap/ic_add"
         android:id="@+id/fab_new_exercise"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/moves_list_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/fab_reverse_board"
+        />
 
     <TextView
         android:id="@+id/label_player_goal"

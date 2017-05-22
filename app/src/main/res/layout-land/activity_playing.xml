@@ -7,7 +7,7 @@
     android:background="#CDCDCD"
     tools:context="com.loloof64.android.basicchessendgamestrainer.PlayingActivity">
 
-    <com.loloof64.android.basicchessendgamestrainer.graphic_board.PlayableAgainstComputerBoardComponent
+    <com.loloof64.android.basicchessendgamestrainer.playing_activity.PlayableAgainstComputerBoardComponent
         android:id="@+id/playingBoard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -18,9 +18,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_swap_vert"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:onClick="reverseBoard"
+        android:layout_below="@+id/label_player_goal"
+        android:layout_toRightOf="@+id/playingBoard"
+        android:layout_toEndOf="@+id/playingBoard"
         android:id="@+id/fab_reverse_board" />
 
     <android.support.design.widget.FloatingActionButton
@@ -29,9 +30,9 @@
         android:onClick="restartLastExercise"
         android:src="@android:drawable/ic_menu_rotate"
         android:id="@+id/fab_restart_exercise"
+        android:layout_toRightOf="@+id/playingBoard"
+        android:layout_toEndOf="@+id/playingBoard"
         android:layout_below="@id/fab_reverse_board"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:layout_marginTop="16dp" />
 
     <android.support.design.widget.FloatingActionButton
@@ -40,16 +41,24 @@
         android:onClick="newExercise"
         android:src="@mipmap/ic_add"
         android:id="@+id/fab_new_exercise"
-        android:layout_below="@id/fab_restart_exercise"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
+        android:layout_toRightOf="@+id/playingBoard"
+        android:layout_toEndOf="@+id/playingBoard"
+        android:layout_below="@+id/fab_restart_exercise"
         android:layout_marginTop="16dp" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/moves_list_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/fab_reverse_board"
+        android:layout_toEndOf="@+id/fab_reverse_board"
+        android:layout_below="@+id/label_player_goal"
+    />
 
     <TextView
         android:id="@+id/label_player_goal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
         android:layout_toEndOf="@id/playingBoard"
         android:layout_toRightOf="@id/playingBoard"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium" />

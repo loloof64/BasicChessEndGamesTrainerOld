@@ -1,14 +1,29 @@
 package com.loloof64.android.basicchessendgamestrainer
 
+import android.content.res.Configuration
+import android.graphics.Rect
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.RecyclerView
+import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
-import com.loloof64.android.basicchessendgamestrainer.graphic_board.PromotionPieceChooserDialogFragment
+import com.loloof64.android.basicchessendgamestrainer.playing_activity.MovesListAdapter
+import com.loloof64.android.basicchessendgamestrainer.playing_activity.PromotionPieceChooserDialogFragment
 import kotlinx.android.synthetic.main.activity_playing.*
 import java.util.*
+
+val listAdapter = MovesListAdapter()
+
+class SpaceLeftAndRightItemDecorator(val space: Int): RecyclerView.ItemDecoration(){
+    override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
+        outRect?.left = space
+        outRect?.right = space
+    }
+}
 
 class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment.Companion.Listener {
 
@@ -20,6 +35,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val playerGoalKey = "PlayerGoal"
         val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
         val generatorIndexKey = "GeneratorIndex"
+        val adapterItemsKey = "AdapterItems"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -33,6 +49,15 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
+
+        val gridLayoutColumns = if (resources.configuration.orientation ==
+                Configuration.ORIENTATION_PORTRAIT) 9 else 6
+        val gridLayoutManager = GridLayoutManager(this, gridLayoutColumns)
+        moves_list_view.layoutManager = gridLayoutManager
+        moves_list_view.adapter = listAdapter
+        val spaceDp = 5.0f
+        val space = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, spaceDp, resources.displayMetrics)
+        moves_list_view.addItemDecoration(SpaceLeftAndRightItemDecorator(space.toInt()))
 
         generatorIndex = intent.extras?.getInt(generatorIndexKey) ?: 0
         val generatedPosition = availableGenerators[generatorIndex].second.generatePosition(random.nextBoolean())
@@ -52,6 +77,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putString(lastExerciseKey, lastExercise)
         outState?.putString(playerGoalKey, playingBoard.playerGoal())
         outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
+        outState?.putStringArray(adapterItemsKey, listAdapter.items)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -64,6 +90,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
             )
             lastExercise = savedInstanceState.getString(lastExerciseKey)
             label_player_goal.text = savedInstanceState.getString(playerGoalKey)
+            listAdapter.items = savedInstanceState.getStringArray(adapterItemsKey)
         }
     }
 
@@ -85,6 +112,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
      * If playerHasWhite is given null, it will be set to the turn of the given fen
      */
     fun newGame(fen: String = standardFEN){
+        listAdapter.clear()
         lastExercise = fen
         playingBoard.new_game(fen)
     }
@@ -110,6 +138,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 })
                 .setNegativeButton(R.string.no, null)
                 .show()
+    }
+
+    fun addTextInMovesList(txt: String){
+        listAdapter.addText(txt)
     }
 
     private lateinit var lastExercise:String
