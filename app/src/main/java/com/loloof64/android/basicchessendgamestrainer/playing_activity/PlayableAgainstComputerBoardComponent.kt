@@ -181,11 +181,14 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     fun playerHasWhite() = _playerHasWhite
 
-    fun reloadPosition(fen: String, playerHasWhite: Boolean, gameFinished: Boolean, waitingForPlayerGoal: Boolean){
+    fun reloadPosition(fen: String, playerHasWhite: Boolean,
+                       gameFinished: Boolean, waitingForPlayerGoal: Boolean,
+                       hasStartedToWriteMoves: Boolean){
         try {
             _gameFinished = gameFinished
             _relatedPosition = Position(fen)
             _playerHasWhite = playerHasWhite
+            _startedToWriteMoves = hasStartedToWriteMoves
             setWaitingForPlayerGoalFlag(waitingForPlayerGoal)
             invalidate()
             val computerToPlay = _playerHasWhite != isWhiteToPlay()
@@ -199,6 +202,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     fun new_game(startFen: String) {
         try {
             _gameFinished = false
+            _startedToWriteMoves = false
             _relatedPosition = Position(startFen)
             _playerHasWhite = isWhiteToPlay()
             waitForPlayerGoal()
@@ -363,13 +367,22 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         when (context) {
             is PlayingActivity -> {
                 val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
-                if (isWhiteTurn) (context as PlayingActivity)
-                        .addTextInMovesList(getMoveNumber().toString())
-                (context as PlayingActivity).addTextInMovesList(Move.getSAN(
-                        move, _relatedPosition
-                ))
+                if (!hasStartedToWriteMoves() && !isWhiteTurn){
+                    with(context as PlayingActivity){
+                        addTextInMovesList(getMoveNumber().toString())
+                        addTextInMovesList("..")
+                        addTextInMovesList(Move.getSAN(move, relatedPosition()))
+                    }
+                }
+                else {
+                    with(context as PlayingActivity){
+                        if (isWhiteTurn) addTextInMovesList(getMoveNumber().toString())
+                        addTextInMovesList(Move.getSAN(move, relatedPosition()))
+                    }
+                }
             }
         }
+        _startedToWriteMoves = true
     }
 
     fun validatePromotionMove(promotedPieceType: Short) {
@@ -392,6 +405,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     fun gameFinished() = _gameFinished
+    fun hasStartedToWriteMoves() = _startedToWriteMoves
 
     fun getMoveNumber(): Int {
         return (_relatedPosition.plyNumber / 2) + 1
@@ -401,4 +415,5 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     private var _gameFinished = false
     private var _waitingForPlayerGoal = true
     private var _playerGoal = ""
+    private var _startedToWriteMoves = false
 }

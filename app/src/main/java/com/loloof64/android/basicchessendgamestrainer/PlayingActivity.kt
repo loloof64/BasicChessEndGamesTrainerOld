@@ -36,6 +36,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
         val generatorIndexKey = "GeneratorIndex"
         val adapterItemsKey = "AdapterItems"
+        val startedToWriteMovesKey = "StartedToWriteMoves"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -78,6 +79,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putString(playerGoalKey, playingBoard.playerGoal())
         outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
         outState?.putStringArray(adapterItemsKey, listAdapter.items)
+        outState?.putBoolean(startedToWriteMovesKey, playingBoard.hasStartedToWriteMoves())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -86,7 +88,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
             playingBoard.reloadPosition(fen = savedInstanceState.getString(currentPositionkey),
                     playerHasWhite = savedInstanceState.getBoolean(playerHasWhiteKey),
                     gameFinished = savedInstanceState.getBoolean(gameFinishedKey),
-                    waitingForPlayerGoal = savedInstanceState.getBoolean(waitingForPlayerGoalKey)
+                    waitingForPlayerGoal = savedInstanceState.getBoolean(waitingForPlayerGoalKey),
+                    hasStartedToWriteMoves = savedInstanceState.getBoolean(startedToWriteMovesKey)
             )
             lastExercise = savedInstanceState.getString(lastExerciseKey)
             label_player_goal.text = savedInstanceState.getString(playerGoalKey)
