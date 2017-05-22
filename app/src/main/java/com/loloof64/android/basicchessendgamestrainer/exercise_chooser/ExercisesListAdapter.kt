@@ -1,34 +1,45 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
-import android.content.Context
+import android.graphics.Color
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
+import android.widget.LinearLayout
 import android.widget.TextView
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
 
-class ExerciseRowViewHolder(val textView: TextView)
-class ExerciseRow(val textId: Int)
+class ExerciseRow(val textId: Int, val mustWin: Boolean)
 
-class ExercisesListAdapter(context: Context, exercisesList: List<ExerciseRow>) :
-        ArrayAdapter<ExerciseRow>(context, 0, exercisesList){
+interface ItemClickListener {
+    fun onClick(position: Int):Unit
+}
 
+class ExercisesListAdapter(val exercisesList: List<ExerciseRow>,
+                           val itemClickListener: ItemClickListener) :
+        RecyclerView.Adapter<ExercisesListAdapter.Companion.ViewHolder>(){
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-        val viewToReturn = convertView ?: LayoutInflater.from(context)
-                .inflate(R.layout.exercises_list_row, parent, false)
+    companion object {
+        class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
+    }
 
-        var viewHolder = viewToReturn.tag as ExerciseRowViewHolder?
-        if (viewHolder == null){
-            viewHolder = ExerciseRowViewHolder(viewToReturn
-                    .findViewById(R.id.exercise_list_row_value) as TextView)
-            viewToReturn.setTag(viewHolder)
-        }
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
+        val layout = LayoutInflater.from(parent?.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
+        val textView = layout.findViewById(R.id.exercise_list_row_value) as TextView
+        layout.removeView(textView)
+        return ViewHolder(textView)
+    }
 
-        val exercise = getItem(position)
-        viewHolder.textView.text = context.resources.getString(exercise.textId)
+    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+        holder?.textView?.text = MyApplication.getApplicationContext().getString(exercisesList[position].textId)
+        holder?.textView?.setOnClickListener{ itemClickListener.onClick(position) }
+        holder?.textView?.setBackgroundColor(
+                if (exercisesList[position].mustWin) Color.parseColor("#50DF50")
+                else Color.parseColor("#DF5050")
+        )
+    }
 
-        return viewToReturn
+    override fun getItemCount(): Int {
+        return exercisesList.size
     }
 }
