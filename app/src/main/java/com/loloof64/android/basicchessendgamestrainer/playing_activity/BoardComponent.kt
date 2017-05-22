@@ -1,10 +1,7 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.Rect
-import android.graphics.Typeface
+import android.graphics.*
 import android.support.graphics.drawable.VectorDrawableCompat
 import android.util.AttributeSet
 import android.view.View
@@ -157,6 +154,43 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         }
     }
 
+    private fun drawHighlightedMove(canvas: Canvas, cellSize: Int){
+        if (_highlightedMoveFromFile !in 0..7) return
+        if (_highlightedMoveFromRank !in 0..7) return
+        if (_highlightedMoveToFile !in 0..7) return
+        if (_highlightedMoveToRank !in 0..7) return
+
+        val paint = Paint()
+
+        val fromPointX = (cellSize * if (reversed) (8 - _highlightedMoveFromFile) else (_highlightedMoveFromFile+1)).toFloat()
+        val fromPointY = (cellSize * if (reversed) (_highlightedMoveFromRank+1) else (8 - _highlightedMoveFromRank)).toFloat()
+        val toPointX = (cellSize * if (reversed) (8 - _highlightedMoveToFile) else (_highlightedMoveToFile+1)).toFloat()
+        val toPointY = (cellSize * if (reversed) (_highlightedMoveToRank+1) else (8 - _highlightedMoveToRank)).toFloat()
+
+        val angleDegrees = Math.toDegrees(Math.atan2(toPointY.toDouble() - fromPointY.toDouble(),
+                toPointX.toDouble() - fromPointX.toDouble())).toFloat()
+
+        val distance = Math.sqrt(Math.pow((toPointX - fromPointX).toDouble(), 2.0) +
+                Math.pow((toPointY - fromPointY).toDouble(), 2.0)).toFloat()
+
+        val arrowLength = distance * 0.3f
+
+        paint.color = Color.parseColor("#FEAC22")
+        paint.strokeWidth = cellSize * 0.1f
+
+        canvas.save()
+        canvas.translate(fromPointX, fromPointY)
+        canvas.rotate(angleDegrees)
+        canvas.drawLine(0f, 0f, distance, 0f, paint)
+        canvas.translate(distance, 0f)
+        canvas.rotate(180f)
+        canvas.save()
+        canvas.drawLine(0f, 0f, arrowLength, arrowLength, paint)
+        canvas.restore()
+        canvas.drawLine(0f, 0f, arrowLength, -arrowLength, paint)
+        canvas.restore()
+    }
+
 
     override fun onDraw(canvas: Canvas) {
         val cellSize = measuredWidth.min(measuredHeight) / 9
@@ -169,13 +203,24 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         if (highlightedCell() != null) drawHighlightedCell(canvas, cellSize)
         drawPieces(canvas, cellSize)
         drawPlayerTurn(canvas, cellSize)
+        drawHighlightedMove(canvas, cellSize)
+    }
+
+    fun setHighlightedMove(fromFile: Int, fromRank: Int,
+                           toFile: Int, toRank: Int){
+        _highlightedMoveFromFile = if (fromFile in 0..7) fromFile else -1
+        _highlightedMoveFromRank = if (fromRank in 0..7) fromRank else -1
+        _highlightedMoveToFile = if (toFile in 0..7) toFile else -1
+        _highlightedMoveToRank = if (toRank in 0..7) toRank else -1
+        invalidate()
     }
 
     fun toFEN(): String = relatedPosition().fen
 
-    fun setFromFen(boardFen: String) {
-        val newPosition = Position(boardFen)
-        replacePositionWith(newPosition)
-    }
+    private var _highlightedMoveFromFile = -1
+    private var _highlightedMoveFromRank = -1
+    private var _highlightedMoveToFile = -1
+    private var _highlightedMoveToRank = -1
+
 
 }

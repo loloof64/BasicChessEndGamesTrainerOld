@@ -38,6 +38,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val generatorIndexKey = "GeneratorIndex"
         val adapterItemsKey = "AdapterItems"
         val startedToWriteMovesKey = "StartedToWriteMoves"
+        val moveToHighlightFromFileKey = "MoveToHighlightFromFile"
+        val moveToHighlightFromRankKey = "MoveToHighlightFromRank"
+        val moveToHighlightToFileKey = "MoveToHighlightToFile"
+        val moveToHighlightToRankKey = "MoveToHighlightToRank"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -81,6 +85,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
         outState?.putStringArray(adapterItemsKey, listAdapter.items)
         outState?.putBoolean(startedToWriteMovesKey, playingBoard.hasStartedToWriteMoves())
+        outState?.putInt(moveToHighlightFromFileKey, playingBoard.getMoveToHighlightFromFile())
+        outState?.putInt(moveToHighlightFromRankKey, playingBoard.getMoveToHighlightFromRank())
+        outState?.putInt(moveToHighlightToFileKey, playingBoard.getMoveToHighlightToFile())
+        outState?.putInt(moveToHighlightToRankKey, playingBoard.getMoveToHighlightToRank())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -90,7 +98,11 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                     playerHasWhite = savedInstanceState.getBoolean(playerHasWhiteKey),
                     gameFinished = savedInstanceState.getBoolean(gameFinishedKey),
                     waitingForPlayerGoal = savedInstanceState.getBoolean(waitingForPlayerGoalKey),
-                    hasStartedToWriteMoves = savedInstanceState.getBoolean(startedToWriteMovesKey)
+                    hasStartedToWriteMoves = savedInstanceState.getBoolean(startedToWriteMovesKey),
+                    moveToHighlightFromFile = savedInstanceState.getInt(moveToHighlightFromFileKey),
+                    moveToHighlightFromRank = savedInstanceState.getInt(moveToHighlightFromRankKey),
+                    moveToHighlightToFile = savedInstanceState.getInt(moveToHighlightToFileKey),
+                    moveToHighlightToRank = savedInstanceState.getInt(moveToHighlightToRankKey)
             )
             lastExercise = savedInstanceState.getString(lastExerciseKey)
             setPlayerGoalTextId(savedInstanceState.getInt(playerGoalIDKey),

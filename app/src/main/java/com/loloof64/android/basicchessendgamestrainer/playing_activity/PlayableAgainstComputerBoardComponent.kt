@@ -12,7 +12,6 @@ import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.UCICommandAnswerCallback
-import kotlinx.android.synthetic.main.activity_playing.*
 import java.lang.ref.WeakReference
 import java.util.logging.Logger
 
@@ -180,12 +179,20 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     fun reloadPosition(fen: String, playerHasWhite: Boolean,
                        gameFinished: Boolean, waitingForPlayerGoal: Boolean,
-                       hasStartedToWriteMoves: Boolean){
+                       hasStartedToWriteMoves: Boolean,
+                       moveToHighlightFromFile: Int, moveToHighlightFromRank: Int,
+                       moveToHighlightToFile: Int, moveToHighlightToRank: Int){
         try {
             _gameFinished = gameFinished
             _relatedPosition = Position(fen)
             _playerHasWhite = playerHasWhite
             _startedToWriteMoves = hasStartedToWriteMoves
+            _moveToHighlightFrom = if (moveToHighlightFromFile in 0..7 &&
+                    moveToHighlightFromRank in 0..7) Pair(moveToHighlightFromFile, moveToHighlightFromRank) else null
+            _moveToHighlightTo = if (moveToHighlightToFile in 0..7 &&
+                    moveToHighlightToRank in 0..7) Pair(moveToHighlightToFile, moveToHighlightToRank) else null
+            updateHighlightedMove()
+
             setWaitingForPlayerGoalFlag(waitingForPlayerGoal)
             invalidate()
             val computerToPlay = _playerHasWhite != isWhiteToPlay()
@@ -200,6 +207,10 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         try {
             _gameFinished = false
             _startedToWriteMoves = false
+            _moveToHighlightFrom = null
+            _moveToHighlightTo = null
+            updateHighlightedMove()
+
             _relatedPosition = Position(startFen)
             _playerHasWhite = isWhiteToPlay()
             waitForPlayerGoal()
@@ -256,13 +267,21 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             }
         }
         handler.post {
-            if (chessMovePossibilities.isEmpty()) reactForIllegalMove()
-            else {
-                addMoveToList(chessMovePossibilities.first())
-                _relatedPosition.doMove(chessMovePossibilities.first())
+            if (chessMovePossibilities.isNotEmpty()) {
+                val move = chessMovePossibilities.first()
+                addMoveToList(move)
+                _relatedPosition.doMove(move)
+                _moveToHighlightFrom = Pair(
+                        Chess.sqiToCol(Move.getFromSqi(move)), Chess.sqiToRow(Move.getFromSqi(move))
+                )
+                _moveToHighlightTo = Pair(
+                        Chess.sqiToCol(Move.getToSqi(move)), Chess.sqiToRow(Move.getToSqi(move))
+                )
+                updateHighlightedMove()
+
+                invalidate()
+                checkIfGameFinished()
             }
-            invalidate()
-            checkIfGameFinished()
         }
     }
 
@@ -345,6 +364,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                     if (!sameCellSelected) reactForIllegalMove()
                 }
                 else {
+                    _moveToHighlightFrom = null
+                    _moveToHighlightTo = null
+                    updateHighlightedMove()
                     addMoveToList(matchMoves.first())
                     _relatedPosition.doMove(matchMoves.first())
                 }
@@ -414,9 +436,31 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         return (_relatedPosition.plyNumber / 2) + 1
     }
 
+    fun getMoveToHighlightFromFile() = if (_moveToHighlightFrom != null) _moveToHighlightFrom!!.first
+                                    else -1
+
+    fun getMoveToHighlightFromRank() = if (_moveToHighlightFrom != null) _moveToHighlightFrom!!.second
+                                    else -1
+
+    fun getMoveToHighlightToFile() = if (_moveToHighlightTo != null) _moveToHighlightTo!!.first
+                                    else -1
+
+    fun getMoveToHighlightToRank() = if (_moveToHighlightTo != null) _moveToHighlightTo!!.second
+                                    else -1
+
+    private fun updateHighlightedMove(){
+        setHighlightedMove(
+                _moveToHighlightFrom?.first ?: -1, _moveToHighlightFrom?.second ?: -1,
+                _moveToHighlightTo?.first ?: -1, _moveToHighlightTo?.second ?: -1
+        )
+        invalidate()
+    }
+
     private var _playerHasWhite = true
     private var _gameFinished = false
     private var _waitingForPlayerGoal = true
     private var _playerGoal = R.string.empty_string
     private var _startedToWriteMoves = false
+    private var _moveToHighlightFrom:Pair<Int, Int>? = null
+    private var _moveToHighlightTo:Pair<Int, Int>? = null
 }
