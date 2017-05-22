@@ -1,5 +1,6 @@
 package com.loloof64.android.basicchessendgamestrainer
 
+import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
 import android.support.v7.app.AppCompatActivity
@@ -56,7 +57,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
 
-        val gridLayoutColumns = 6
+        val gridLayoutColumns = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 9 else 6
         val gridLayoutManager = GridLayoutManager(this, gridLayoutColumns)
         moves_list_view.layoutManager = gridLayoutManager
         moves_list_view.adapter = listAdapter

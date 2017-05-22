@@ -166,6 +166,22 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         }
     }
 
+    private fun drawCurrentTargetCellGuidingAxis(canvas: Canvas, cellSize: Int){
+        val targetCellToHighlight = highlightedTargetCell()
+        if (targetCellToHighlight != null) {
+            val fileIndex = targetCellToHighlight.first
+            val rankIndex = targetCellToHighlight.second
+
+            val x = (cellSize * (1 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
+            val y = (cellSize * (1 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
+            rectPaint.setARGB(185, 0, 255, 0)
+            rectPaint.strokeWidth = cellSize * 0.1f
+
+            canvas.drawLine(0f, y, width.toFloat(), y, rectPaint)
+            canvas.drawLine(x, 0f, x, height.toFloat(), rectPaint)
+        }
+    }
+
     private fun drawHighlightedMove(canvas: Canvas, cellSize: Int){
         if (_highlightedMoveFromFile !in 0..7) return
         if (_highlightedMoveFromRank !in 0..7) return
@@ -216,6 +232,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         drawPieces(canvas, cellSize)
         drawPlayerTurn(canvas, cellSize)
         drawHighlightedMove(canvas, cellSize)
+        drawCurrentTargetCellGuidingAxis(canvas, cellSize)
     }
 
     fun setHighlightedMove(fromFile: Int, fromRank: Int,
