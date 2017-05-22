@@ -28,4 +28,5 @@
     <string name="new_exercise_alert_title">New exercise</string>
     <string name="new_exercise_alert_message">About to start a new exercise : are you sure ?</string>
     <string name="empty_string" />
+    <string name="san_chess_pieces">NBRQK</string>
 </resources>

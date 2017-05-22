@@ -408,18 +408,26 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                     with(context as PlayingActivity){
                         addTextInMovesList(getMoveNumber().toString())
                         addTextInMovesList("..")
-                        addTextInMovesList(Move.getSAN(move, relatedPosition()))
+                        addTextInMovesList(localizedSAN(Move.getSAN(move, relatedPosition())))
                     }
                 }
                 else {
                     with(context as PlayingActivity){
                         if (isWhiteTurn) addTextInMovesList(getMoveNumber().toString())
-                        addTextInMovesList(Move.getSAN(move, relatedPosition()))
+                        addTextInMovesList(localizedSAN(Move.getSAN(move, relatedPosition())))
                     }
                 }
             }
         }
         _startedToWriteMoves = true
+    }
+
+    private fun  localizedSAN(san: String): String {
+        val originalSan = "NBRQK"
+        val sanTranslations = context.getString(R.string.san_chess_pieces)
+
+        val mappings = originalSan.zip(sanTranslations).toMap()
+        return san.map { if (it in originalSan) mappings[it] else it }.joinToString("")
     }
 
     fun validatePromotionMove(promotedPieceType: Short) {
