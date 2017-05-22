@@ -4,7 +4,6 @@ import android.content.Context
 import android.os.Handler
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.widget.Toast
 import chesspresso.Chess
 import chesspresso.move.Move
 import chesspresso.position.FEN
@@ -119,8 +118,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         (context.applicationContext as MyApplication).uciNewGame(_relatedPosition.fen)
         (context.applicationContext as MyApplication).uciInteract("go")
     }
-
-    fun playerGoal() = _playerGoal
 
     override fun relatedPosition(): Position {
         return _relatedPosition
@@ -271,15 +268,21 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     fun checkIfGameFinished() {
         if (_relatedPosition.isMate) {
-            Toast.makeText(context, R.string.checkmate, Toast.LENGTH_LONG).show()
+            when(context){
+                is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(R.string.checkmate, alertMode = true)
+            }
             _gameFinished = true
         }
         if (_relatedPosition.isStaleMate){
-            Toast.makeText(context, R.string.stalemate, Toast.LENGTH_LONG).show()
+            when(context){
+                is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(R.string.stalemate, alertMode = true)
+            }
             _gameFinished = true
         }
         else if (_relatedPosition.halfMoveClock >= 100){
-            Toast.makeText(context, R.string.fiftyMoveDraw, Toast.LENGTH_LONG).show()
+            when(context){
+                is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(R.string.fiftyMoveDraw, alertMode = true)
+            }
             _gameFinished = true
         }
     }
@@ -294,14 +297,14 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                     val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
 
                     _playerGoal = when (positionResultFromPositionInfo(infoLines.last(), isWhiteTurn)) {
-                        ChessResult.WHITE_WIN -> context.getString(R.string.white_play_for_mate)
-                        ChessResult.BLACK_WIN -> context.getString(R.string.black_play_for_mate)
-                        ChessResult.DRAW -> context.getString(R.string.should_be_draw)
-                        ChessResult.UNDECIDED -> ""
+                        ChessResult.WHITE_WIN -> R.string.white_play_for_mate
+                        ChessResult.BLACK_WIN -> R.string.black_play_for_mate
+                        ChessResult.DRAW -> R.string.should_be_draw
+                        ChessResult.UNDECIDED -> R.string.empty_string
                     }
 
                     when (context) {
-                        is PlayingActivity -> (context as PlayingActivity).label_player_goal.text = _playerGoal
+                        is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(_playerGoal, alertMode = false)
                     }
                     _waitingForPlayerGoal = false
                 }
@@ -414,6 +417,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     private var _playerHasWhite = true
     private var _gameFinished = false
     private var _waitingForPlayerGoal = true
-    private var _playerGoal = ""
+    private var _playerGoal = R.string.empty_string
     private var _startedToWriteMoves = false
 }

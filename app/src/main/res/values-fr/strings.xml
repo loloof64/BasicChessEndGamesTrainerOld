@@ -27,4 +27,5 @@
     <string name="no">Non</string>
     <string name="new_exercise_alert_title">Nouvel exercice</string>
     <string name="new_exercise_alert_message">Sur le point de commencer un nouvel exercice : en êtes-vous sûr ?</string>
+    <string name="empty_string" />
 </resources>

@@ -1,6 +1,6 @@
 package com.loloof64.android.basicchessendgamestrainer
 
-import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.Rect
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
@@ -32,7 +32,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val playerHasWhiteKey = "PlayerHasWhite"
         val gameFinishedKey = "GameFinished"
         val lastExerciseKey = "LastExercise"
-        val playerGoalKey = "PlayerGoal"
+        val playerGoalIDKey = "PlayerGoalID"
+        val playerGoalInAlertModeKey = "PlayerGoalInAlertMode"
         val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
         val generatorIndexKey = "GeneratorIndex"
         val adapterItemsKey = "AdapterItems"
@@ -75,7 +76,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
         outState?.putBoolean(gameFinishedKey, playingBoard.gameFinished())
         outState?.putString(lastExerciseKey, lastExercise)
-        outState?.putString(playerGoalKey, playingBoard.playerGoal())
+        outState?.putInt(playerGoalIDKey, playerGoalTextId)
+        outState?.putBoolean(playerGoalInAlertModeKey, playerGoalInAlertMode)
         outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
         outState?.putStringArray(adapterItemsKey, listAdapter.items)
         outState?.putBoolean(startedToWriteMovesKey, playingBoard.hasStartedToWriteMoves())
@@ -91,7 +93,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                     hasStartedToWriteMoves = savedInstanceState.getBoolean(startedToWriteMovesKey)
             )
             lastExercise = savedInstanceState.getString(lastExerciseKey)
-            label_player_goal.text = savedInstanceState.getString(playerGoalKey)
+            setPlayerGoalTextId(savedInstanceState.getInt(playerGoalIDKey),
+                    savedInstanceState.getBoolean(playerGoalInAlertModeKey))
             listAdapter.items = savedInstanceState.getStringArray(adapterItemsKey)
         }
     }
@@ -114,6 +117,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
      * If playerHasWhite is given null, it will be set to the turn of the given fen
      */
     fun newGame(fen: String = standardFEN){
+        setPlayerGoalTextId(R.string.empty_string, alertMode = false)
         listAdapter.clear()
         lastExercise = fen
         playingBoard.new_game(fen)
@@ -125,8 +129,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setTitle(R.string.restarting_exercise_alert_title)
                 .setMessage(R.string.restarting_exercise_alert_message)
                 .setPositiveButton(R.string.yes, {_, _ ->
-                    listAdapter.clear()
-                    playingBoard.new_game(lastExercise)
+                    newGame(lastExercise)
                 })
                 .setNegativeButton(R.string.no, null)
                 .show()
@@ -152,7 +155,17 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         }
     }
 
+    fun setPlayerGoalTextId(textID: Int, alertMode: Boolean){
+        playerGoalTextId = textID
+        playerGoalInAlertMode = alertMode
+        label_player_goal.text = resources.getString(textID)
+        if (alertMode) label_player_goal.setTextColor(Color.parseColor("#FA2323"))
+        else label_player_goal.setTextColor(Color.parseColor("#000000"))
+    }
+
     private lateinit var lastExercise:String
     private var generatorIndex: Int = 0
     private var random = Random()
+    private var playerGoalTextId: Int = -1
+    private var playerGoalInAlertMode = false
 }
