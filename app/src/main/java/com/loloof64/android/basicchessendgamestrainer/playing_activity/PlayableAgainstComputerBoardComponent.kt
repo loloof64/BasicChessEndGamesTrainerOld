@@ -253,6 +253,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                        moveToHighlightToFile: Int, moveToHighlightToRank: Int){
         try {
             _gameFinished = gameFinished
+            when(context){
+                is PlayingActivity -> (context as PlayingActivity).disallowPositionNavigation()
+            }
             _relatedPosition = Position(fen)
             _playerHasWhite = playerHasWhite
             _startedToWriteMoves = hasStartedToWriteMoves
@@ -275,6 +278,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     fun new_game(startFen: String) {
         try {
             _gameFinished = false
+            when(context){
+                is PlayingActivity -> (context as PlayingActivity).disallowPositionNavigation()
+            }
             _startedToWriteMoves = false
             _moveToHighlightFrom = null
             _moveToHighlightTo = null
@@ -357,19 +363,28 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     fun checkIfGameFinished() {
         if (_relatedPosition.isMate) {
             when(context){
-                is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(R.string.checkmate, alertMode = true)
+                is PlayingActivity -> with(context as PlayingActivity){
+                    setPlayerGoalTextId(R.string.checkmate, alertMode = true)
+                    activatePositionNavigation()
+                }
             }
             _gameFinished = true
         }
         if (_relatedPosition.isStaleMate){
             when(context){
-                is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(R.string.stalemate, alertMode = true)
+                is PlayingActivity -> with(context as PlayingActivity){
+                    setPlayerGoalTextId(R.string.stalemate, alertMode = true)
+                    activatePositionNavigation()
+                }
             }
             _gameFinished = true
         }
         else if (_relatedPosition.halfMoveClock >= 100){
             when(context){
-                is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(R.string.fiftyMoveDraw, alertMode = true)
+                is PlayingActivity -> with(context as PlayingActivity){
+                    setPlayerGoalTextId(R.string.fiftyMoveDraw, alertMode = true)
+                    activatePositionNavigation()
+                }
             }
             _gameFinished = true
         }
@@ -403,18 +418,37 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     private fun addMoveToList(move: Short) {
         when (context) {
             is PlayingActivity -> {
+                val positionClone = Position(_relatedPosition.fen)
+                positionClone.doMove(move)
+                val fenAfterMove = positionClone.fen
                 val isWhiteTurn = _relatedPosition.toPlay == Chess.WHITE
                 if (!hasStartedToWriteMoves() && !isWhiteTurn){
                     with(context as PlayingActivity){
-                        addTextInMovesList(getMoveNumber().toString())
-                        addTextInMovesList("..")
-                        addTextInMovesList(localizedSAN(Move.getSAN(move, relatedPosition())))
+                        addPositionInMovesList(getMoveNumber().toString(), "", MoveToHighlight(-1,-1,-1,-1))
+                        addPositionInMovesList("..", "",MoveToHighlight(-1,-1,-1,-1))
+                        addPositionInMovesList(localizedSAN(san = Move.getSAN(move, relatedPosition())),
+                            fen = fenAfterMove, moveToHighlight = MoveToHighlight(
+                            startFile = Chess.sqiToCol(Move.getFromSqi(move)),
+                            startRank = Chess.sqiToRow(Move.getFromSqi(move)),
+                            endFile = Chess.sqiToCol(Move.getToSqi(move)),
+                            endRank = Chess.sqiToRow(Move.getToSqi(move))
+                        ))
                     }
                 }
                 else {
                     with(context as PlayingActivity){
-                        if (isWhiteTurn) addTextInMovesList(getMoveNumber().toString())
-                        addTextInMovesList(localizedSAN(Move.getSAN(move, relatedPosition())))
+                        if (isWhiteTurn) addPositionInMovesList(getMoveNumber().toString(), "",
+                                MoveToHighlight(-1,-1,-1,-1))
+                        addPositionInMovesList(
+                                san = localizedSAN(Move.getSAN(move, relatedPosition())),
+                                fen = fenAfterMove,
+                                moveToHighlight = MoveToHighlight(
+                                    startFile = Chess.sqiToCol(Move.getFromSqi(move)),
+                                    startRank = Chess.sqiToRow(Move.getFromSqi(move)),
+                                    endFile = Chess.sqiToCol(Move.getToSqi(move)),
+                                    endRank = Chess.sqiToRow(Move.getToSqi(move))
+                                )
+                        )
                     }
                 }
             }
@@ -423,7 +457,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     private fun  localizedSAN(san: String): String {
-        val originalSan = "NBRQK"
+        val originalSan = "PNBRQK"
         val sanTranslations = context.getString(R.string.san_chess_pieces)
 
         val mappings = originalSan.zip(sanTranslations).toMap()

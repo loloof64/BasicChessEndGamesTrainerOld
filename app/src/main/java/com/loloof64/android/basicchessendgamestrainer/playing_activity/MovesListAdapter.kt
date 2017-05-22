@@ -1,13 +1,24 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
+import android.content.Context
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.loloof64.android.basicchessendgamestrainer.R
+import java.lang.ref.WeakReference
 
-class MovesListAdapter : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHolder>() {
+data class RowInput(val san:String, val relatedFen: String, val moveToHighlight: MoveToHighlight)
+data class MoveToHighlight(val startFile: Int, val startRank : Int,
+                           val endFile: Int, val endRank : Int)
+
+abstract class ItemClickListener {
+    abstract fun onClick(weakRefContext: WeakReference<Context>,
+                         positionFen: String, moveToHighlight: MoveToHighlight):Unit
+}
+
+class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClickListener: ItemClickListener) : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHolder>() {
     companion object {
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
     }
@@ -22,15 +33,22 @@ class MovesListAdapter : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHol
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.textView?.text = inputsList[position]
+        holder?.textView?.text = inputsList[position].san
+        holder?.textView?.setOnClickListener {
+            val relatedFen = inputsList[position].relatedFen
+            val moveToHighlight = inputsList[position].moveToHighlight
+            if (relatedFen.isNotEmpty() && _switchingPositionFeatureActive) {
+                itemClickListener.onClick(weakRefContext, relatedFen, moveToHighlight)
+            }
+        }
     }
 
     override fun getItemCount(): Int {
         return inputsList.size
     }
 
-    fun addText(txt: String){
-        inputsList.add(txt)
+    fun addPosition(san: String, fen: String, moveToHighlight: MoveToHighlight){
+        inputsList.add(RowInput(san, fen, moveToHighlight))
         update()
     }
 
@@ -39,7 +57,13 @@ class MovesListAdapter : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHol
         update()
     }
 
-    var items: Array<String>
+    var switchingPosition: Boolean
+        get() = _switchingPositionFeatureActive
+        set(value) {
+            _switchingPositionFeatureActive = value
+        }
+
+    var items: Array<RowInput>
         get() = inputsList.toTypedArray()
         set(value){
             inputsList = value.toMutableList()
@@ -50,5 +74,6 @@ class MovesListAdapter : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHol
         notifyDataSetChanged()
     }
 
-    private var inputsList = mutableListOf<String>()
+    private var inputsList = mutableListOf<RowInput>()
+    private var _switchingPositionFeatureActive = false
 }

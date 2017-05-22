@@ -1,23 +1,22 @@
 package com.loloof64.android.basicchessendgamestrainer
 
+import android.content.Context
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
+import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
 import android.view.View
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
-import com.loloof64.android.basicchessendgamestrainer.playing_activity.MovesListAdapter
-import com.loloof64.android.basicchessendgamestrainer.playing_activity.PromotionPieceChooserDialogFragment
+import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
 import kotlinx.android.synthetic.main.activity_playing.*
+import java.lang.ref.WeakReference
 import java.util.*
-
-val listAdapter = MovesListAdapter()
 
 class SpaceLeftAndRightItemDecorator(val space: Int): RecyclerView.ItemDecoration(){
     override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
@@ -37,12 +36,18 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val playerGoalInAlertModeKey = "PlayerGoalInAlertMode"
         val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
         val generatorIndexKey = "GeneratorIndex"
-        val adapterItemsKey = "AdapterItems"
+        val adapterSanItemsKey = "AdapterSanItems"
+        val adapterFenItemsKey = "AdapterFenItems"
         val startedToWriteMovesKey = "StartedToWriteMoves"
         val moveToHighlightFromFileKey = "MoveToHighlightFromFile"
         val moveToHighlightFromRankKey = "MoveToHighlightFromRank"
         val moveToHighlightToFileKey = "MoveToHighlightToFile"
         val moveToHighlightToRankKey = "MoveToHighlightToRank"
+        val switchingPositionAllowedKey = "SwitchingPositionAllowed"
+        val registedHighlitedMovesStartFilesKey = "RegistedHighlitedMovesStartFiles"
+        val registedHighlitedMovesStartRanksKey = "RegistedHighlitedMovesStartRanks"
+        val registedHighlitedMovesEndFilesKey = "RegistedHighlitedMovesEndFiles"
+        val registedHighlitedMovesEndRanksKey = "RegistedHighlitedMovesEndRanks"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -84,12 +89,22 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putInt(playerGoalIDKey, playerGoalTextId)
         outState?.putBoolean(playerGoalInAlertModeKey, playerGoalInAlertMode)
         outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
-        outState?.putStringArray(adapterItemsKey, listAdapter.items)
+        outState?.putStringArray(adapterSanItemsKey, listAdapter.items.map { it.san }.toTypedArray())
+        outState?.putStringArray(adapterFenItemsKey, listAdapter.items.map { it.relatedFen }.toTypedArray())
         outState?.putBoolean(startedToWriteMovesKey, playingBoard.hasStartedToWriteMoves())
         outState?.putInt(moveToHighlightFromFileKey, playingBoard.getMoveToHighlightFromFile())
         outState?.putInt(moveToHighlightFromRankKey, playingBoard.getMoveToHighlightFromRank())
         outState?.putInt(moveToHighlightToFileKey, playingBoard.getMoveToHighlightToFile())
         outState?.putInt(moveToHighlightToRankKey, playingBoard.getMoveToHighlightToRank())
+        outState?.putBoolean(switchingPositionAllowedKey, listAdapter.switchingPosition)
+        outState?.putIntArray(registedHighlitedMovesStartFilesKey,
+                listAdapter.items.map { it.moveToHighlight.startFile }.toIntArray())
+        outState?.putIntArray(registedHighlitedMovesStartRanksKey,
+                listAdapter.items.map { it.moveToHighlight.startRank }.toIntArray())
+        outState?.putIntArray(registedHighlitedMovesEndFilesKey,
+                listAdapter.items.map { it.moveToHighlight.endFile }.toIntArray())
+        outState?.putIntArray(registedHighlitedMovesEndRanksKey,
+                listAdapter.items.map { it.moveToHighlight.endRank }.toIntArray())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -108,7 +123,24 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
             lastExercise = savedInstanceState.getString(lastExerciseKey)
             setPlayerGoalTextId(savedInstanceState.getInt(playerGoalIDKey),
                     savedInstanceState.getBoolean(playerGoalInAlertModeKey))
-            listAdapter.items = savedInstanceState.getStringArray(adapterItemsKey)
+            val sanItems = savedInstanceState.getStringArray(adapterSanItemsKey)
+            val fenItems = savedInstanceState.getStringArray(adapterFenItemsKey)
+            val highlightStartFiles = savedInstanceState.getIntArray(registedHighlitedMovesStartFilesKey)
+            val highlightStartRanks = savedInstanceState.getIntArray(registedHighlitedMovesStartRanksKey)
+            val highlightEndFiles = savedInstanceState.getIntArray(registedHighlitedMovesEndFilesKey)
+            val highlightEndRanks = savedInstanceState.getIntArray(registedHighlitedMovesEndRanksKey)
+
+            val highlightStart = highlightStartFiles zip highlightStartRanks
+            val highlightEnd = highlightEndFiles zip highlightEndRanks
+            val highlight = highlightStart zip highlightEnd
+            val adapterItems = (sanItems zip fenItems) zip highlight
+
+            listAdapter.items = adapterItems.map { entry ->
+                RowInput(entry.first.first, entry.first.second,
+                        MoveToHighlight(entry.second.first.first, entry.second.first.second,
+                                entry.second.second.first, entry.second.second.second))
+            }.toTypedArray()
+            listAdapter.switchingPosition = savedInstanceState.getBoolean(switchingPositionAllowedKey)
         }
     }
 
@@ -161,8 +193,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .show()
     }
 
-    fun addTextInMovesList(txt: String){
-        listAdapter.addText(txt)
+    fun addPositionInMovesList(san: String, fen: String, moveToHighlight: MoveToHighlight) {
+        listAdapter.addPosition(san, fen, moveToHighlight)
         moves_list_view.post {
             moves_list_view.smoothScrollToPosition(listAdapter.itemCount)
         }
@@ -174,6 +206,14 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         label_player_goal.text = resources.getString(textID)
         if (alertMode) label_player_goal.setTextColor(Color.parseColor("#FA2323"))
         else label_player_goal.setTextColor(Color.parseColor("#000000"))
+    }
+
+    fun activatePositionNavigation(){
+        listAdapter.switchingPosition = true
+    }
+
+    fun disallowPositionNavigation(){
+        listAdapter.switchingPosition = false
     }
 
     override fun onBackPressed() {
@@ -193,4 +233,22 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     private var random = Random()
     private var playerGoalTextId: Int = -1
     private var playerGoalInAlertMode = false
+    private val listAdapter = MovesListAdapter(WeakReference(this), object : ItemClickListener() {
+        override fun onClick(weakRefContext: WeakReference<Context>, positionFen: String,
+                             moveToHighlight: MoveToHighlight) {
+            if (weakRefContext.get() != null){
+                when(weakRefContext.get()){
+                    is PlayingActivity -> {
+                        with(weakRefContext.get() as PlayingActivity){
+                            playingBoard.setFromFen(positionFen)
+                            playingBoard.setHighlightedMove(moveToHighlight.startFile,
+                                    moveToHighlight.startRank,
+                                    moveToHighlight.endFile,
+                                    moveToHighlight.endRank)
+                        }
+                    }
+                }
+            }
+        }
+    })
 }

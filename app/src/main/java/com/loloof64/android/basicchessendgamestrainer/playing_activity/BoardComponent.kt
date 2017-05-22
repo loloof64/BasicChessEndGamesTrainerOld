@@ -246,6 +246,12 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
     fun toFEN(): String = relatedPosition().fen
 
+    fun setFromFen(boardFen: String) {
+        val newPosition = Position(boardFen)
+        replacePositionWith(newPosition)
+        invalidate()
+    }
+
     private var _highlightedMoveFromFile = -1
     private var _highlightedMoveFromRank = -1
     private var _highlightedMoveToFile = -1
