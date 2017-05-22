@@ -147,6 +147,9 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
 
     fun addTextInMovesList(txt: String){
         listAdapter.addText(txt)
+        moves_list_view.post {
+            moves_list_view.smoothScrollToPosition(listAdapter.itemCount)
+        }
     }
 
     private lateinit var lastExercise:String
