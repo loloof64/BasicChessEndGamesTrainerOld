@@ -48,6 +48,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val registedHighlitedMovesStartRanksKey = "RegistedHighlitedMovesStartRanks"
         val registedHighlitedMovesEndFilesKey = "RegistedHighlitedMovesEndFiles"
         val registedHighlitedMovesEndRanksKey = "RegistedHighlitedMovesEndRanks"
+        val selectedNavigationItemKey = "SelectedNavigationItem"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -105,6 +106,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 listAdapter.items.map { it.moveToHighlight.endFile }.toIntArray())
         outState?.putIntArray(registedHighlitedMovesEndRanksKey,
                 listAdapter.items.map { it.moveToHighlight.endRank }.toIntArray())
+        outState?.putInt(selectedNavigationItemKey, listAdapter.selectedNavigationItem)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -135,12 +137,13 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
             val highlight = highlightStart zip highlightEnd
             val adapterItems = (sanItems zip fenItems) zip highlight
 
-            listAdapter.items = adapterItems.map { entry ->
-                RowInput(entry.first.first, entry.first.second,
-                        MoveToHighlight(entry.second.first.first, entry.second.first.second,
-                                entry.second.second.first, entry.second.second.second))
+            listAdapter.items = adapterItems.map { (a, b) ->
+                RowInput(a.first, a.second,
+                        MoveToHighlight(b.first.first, b.first.second,
+                                b.second.first, b.second.second))
             }.toTypedArray()
             listAdapter.switchingPosition = savedInstanceState.getBoolean(switchingPositionAllowedKey)
+            listAdapter.selectedNavigationItem = savedInstanceState.getInt(selectedNavigationItemKey)
         }
     }
 

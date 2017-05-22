@@ -1,6 +1,7 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
+import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -34,10 +35,15 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.textView?.text = inputsList[position].san
+        holder?.textView?.setBackgroundColor(
+                if (position == _selectedNavigationItem && _switchingPositionFeatureActive) Color.parseColor("#FFDD26")
+                else Color.parseColor("#CDCDCD")
+        )
         holder?.textView?.setOnClickListener {
             val relatedFen = inputsList[position].relatedFen
             val moveToHighlight = inputsList[position].moveToHighlight
             if (relatedFen.isNotEmpty() && _switchingPositionFeatureActive) {
+                selectedNavigationItem = position
                 itemClickListener.onClick(weakRefContext, relatedFen, moveToHighlight)
             }
         }
@@ -70,10 +76,18 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
             update()
         }
 
+    var selectedNavigationItem: Int
+        get() = _selectedNavigationItem
+        set(value) {
+            _selectedNavigationItem = value
+            update()
+        }
+
     private fun update(){
         notifyDataSetChanged()
     }
 
     private var inputsList = mutableListOf<RowInput>()
     private var _switchingPositionFeatureActive = false
+    private var _selectedNavigationItem = -1
 }
