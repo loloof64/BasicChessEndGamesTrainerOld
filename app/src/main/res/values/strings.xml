@@ -28,5 +28,7 @@
     <string name="new_exercise_alert_title">New exercise</string>
     <string name="new_exercise_alert_message">About to start a new exercise : are you sure ?</string>
     <string name="empty_string" />
-    <string name="san_chess_pieces">NBRQK</string>
+    <string name="san_chess_pieces">PNBRQK</string>
+    <string name="quit_exercise_confirmation_title">Quit current exercise ?</string>
+    <string name="quit_exercise_confirmation_message">Are you sure you want to quit current exercise ?</string>
 </resources>

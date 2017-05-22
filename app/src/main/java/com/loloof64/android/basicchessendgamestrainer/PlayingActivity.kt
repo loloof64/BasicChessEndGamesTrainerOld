@@ -176,6 +176,18 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         else label_player_goal.setTextColor(Color.parseColor("#000000"))
     }
 
+    override fun onBackPressed() {
+        AlertDialog.Builder(this)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setTitle(R.string.quit_exercise_confirmation_title)
+                .setMessage(R.string.quit_exercise_confirmation_message)
+                .setPositiveButton(R.string.yes, {_, _ ->
+                    super.onBackPressed()
+                })
+                .setNegativeButton(R.string.no, null)
+                .show()
+    }
+
     private lateinit var lastExercise:String
     private var generatorIndex: Int = 0
     private var random = Random()
