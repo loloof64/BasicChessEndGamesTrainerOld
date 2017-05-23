@@ -4,12 +4,9 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.view.MotionEvent
-import android.view.View
-import android.widget.AdapterView
-import android.widget.Toast
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.*
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExerciseRow
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
 import java.util.*
 
@@ -39,7 +36,11 @@ class ExerciseChooserActivity : AppCompatActivity() {
                 R.string.exercise_kbb_k to true).map { ExerciseRow(it.first, it.second) }
     }
 
-    override fun onStop() {
+    override fun onDestroy() {
+        super.onDestroy()
+    }
+
+    override fun onStop(){
         super.onStop()
         if (isFinishing) (application as MyApplication).uciEnd()
     }

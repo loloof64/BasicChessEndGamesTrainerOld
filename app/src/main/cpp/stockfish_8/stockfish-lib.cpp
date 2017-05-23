@@ -1,14 +1,12 @@
 #include <jni.h>
 #include <iostream>
 #include <android/log.h>
-#include <sstream>
 
 #include "bitboard.h"
 #include "position.h"
 #include "search.h"
 #include "thread.h"
 #include "tt.h"
-#include "misc.h"
 #include "uci.h"
 #include "syzygy/tbprobe.h"
 
@@ -116,7 +114,6 @@ Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciSetAnswerCa
 
 JNIEXPORT void JNICALL
 Java_com_loloof64_android_basicchessendgamestrainer_MyApplication_uciEnd(JNIEnv *env, jobject obj){
-    UCI::endCommandReader();
     if (callbackWrapper.callbackPtr != nullptr) env->DeleteGlobalRef(callbackWrapper.callbackPtr);
 
     Threads.exit();
