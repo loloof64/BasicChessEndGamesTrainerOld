@@ -241,7 +241,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         drawCurrentTargetCellGuidingAxis(canvas, cellSize)
     }
 
-    fun setHighlightedMove(fromFile: Int, fromRank: Int,
+    open fun setHighlightedMove(fromFile: Int, fromRank: Int,
                            toFile: Int, toRank: Int){
         _highlightedMoveFromFile = if (fromFile in 0..7) fromFile else -1
         _highlightedMoveFromRank = if (fromRank in 0..7) fromRank else -1

@@ -504,6 +504,12 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         return (_relatedPosition.plyNumber / 2) + 1
     }
 
+    override fun setHighlightedMove(fromFile: Int, fromRank: Int, toFile: Int, toRank: Int) {
+        super.setHighlightedMove(fromFile, fromRank, toFile, toRank)
+        _moveToHighlightFrom = Pair(fromFile, fromRank)
+        _moveToHighlightTo = Pair(toFile, toRank)
+    }
+
     fun getMoveToHighlightFromFile() = if (_moveToHighlightFrom != null) _moveToHighlightFrom!!.first
                                     else -1
 
