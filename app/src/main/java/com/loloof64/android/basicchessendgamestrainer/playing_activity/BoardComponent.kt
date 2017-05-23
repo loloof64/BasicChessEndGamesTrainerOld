@@ -19,10 +19,10 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
     data class ColorARGB(val alpha: Int, val red: Int, val green: Int, val blue: Int)
 
-    private val typedArray by lazy {
+    protected val typedArray by lazy {
         context.obtainStyledAttributes(attrs, R.styleable.board_component)
     }
-    private val minAvailableSpacePercentage by lazy {
+    protected val minAvailableSpacePercentage by lazy {
         val computed = typedArray.getInt(R.styleable.board_component_available_space_min_dimension_percentage, 100)
         typedArray.recycle()
         computed
@@ -47,8 +47,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        val widthAdjusted = widthSize * minAvailableSpacePercentage / 100.max(suggestedMinimumWidth)
-        val heightAdjusted = heightSize * minAvailableSpacePercentage / 100.max(suggestedMinimumHeight)
+        val widthAdjusted = (widthSize * minAvailableSpacePercentage / 100).max(suggestedMinimumWidth)
+        val heightAdjusted = (heightSize * minAvailableSpacePercentage / 100).max(suggestedMinimumHeight)
 
         val desiredWidth = widthAdjusted - (widthAdjusted % 9)
         val desiredHeight = heightAdjusted - (heightAdjusted % 9)

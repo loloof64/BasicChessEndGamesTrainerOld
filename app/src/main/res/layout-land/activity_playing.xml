@@ -11,7 +11,8 @@
         android:id="@+id/playingBoard"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:available_space_min_dimension_percentage="100"
+        android:layout_centerVertical="true"
+        app:available_space_min_dimension_percentage="90"
         />
 
     <android.support.design.widget.FloatingActionButton
@@ -30,10 +31,9 @@
         android:onClick="restartLastExercise"
         android:src="@android:drawable/ic_menu_rotate"
         android:id="@+id/fab_restart_exercise"
-        android:layout_toRightOf="@+id/playingBoard"
-        android:layout_toEndOf="@+id/playingBoard"
-        android:layout_below="@id/fab_reverse_board"
-        android:layout_marginTop="16dp" />
+        android:layout_toRightOf="@+id/fab_reverse_board"
+        android:layout_toEndOf="@+id/fab_reverse_board"
+        android:layout_below="@id/label_player_goal" />
 
     <android.support.design.widget.FloatingActionButton
         android:layout_width="wrap_content"
@@ -41,18 +41,17 @@
         android:onClick="newExercise"
         android:src="@mipmap/ic_add"
         android:id="@+id/fab_new_exercise"
-        android:layout_toRightOf="@+id/playingBoard"
-        android:layout_toEndOf="@+id/playingBoard"
-        android:layout_below="@+id/fab_restart_exercise"
-        android:layout_marginTop="16dp" />
+        android:layout_toRightOf="@+id/fab_restart_exercise"
+        android:layout_toEndOf="@+id/fab_restart_exercise"
+        android:layout_below="@+id/label_player_goal" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/moves_list_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toRightOf="@+id/fab_reverse_board"
-        android:layout_toEndOf="@+id/fab_reverse_board"
-        android:layout_below="@+id/label_player_goal"
+        android:layout_toRightOf="@+id/playingBoard"
+        android:layout_toEndOf="@+id/playingBoard"
+        android:layout_below="@+id/fab_reverse_board"
     />
 
     <TextView
