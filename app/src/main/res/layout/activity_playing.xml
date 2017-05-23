@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
-        app:available_space_min_dimension_percentage="90"
+        app:min_dimension_percentage="90"
     />
 
     <android.support.design.widget.FloatingActionButton

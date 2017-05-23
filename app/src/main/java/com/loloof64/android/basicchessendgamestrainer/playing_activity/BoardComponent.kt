@@ -19,13 +19,17 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
     data class ColorARGB(val alpha: Int, val red: Int, val green: Int, val blue: Int)
 
-    protected val typedArray by lazy {
-        context.obtainStyledAttributes(attrs, R.styleable.board_component)
+    private val typedArray by lazy {
+        context.obtainStyledAttributes(attrs, R.styleable.BoardComponent)
     }
-    protected val minAvailableSpacePercentage by lazy {
-        val computed = typedArray.getInt(R.styleable.board_component_available_space_min_dimension_percentage, 100)
+    private val minAvailableSpacePercentage by lazy {
+        val computed = typedArray.getInt(R.styleable.BoardComponent_available_space_min_dimension_percentage, 100)
         typedArray.recycle()
         computed
+    }
+
+    open fun computeMinAvailableSpacePercentage():Int {
+        return minAvailableSpacePercentage
     }
 
     protected abstract fun relatedPosition() : Position
@@ -47,8 +51,10 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)
 
-        val widthAdjusted = (widthSize * minAvailableSpacePercentage / 100).max(suggestedMinimumWidth)
-        val heightAdjusted = (heightSize * minAvailableSpacePercentage / 100).max(suggestedMinimumHeight)
+        val minSpacePercentage = computeMinAvailableSpacePercentage()
+
+        val widthAdjusted = (widthSize * minSpacePercentage / 100).max(suggestedMinimumWidth)
+        val heightAdjusted = (heightSize * minSpacePercentage / 100).max(suggestedMinimumHeight)
 
         val desiredWidth = widthAdjusted - (widthAdjusted % 9)
         val desiredHeight = heightAdjusted - (heightAdjusted % 9)
@@ -201,7 +207,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         val distance = Math.sqrt(Math.pow((toPointX - fromPointX).toDouble(), 2.0) +
                 Math.pow((toPointY - fromPointY).toDouble(), 2.0)).toFloat()
 
-        val arrowLength = distance * 0.3f
+        val arrowLength = distance * 0.15f
 
         paint.color = Color.parseColor("#FEAC22")
         paint.strokeWidth = cellSize * 0.1f

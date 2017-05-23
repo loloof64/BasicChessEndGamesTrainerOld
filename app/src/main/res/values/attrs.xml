@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <declare-styleable name="board_component">
-      <attr name="available_space_min_dimension_percentage" format="integer" />
+   <declare-styleable name="BoardComponent">
+       <attr name="available_space_min_dimension_percentage" format="integer"/>
+   </declare-styleable>
+    <declare-styleable name="playable_against_computer_board_component">
+        <attr name="min_dimension_percentage" format="integer"/>
     </declare-styleable>
-
 </resources>

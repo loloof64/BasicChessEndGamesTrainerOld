@@ -134,13 +134,12 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
 
             val highlightStart = highlightStartFiles zip highlightStartRanks
             val highlightEnd = highlightEndFiles zip highlightEndRanks
-            val highlight = highlightStart zip highlightEnd
-            val adapterItems = (sanItems zip fenItems) zip highlight
+            val highlights = (highlightStart zip highlightEnd).map { (start, end) -> MoveToHighlight(
+                    start.first, start.second, end.first, end.second) }
+            val adapterItems = (sanItems zip fenItems) zip highlights
 
             listAdapter.items = adapterItems.map { (a, b) ->
-                RowInput(a.first, a.second,
-                        MoveToHighlight(b.first.first, b.first.second,
-                                b.second.first, b.second.second))
+                RowInput(a.first, a.second, b)
             }.toTypedArray()
             listAdapter.switchingPosition = savedInstanceState.getBoolean(switchingPositionAllowedKey)
             listAdapter.selectedNavigationItem = savedInstanceState.getInt(selectedNavigationItemKey)
