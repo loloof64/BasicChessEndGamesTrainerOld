@@ -29,4 +29,6 @@
     <string name="new_exercise_alert_message">Sur le point de commencer un nouvel exercice : en êtes-vous sûr ?</string>
     <string name="empty_string" />
     <string name="san_chess_pieces">PCFTDR</string>
+    <string name="quit_exercise_confirmation_title">Quitter l\'exercice actuel ?</string>
+    <string name="quit_exercise_confirmation_message">Etes-vous sûr de vouloir quitter l\'exercice actuel ?</string>
 </resources>
