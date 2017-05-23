@@ -268,7 +268,13 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         try {
             _gameFinished = gameFinished
             when(context){
-                is PlayingActivity -> (context as PlayingActivity).disallowPositionNavigation()
+                is PlayingActivity -> with(context as PlayingActivity){
+                    if (_gameFinished) {
+                        activatePositionNavigation()
+                    } else {
+                        disallowPositionNavigation()
+                    }
+                }
             }
             _relatedPosition = Position(fen)
             _playerHasWhite = playerHasWhite
@@ -293,7 +299,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         try {
             _gameFinished = false
             when(context){
-                is PlayingActivity -> (context as PlayingActivity).disallowPositionNavigation()
+                is PlayingActivity -> with(context as PlayingActivity){
+                    disallowPositionNavigation()
+                }
             }
             _startedToWriteMoves = false
             _moveToHighlightFrom = null

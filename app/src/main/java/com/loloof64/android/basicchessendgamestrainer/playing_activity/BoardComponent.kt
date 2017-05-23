@@ -9,8 +9,8 @@ import chesspresso.Chess
 import chesspresso.position.Position
 import com.loloof64.android.basicchessendgamestrainer.R
 
-fun Int.min(other : Int) = if (this < other) this else other
-fun Int.max(other : Int) = if (this > other) this else other
+infix fun Int.min(other : Int) = if (this < other) this else other
+infix fun Int.max(other : Int) = if (this > other) this else other
 
 abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, defStyleAttr: Int) : View(context, attrs, defStyleAttr) {
 
