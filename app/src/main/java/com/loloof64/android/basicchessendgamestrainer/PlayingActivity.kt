@@ -71,6 +71,9 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val space = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, spaceDp, resources.displayMetrics)
         moves_list_view.addItemDecoration(SpaceLeftAndRightItemDecorator(space.toInt()))
 
+        playing_board_history_back.setOnClickListener { listAdapter.goBackInHistory() }
+        playing_board_history_forward.setOnClickListener { listAdapter.goForwardInHistory() }
+
         generatorIndex = intent.extras?.getInt(generatorIndexKey) ?: 0
         val generatedPosition = availableGenerators[generatorIndex].second.generatePosition(random.nextBoolean())
         if (generatedPosition.isNotEmpty()) {
@@ -212,10 +215,14 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
 
     fun activatePositionNavigation(){
         listAdapter.switchingPosition = true
+        playing_board_history_back.visibility = View.VISIBLE
+        playing_board_history_forward.visibility = View.VISIBLE
     }
 
     fun disallowPositionNavigation(){
         listAdapter.switchingPosition = false
+        playing_board_history_back.visibility = View.INVISIBLE
+        playing_board_history_forward.visibility = View.INVISIBLE
     }
 
     override fun onBackPressed() {

@@ -40,12 +40,9 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
                 else Color.parseColor("#CDCDCD")
         )
         holder?.textView?.setOnClickListener {
-            val relatedFen = inputsList[position].relatedFen
-            val moveToHighlight = inputsList[position].moveToHighlight
-            if (relatedFen.isNotEmpty() && _switchingPositionFeatureActive) {
-                selectedNavigationItem = position
-                itemClickListener.onClick(weakRefContext, relatedFen, moveToHighlight)
-            }
+            _selectedNavigationItem = position
+            updateHostView()
+            update()
         }
     }
 
@@ -63,10 +60,46 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
         update()
     }
 
+    fun goBackInHistory(){
+        if (_switchingPositionFeatureActive){
+            if (_selectedNavigationItem > 1) {
+                _selectedNavigationItem -= 1
+                if (_selectedNavigationItem % 3 == 0){ // pointing a move number
+                    if (_selectedNavigationItem > 1) _selectedNavigationItem -= 1 // going further back
+                    else _selectedNavigationItem += 1 //cancelling
+                }
+                if (items[_selectedNavigationItem].san == ".."){ // pointing to a 'non-move'
+                    _selectedNavigationItem += 1 // cancelling one step
+                }
+                updateHostView()
+                update()
+            }
+        }
+    }
+
+    fun goForwardInHistory(){
+        if (_switchingPositionFeatureActive){
+            if (_selectedNavigationItem < (inputsList.size - 1)) {
+                _selectedNavigationItem += 1
+                if (_selectedNavigationItem % 3 == 0){ // pointing a move number
+                    if (_selectedNavigationItem < (inputsList.size - 1)) _selectedNavigationItem += 1 // going further
+                    else _selectedNavigationItem -= 1 // cancelling
+                }
+                updateHostView()
+                update()
+            }
+        }
+    }
+
     var switchingPosition: Boolean
         get() = _switchingPositionFeatureActive
         set(value) {
-            _switchingPositionFeatureActive = value
+            if (inputsList.size > 0) {
+                _switchingPositionFeatureActive = value
+                _selectedNavigationItem = inputsList.size - 1
+                updateHostView()
+                update()
+            }
         }
 
     var items: Array<RowInput>
@@ -79,11 +112,22 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
     var selectedNavigationItem: Int
         get() = _selectedNavigationItem
         set(value) {
-            _selectedNavigationItem = value
-            update()
+            if (_switchingPositionFeatureActive){
+                _selectedNavigationItem = value
+                updateHostView()
+                update()
+            }
         }
 
-    private fun update(){
+    private fun updateHostView(){ // switch the current position in host view (Playing activity)
+        val relatedFen = inputsList[_selectedNavigationItem].relatedFen
+        val moveToHighlight = inputsList[_selectedNavigationItem].moveToHighlight
+        if (relatedFen.isNotEmpty() && _switchingPositionFeatureActive) {
+            itemClickListener.onClick(weakRefContext, relatedFen, moveToHighlight)
+        }
+    }
+
+    private fun update(){ // switch the position highlighter in host view (Playing activity)
         notifyDataSetChanged()
     }
 

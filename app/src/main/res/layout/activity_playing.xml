@@ -47,6 +47,28 @@
         android:src="@mipmap/ic_add"
         android:id="@+id/fab_new_exercise"/>
 
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_arrow_back"
+        android:layout_below="@+id/label_player_goal"
+        android:layout_toRightOf="@+id/fab_new_exercise"
+        android:layout_toEndOf="@+id/fab_new_exercise"
+        android:visibility="invisible"
+        android:contentDescription="@string/back_in_history"
+        android:id="@+id/playing_board_history_back"/>
+
+    <ImageButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_arrow_forward"
+        android:layout_below="@+id/label_player_goal"
+        android:layout_toRightOf="@+id/playing_board_history_back"
+        android:layout_toEndOf="@+id/playing_board_history_back"
+        android:visibility="invisible"
+        android:contentDescription="@string/forward_in_history"
+        android:id="@+id/playing_board_history_forward"/>
+
     <android.support.v7.widget.RecyclerView
         android:id="@+id/moves_list_view"
         android:layout_width="wrap_content"

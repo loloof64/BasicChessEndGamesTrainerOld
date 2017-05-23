@@ -31,4 +31,6 @@
     <string name="san_chess_pieces">PCFTDR</string>
     <string name="quit_exercise_confirmation_title">Quitter l\'exercice actuel ?</string>
     <string name="quit_exercise_confirmation_message">Etes-vous sûr de vouloir quitter l\'exercice actuel ?</string>
+    <string name="back_in_history">Reculer dans l\'historique</string>
+    <string name="forward_in_history">Avancer dans l\'historique</string>
 </resources>

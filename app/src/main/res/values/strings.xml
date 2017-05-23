@@ -31,4 +31,6 @@
     <string name="san_chess_pieces">PNBRQK</string>
     <string name="quit_exercise_confirmation_title">Quit current exercise ?</string>
     <string name="quit_exercise_confirmation_message">Are you sure you want to quit current exercise ?</string>
+    <string name="back_in_history">Back in history</string>
+    <string name="forward_in_history">Forward in history</string>
 </resources>
