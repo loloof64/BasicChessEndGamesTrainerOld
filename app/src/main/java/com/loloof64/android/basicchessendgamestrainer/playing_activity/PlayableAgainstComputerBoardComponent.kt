@@ -36,14 +36,14 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
 
-    private val typedArray by lazy {
-        context.obtainStyledAttributes(attrs, R.styleable.playable_against_computer_board_component, 0, 0)
-    }
-    private val minSpacePercentage by lazy {
+    private val minSpacePercentage: Int
+
+    init {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.PlayableAgainstComputerBoardComponent)
         val computed = typedArray.getInt(R.styleable
-                .playable_against_computer_board_component_min_dimension_percentage, 100)
+                .PlayableAgainstComputerBoardComponent_min_dimension_percentage, 100)
         typedArray.recycle()
-        computed
+        minSpacePercentage = computed
     }
 
     override fun computeMinAvailableSpacePercentage():Int {

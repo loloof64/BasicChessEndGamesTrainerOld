@@ -19,13 +19,13 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
     data class ColorARGB(val alpha: Int, val red: Int, val green: Int, val blue: Int)
 
-    private val typedArray by lazy {
-        context.obtainStyledAttributes(attrs, R.styleable.BoardComponent)
-    }
-    private val minAvailableSpacePercentage by lazy {
-        val computed = typedArray.getInt(R.styleable.BoardComponent_available_space_min_dimension_percentage, 100)
+    private val minAvailableSpacePercentage:Int
+
+    init {
+        val typedArray = context.obtainStyledAttributes(attrs, R.styleable.BoardComponent)
+        val computed = typedArray.getInt(R.styleable.BoardComponent_min_dimension_percentage, 100)
         typedArray.recycle()
-        computed
+        minAvailableSpacePercentage = computed
     }
 
     open fun computeMinAvailableSpacePercentage():Int {
