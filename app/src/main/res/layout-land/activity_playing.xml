@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        app:min_dimension_percentage="90"
+        app:min_dimension_percentage="100"
         />
 
     <android.support.design.widget.FloatingActionButton
@@ -20,6 +20,7 @@
         android:layout_height="wrap_content"
         android:src="@mipmap/ic_swap_vert"
         android:onClick="reverseBoard"
+        android:paddingTop="@dimen/playing_activity_fab_padding_top"
         android:layout_below="@+id/label_player_goal"
         android:layout_toRightOf="@+id/playingBoard"
         android:layout_toEndOf="@+id/playingBoard"
@@ -29,6 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="restartLastExercise"
+        android:paddingTop="@dimen/playing_activity_fab_padding_top"
         android:src="@android:drawable/ic_menu_rotate"
         android:id="@+id/fab_restart_exercise"
         android:layout_toRightOf="@+id/fab_reverse_board"
@@ -39,6 +41,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="newExercise"
+        android:paddingTop="@dimen/playing_activity_fab_padding_top"
         android:src="@mipmap/ic_add"
         android:id="@+id/fab_new_exercise"
         android:layout_toRightOf="@+id/fab_restart_exercise"
@@ -48,10 +51,11 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@null"
+        android:padding="@dimen/playing_activity_arrows_padding"
         android:src="@mipmap/ic_arrow_back"
-        android:layout_below="@+id/label_player_goal"
-        android:layout_toRightOf="@+id/fab_new_exercise"
-        android:layout_toEndOf="@+id/fab_new_exercise"
+        android:layout_toRightOf="@+id/label_player_goal"
+        android:layout_toEndOf="@+id/label_player_goal"
         android:visibility="invisible"
         android:contentDescription="@string/back_in_history"
         android:id="@+id/playing_board_history_back"/>
@@ -59,8 +63,9 @@
     <ImageButton
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:background="@null"
+        android:padding="@dimen/playing_activity_arrows_padding"
         android:src="@mipmap/ic_arrow_forward"
-        android:layout_below="@+id/label_player_goal"
         android:layout_toRightOf="@+id/playing_board_history_back"
         android:layout_toEndOf="@+id/playing_board_history_back"
         android:visibility="invisible"
@@ -78,7 +83,7 @@
 
     <TextView
         android:id="@+id/label_player_goal"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_toEndOf="@id/playingBoard"
         android:layout_toRightOf="@id/playingBoard"

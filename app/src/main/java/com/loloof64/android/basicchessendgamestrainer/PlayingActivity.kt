@@ -63,7 +63,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_playing)
 
-        val gridLayoutColumns = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 9 else 6
+        val gridLayoutColumns = if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) 6 else 6
         val gridLayoutManager = GridLayoutManager(this, gridLayoutColumns)
         moves_list_view.layoutManager = gridLayoutManager
         moves_list_view.adapter = listAdapter
