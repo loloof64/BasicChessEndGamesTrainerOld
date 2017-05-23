@@ -243,8 +243,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     private var playerGoalTextId: Int = -1
     private var playerGoalInAlertMode = false
     private val listAdapter = MovesListAdapter(WeakReference(this), object : ItemClickListener() {
-        override fun onClick(weakRefContext: WeakReference<Context>, positionFen: String,
-                             moveToHighlight: MoveToHighlight) {
+        override fun onClick(weakRefContext: WeakReference<Context>, position: Int,
+                             positionFen: String, moveToHighlight: MoveToHighlight) {
             if (weakRefContext.get() != null){
                 when(weakRefContext.get()){
                     is PlayingActivity -> {
@@ -254,6 +254,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                                     moveToHighlight.startRank,
                                     moveToHighlight.endFile,
                                     moveToHighlight.endRank)
+                            moves_list_view.smoothScrollToPosition(position)
                         }
                     }
                 }

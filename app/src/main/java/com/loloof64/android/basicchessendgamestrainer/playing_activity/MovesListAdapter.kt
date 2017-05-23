@@ -15,7 +15,7 @@ data class MoveToHighlight(val startFile: Int, val startRank : Int,
                            val endFile: Int, val endRank : Int)
 
 abstract class ItemClickListener {
-    abstract fun onClick(weakRefContext: WeakReference<Context>,
+    abstract fun onClick(weakRefContext: WeakReference<Context>, position: Int,
                          positionFen: String, moveToHighlight: MoveToHighlight):Unit
 }
 
@@ -123,7 +123,7 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
         val relatedFen = inputsList[_selectedNavigationItem].relatedFen
         val moveToHighlight = inputsList[_selectedNavigationItem].moveToHighlight
         if (relatedFen.isNotEmpty() && _switchingPositionFeatureActive) {
-            itemClickListener.onClick(weakRefContext, relatedFen, moveToHighlight)
+            itemClickListener.onClick(weakRefContext, _selectedNavigationItem, relatedFen, moveToHighlight)
         }
     }
 
