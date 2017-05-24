@@ -15,39 +15,45 @@
         app:min_dimension_percentage="90"
     />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:layout_width="@dimen/playing_activity_fab_size"
+        android:layout_height="@dimen/playing_activity_fab_size"
         android:src="@mipmap/ic_swap_vert"
         android:onClick="reverseBoard"
-        android:paddingTop="@dimen/playing_activity_fab_padding_top"
+        android:contentDescription="@string/reverse_board"
+        android:layout_marginTop="@dimen/playing_activity_fab_padding_top"
         android:layout_below="@+id/label_player_goal"
+        android:background="@color/playing_activity_fab_bg"
         android:id="@+id/fab_reverse_board" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:layout_width="@dimen/playing_activity_fab_size"
+        android:layout_height="@dimen/playing_activity_fab_size"
         android:layout_below="@+id/label_player_goal"
+        android:contentDescription="@string/restart_exercise"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/fab_reverse_board"
         android:layout_toRightOf="@+id/fab_reverse_board"
         android:onClick="restartLastExercise"
-        android:paddingTop="@dimen/playing_activity_fab_padding_top"
+        android:layout_marginTop="@dimen/playing_activity_fab_padding_top"
         android:src="@android:drawable/ic_menu_rotate"
+        android:background="@color/playing_activity_fab_bg"
         android:id="@+id/fab_restart_exercise"/>
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:layout_width="@dimen/playing_activity_fab_size"
+        android:layout_height="@dimen/playing_activity_fab_size"
         android:layout_below="@+id/label_player_goal"
+        android:contentDescription="@string/new_exercise"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
         android:layout_toEndOf="@+id/fab_restart_exercise"
         android:layout_toRightOf="@+id/fab_restart_exercise"
         android:onClick="newExercise"
-        android:paddingTop="@dimen/playing_activity_fab_padding_top"
+        android:layout_marginTop="@dimen/playing_activity_fab_padding_top"
         android:src="@mipmap/ic_add"
+        android:background="@color/playing_activity_fab_bg"
         android:id="@+id/fab_new_exercise"/>
 
     <ImageButton

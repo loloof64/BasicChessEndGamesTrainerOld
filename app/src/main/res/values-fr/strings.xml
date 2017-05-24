@@ -67,4 +67,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
 </string>
     <string name="action_help">Aide</string>
     <string name="position_repetitions_draw">Nulle par répétitions !</string>
+    <string name="reverse_board">Retourner l\'échiquier</string>
+    <string name="restart_exercise">Recommencer l\'exercice</string>
+    <string name="new_exercise">Nouvel exercice</string>
 </resources>

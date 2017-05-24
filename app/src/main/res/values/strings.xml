@@ -62,4 +62,7 @@ of endgame.[CR][CR]
 </string>
     <string name="action_help">Help</string>
     <string name="position_repetitions_draw">Draw by threefold repetition !</string>
+    <string name="reverse_board">Reverse board</string>
+    <string name="restart_exercise">Restart exercise</string>
+    <string name="new_exercise">New exercise</string>
 </resources>

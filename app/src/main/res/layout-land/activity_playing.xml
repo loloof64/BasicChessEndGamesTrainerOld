@@ -15,37 +15,47 @@
         app:min_dimension_percentage="100"
         />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:layout_width="@dimen/playing_activity_fab_size"
+        android:layout_height="@dimen/playing_activity_fab_size"
         android:src="@mipmap/ic_swap_vert"
         android:onClick="reverseBoard"
-        android:paddingTop="@dimen/playing_activity_fab_padding_top"
+        android:contentDescription="@string/reverse_board"
+        android:layout_marginTop="@dimen/playing_activity_fab_padding_top"
         android:layout_below="@+id/label_player_goal"
         android:layout_toRightOf="@+id/playingBoard"
         android:layout_toEndOf="@+id/playingBoard"
+        android:background="@color/playing_activity_fab_bg"
         android:id="@+id/fab_reverse_board" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:layout_width="@dimen/playing_activity_fab_size"
+        android:layout_height="@dimen/playing_activity_fab_size"
         android:onClick="restartLastExercise"
-        android:paddingTop="@dimen/playing_activity_fab_padding_top"
+        android:contentDescription="@string/restart_exercise"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="@dimen/playing_activity_fab_padding_top"
         android:src="@android:drawable/ic_menu_rotate"
         android:id="@+id/fab_restart_exercise"
         android:layout_toRightOf="@+id/fab_reverse_board"
         android:layout_toEndOf="@+id/fab_reverse_board"
+        android:background="@color/playing_activity_fab_bg"
         android:layout_below="@id/label_player_goal" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageButton
+        android:layout_width="@dimen/playing_activity_fab_size"
+        android:layout_height="@dimen/playing_activity_fab_size"
         android:onClick="newExercise"
-        android:paddingTop="@dimen/playing_activity_fab_padding_top"
+        android:contentDescription="@string/new_exercise"
+        android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="@dimen/playing_activity_fab_padding_top"
         android:src="@mipmap/ic_add"
         android:id="@+id/fab_new_exercise"
         android:layout_toRightOf="@+id/fab_restart_exercise"
         android:layout_toEndOf="@+id/fab_restart_exercise"
+        android:background="@color/playing_activity_fab_bg"
         android:layout_below="@+id/label_player_goal" />
 
     <ImageButton
