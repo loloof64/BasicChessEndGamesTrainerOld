@@ -39,10 +39,12 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
                 if (position == _selectedNavigationItem && _switchingPositionFeatureActive) Color.parseColor("#FFDD26")
                 else Color.parseColor("#CDCDCD")
         )
-        holder?.textView?.setOnClickListener {
-            _selectedNavigationItem = position
-            updateHostView()
-            update()
+        if (position%3 > 0) {
+            holder?.textView?.setOnClickListener {
+                _selectedNavigationItem = position
+                updateHostView()
+                update()
+            }
         }
     }
 
