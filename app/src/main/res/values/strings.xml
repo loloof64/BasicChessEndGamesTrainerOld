@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Basic Chess EndGames</string>
+    <string name="app_name">Basic Chess Endgames</string>
     <string name="title_activity_exercise_chooser">Exercise Chooser</string>
     <string name="action_settings">Settings</string>
     <string name="main_menu_select_exercise">Select your exercise</string>
@@ -21,8 +21,8 @@
     <string name="exercise_kr_k">King+Rook/King</string>
     <string name="custom_generator">Custom generator</string>
     <string name="position_generation_error">Failed to generate position !</string>
-    <string name="restarting_exercise_alert_title" >Restart exercise ?</string>
-    <string name="restarting_exercise_alert_message" >About to restart exercise : are you sure ?</string>
+    <string name="restarting_exercise_alert_title">Restart exercise ?</string>
+    <string name="restarting_exercise_alert_message">About to restart exercise : are you sure ?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
     <string name="new_exercise_alert_title">New exercise</string>
@@ -33,4 +33,33 @@
     <string name="quit_exercise_confirmation_message">Are you sure you want to quit current exercise ?</string>
     <string name="back_in_history">Back in history</string>
     <string name="forward_in_history">Forward in history</string>
+    <string name="help">
+[TAB]Generates basic chess endgames and let you play them again computer (at its best level).[CR][CR][CR]
+
+
+[TAB]First, you have to select a chess endgame kind in the menu screen. Then you will get into the playing screen,
+with a random position based on the endgame you chose. The color you have is also determined randomly.
+You are given your goal : knowing you always start the game.[CR][CR][CR]
+
+
+
+[TAB]You move a piece with the Drag And Drop interaction. There are also lines "around your finger",
+in order to indicate more
+the cell where you are going to leave the piece : which can be very useful if you are on a small device.[CR]
+[TAB]Whenever the game is finished, you have the possibility to review moves (either by touching a move,
+or by using the history arrow buttons).[CR][CR]
+
+[TAB]You also have three buttons, actives whatever the game state, which let you respectively
+reverse the board, restart the last generated position or generate a new position for the same kind
+of endgame.[CR][CR]
+
+
+[TAB]This project has been developed using the Stockfish 8 chess engine sources (that I modified a bit).[CR]
+[TAB]You can find the project files at https://goo.gl/KDKig0.[CR][CR]
+
+
+[TAB]Developed by Laurent Bernabe in 2017.
+</string>
+    <string name="action_help">Help</string>
+    <string name="position_repetitions_draw">Draw by threefold repetition !</string>
 </resources>

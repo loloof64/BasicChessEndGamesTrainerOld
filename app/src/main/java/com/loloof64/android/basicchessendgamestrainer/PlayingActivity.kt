@@ -1,6 +1,7 @@
 package com.loloof64.android.basicchessendgamestrainer
 
 import android.content.Context
+import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.Rect
@@ -10,6 +11,8 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.TypedValue
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
@@ -149,6 +152,22 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         }
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_playing, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when(item?.itemId) {
+            R.id.action_help -> {
+                val intent = Intent(this, HelpActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
     fun askForPromotionPiece() {
         val title = getString(R.string.promotion_chooser_title)
         val dialog = PromotionPieceChooserDialogFragment.newInstance(title, playingBoard.isWhiteToPlay())
@@ -223,6 +242,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         listAdapter.switchingPosition = false
         playing_board_history_back.visibility = View.INVISIBLE
         playing_board_history_forward.visibility = View.INVISIBLE
+    }
+
+    fun getAllPositions(): List<String>{
+        return listAdapter.items.map { it.relatedFen }
     }
 
     override fun onBackPressed() {

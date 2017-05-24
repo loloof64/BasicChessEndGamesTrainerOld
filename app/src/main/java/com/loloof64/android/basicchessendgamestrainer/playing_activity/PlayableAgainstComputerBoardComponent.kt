@@ -410,6 +410,15 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             }
             _gameFinished = true
         }
+        else if (isDrawByThreeFolds()){
+            when(context){
+                is PlayingActivity -> with(context as PlayingActivity){
+                    setPlayerGoalTextId(R.string.position_repetitions_draw, alertMode = true)
+                    activatePositionNavigation()
+                }
+            }
+            _gameFinished = true
+        }
     }
 
     fun notifyPlayerGoal(longUCICommandAnswer: String) {
@@ -502,6 +511,21 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                 _highlightedTargetCell = null
                 invalidate()
             }
+        }
+    }
+
+    private fun isDrawByThreeFolds(): Boolean {
+        infix fun String.equalsPosition(other: String): Boolean {
+            val thisParts = this.split(" ")
+            val otherParts = other.split(" ")
+            return (0..3).all { thisParts[it] == otherParts[it] }
+        }
+
+        val currentPositionFen = _relatedPosition.fen
+        return when (context){
+            is PlayingActivity -> (context as PlayingActivity).getAllPositions()
+                    .filter { it equalsPosition currentPositionFen }.size >= 3
+            else -> false
         }
     }
 

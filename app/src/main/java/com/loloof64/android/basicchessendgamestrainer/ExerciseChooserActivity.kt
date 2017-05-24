@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.view.Menu
+import android.view.MenuItem
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExerciseRow
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
@@ -34,6 +36,22 @@ class ExerciseChooserActivity : AppCompatActivity() {
                 R.string.exercise_kq_k to true,
                 R.string.exercise_kr_k to true,
                 R.string.exercise_kbb_k to true).map { ExerciseRow(it.first, it.second) }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_exercise_chooser, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when(item?.itemId) {
+            R.id.action_help -> {
+                val intent = Intent(this, HelpActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     override fun onDestroy() {

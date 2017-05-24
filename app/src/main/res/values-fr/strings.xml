@@ -33,5 +33,38 @@
     <string name="quit_exercise_confirmation_message">Etes-vous sûr de vouloir quitter l\'exercice actuel ?</string>
     <string name="back_in_history">Reculer dans l\'historique</string>
     <string name="forward_in_history">Avancer dans l\'historique</string>
-    <string name="app_name" translatable="false">Finales d\'Echecs Basiques</string>
+    <string name="app_name">Finales d\'Echecs Basiques</string>
+    <string name="help">
+[TAB]Génère des finales simples du jeu d\'échecs et vous permet de les jouer contre l\'ordinateur
+(à son meilleur niveau).[CR][CR][CR]
+
+
+
+[TAB]D\'abord, vous devez choisir un type de finale dans l\'écran menu. Ensuite vous arrivez à l\'écran de jeu,
+avec une position aléatoire basée sur le type de finale choisi. La couleur qui vous est attribuée
+est aussi déterminée de manière aléatoire.[CR]
+
+[TAB]Votre objectif est aussi précisé : sachant que vous démarrez toujours la partie.[CR][CR]
+
+
+[TAB]Vous déplacez les pièces à l\'aide de la technique du glisser-déposer. Egalement des lignes
+apparaissent "autour de votre doigt", afin de vous aider à mieux visualiser la case où la pièce
+arrivera : ce qui peut s\'avérer très utile sur les petits périphériques.[CR]
+[TAB]Dès que la partie s\'achève, vous pouvez revoir les coups (soit en touchant un coup, ou à l\'aide
+des boutons fléchés).[CR][CR]
+
+[TAB]Vous disposez également de trois boutons, actifs quel que soit l\'état de la partie, vous permettant
+respectivement de renverser le plateau, redémarrer à partir de la dernière position générée ou
+de générer une nouvelle position pour le même type de fin de partie.[CR][CR][CR]
+
+
+[TAB]Ce projet a été développé en réutilisant les sources du moteur d\'échecs Stockfish 8
+(que j\'ai légèrement modifiées).[CR]
+[TAB]Les fichiers du projet sont disponibles à l\'adresse https://goo.gl/KDKig0.[CR][CR]
+
+
+[TAB]Developpée par Laurent Bernabe en 2017.
+</string>
+    <string name="action_help">Aide</string>
+    <string name="position_repetitions_draw">Nulle par répétitions !</string>
 </resources>
