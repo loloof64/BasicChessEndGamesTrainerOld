@@ -35,7 +35,9 @@ class ExerciseChooserActivity : AppCompatActivity() {
         return listOf(R.string.exercise_krr_k to true,
                 R.string.exercise_kq_k to true,
                 R.string.exercise_kr_k to true,
-                R.string.exercise_kbb_k to true).map { ExerciseRow(it.first, it.second) }
+                R.string.exercise_kbb_k to true,
+                R.string.exercise_kp_k_I to true,
+                R.string.exercise_kp_k_II to false).map { ExerciseRow(it.first, it.second) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

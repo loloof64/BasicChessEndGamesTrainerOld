@@ -65,4 +65,7 @@ of endgame.[CR][CR]
     <string name="reverse_board">Reverse board</string>
     <string name="restart_exercise">Restart exercise</string>
     <string name="new_exercise">New exercise</string>
+    <string name="exercise_kp_k_I">King+Pawn/King (I)</string>
+    <string name="exercise_kp_k_II">King+Pawn/King (II)</string>
+    <string name="position_draw">Draw !</string>
 </resources>

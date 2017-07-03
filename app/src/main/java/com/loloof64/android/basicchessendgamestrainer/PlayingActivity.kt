@@ -56,7 +56,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
 
-    override fun reactToPromotionPieceSelection(piece: Short) {
+    override fun reactToPromotionPieceSelection(piece: Int) {
         playingBoard.validatePromotionMove(piece)
         playingBoard.checkIfGameFinished()
         if (!playingBoard.gameFinished()) playingBoard.makeComputerPlay()

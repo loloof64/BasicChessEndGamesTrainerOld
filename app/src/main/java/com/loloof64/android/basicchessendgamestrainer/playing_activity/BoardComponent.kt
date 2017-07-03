@@ -5,12 +5,21 @@ import android.graphics.*
 import android.support.graphics.drawable.VectorDrawableCompat
 import android.util.AttributeSet
 import android.view.View
-import chesspresso.Chess
-import chesspresso.position.Position
 import com.loloof64.android.basicchessendgamestrainer.R
+import karballo.Board
+import karballo.Color as KColor
 
 infix fun Int.min(other : Int) = if (this < other) this else other
 infix fun Int.max(other : Int) = if (this > other) this else other
+
+fun coordinatesToSquare(file: Int, rank: Int) : Long {
+    return 1L shl ((7-file) + (8*rank))
+}
+
+fun squareToCoordinates(squareIndex: Long) : Pair<Int, Int> {
+    val powerOf2 = (Math.log(squareIndex.toDouble()) / Math.log(2.0)).toInt()
+    return Pair(7-(powerOf2%8), powerOf2/8)
+}
 
 abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, defStyleAttr: Int) : View(context, attrs, defStyleAttr) {
 
@@ -32,8 +41,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         return minAvailableSpacePercentage
     }
 
-    protected abstract fun relatedPosition() : Position
-    protected abstract fun replacePositionWith(board: Position): Unit
+    protected abstract fun relatedPosition() : Board
+    protected abstract fun replacePositionWith(positionFEN : String): Unit
 
     protected var reversed = false
     private val rectPaint = Paint()
@@ -112,21 +121,21 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     private fun drawPieces(canvas: Canvas, cellSize: Int) {
         for (cellRank in (0 until 8)) {
             for (cellFile in (0 until 8)) {
-                val piece = relatedPosition().getStone(cellFile + 8*cellRank).toShort()
-                if (piece != Chess.NO_STONE) {
+                val piece = relatedPosition().getPieceAt(coordinatesToSquare(file = cellFile, rank = cellRank))
+                if (piece != '.') {
                     val imageRes = when (piece) {
-                        Chess.WHITE_PAWN -> R.drawable.chess_pl
-                        Chess.BLACK_PAWN -> R.drawable.chess_pd
-                        Chess.WHITE_KNIGHT -> R.drawable.chess_nl
-                        Chess.BLACK_KNIGHT -> R.drawable.chess_nd
-                        Chess.WHITE_BISHOP -> R.drawable.chess_bl
-                        Chess.BLACK_BISHOP -> R.drawable.chess_bd
-                        Chess.WHITE_ROOK -> R.drawable.chess_rl
-                        Chess.BLACK_ROOK -> R.drawable.chess_rd
-                        Chess.WHITE_QUEEN -> R.drawable.chess_ql
-                        Chess.BLACK_QUEEN -> R.drawable.chess_qd
-                        Chess.WHITE_KING -> R.drawable.chess_kl
-                        Chess.BLACK_KING -> R.drawable.chess_kd
+                        'P' -> R.drawable.chess_pl
+                        'p' -> R.drawable.chess_pd
+                        'N' -> R.drawable.chess_nl
+                        'n' -> R.drawable.chess_nd
+                        'B' -> R.drawable.chess_bl
+                        'b' -> R.drawable.chess_bd
+                        'R' -> R.drawable.chess_rl
+                        'r' -> R.drawable.chess_rd
+                        'Q' -> R.drawable.chess_ql
+                        'q' -> R.drawable.chess_qd
+                        'K' -> R.drawable.chess_kl
+                        'k' -> R.drawable.chess_kd
                         else -> R.drawable.red_cross
                     }
                     val x = (cellSize * (0.5 + (if (reversed) 7 - cellFile else cellFile))).toInt()
@@ -141,7 +150,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     }
 
     private fun drawPlayerTurn(canvas: Canvas, cellSize: Int) {
-        val color = if (relatedPosition().toPlay == Chess.WHITE) ColorARGB(255, 255, 255, 255) else ColorARGB(255, 0, 0, 0)
+        val color = if (relatedPosition().turn) ColorARGB(255, 255, 255, 255) else ColorARGB(255, 0, 0, 0)
         val location = (8.5 * cellSize).toFloat()
         val locationEnd = (location + cellSize * 0.5).toFloat()
         rectPaint.setARGB(color.alpha, color.red, color.green, color.blue)
@@ -253,8 +262,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     fun toFEN(): String = relatedPosition().fen
 
     fun setFromFen(boardFen: String) {
-        val newPosition = Position(boardFen)
-        replacePositionWith(newPosition)
+        replacePositionWith(boardFen)
         invalidate()
     }
 

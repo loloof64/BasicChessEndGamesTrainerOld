@@ -8,8 +8,8 @@ import android.support.v7.app.AlertDialog.Builder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import chesspresso.Chess
 import com.loloof64.android.basicchessendgamestrainer.R
+import karballo.Piece
 import java.lang.ref.WeakReference
 
 class PromotionPieceChooserDialogFragment : DialogFragment() {
@@ -28,7 +28,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         }
 
         interface Listener {
-            fun reactToPromotionPieceSelection(piece: Short) : Unit
+            fun reactToPromotionPieceSelection(piece: Int) : Unit
         }
     }
 
@@ -52,10 +52,10 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         val nullParent: ViewGroup? = null
         val rootView = activity.layoutInflater.inflate(R.layout.promotion_chooser_dialog, nullParent)
 
-        promotionChooserQueenButton = rootView.findViewById(R.id.promotion_chooser_queen_button) as ImageButton
-        promotionChooserRookButton = rootView.findViewById(R.id.promotion_chooser_rook_button) as ImageButton
-        promotionChooserBishopButton = rootView.findViewById(R.id.promotion_chooser_bishop_button) as ImageButton
-        promotionChooserKnightButton = rootView.findViewById(R.id.promotion_chooser_knight_button) as ImageButton
+        promotionChooserQueenButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_queen_button)
+        promotionChooserRookButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_rook_button)
+        promotionChooserBishopButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_bishop_button)
+        promotionChooserKnightButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_knight_button)
 
         promotionChooserQueenButton.setImageResource(if (whiteToPlay) R.drawable.chess_ql else R.drawable.chess_qd)
         promotionChooserRookButton.setImageResource(if (whiteToPlay) R.drawable.chess_rl else R.drawable.chess_rd)
@@ -80,10 +80,10 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         when(context) {
             is Listener -> {
                 listener = context
-                queenPromotionListener = PromotionButtonOnClickListener(listener as Listener, Chess.QUEEN)
-                rookPromotionListener = PromotionButtonOnClickListener(listener as Listener, Chess.ROOK)
-                bishopPromotionListener = PromotionButtonOnClickListener(listener as Listener, Chess.BISHOP)
-                knightPromotionListener = PromotionButtonOnClickListener(listener as Listener, Chess.KNIGHT)
+                queenPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.QUEEN)
+                rookPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.ROOK)
+                bishopPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.BISHOP)
+                knightPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.KNIGHT)
             }
             else -> throw IllegalArgumentException("Context must use PromotionPieceChooseDialogFragment.Listener trait !")
         }
@@ -92,7 +92,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
 }
 
 class PromotionButtonOnClickListener(listener: PromotionPieceChooserDialogFragment.Companion.Listener,
-                                     val promotionPiece: Short) : View.OnClickListener {
+                                     val promotionPiece: Int) : View.OnClickListener {
 
     override fun onClick(relatedView: View?) {
         refListener.get()?.reactToPromotionPieceSelection(promotionPiece)

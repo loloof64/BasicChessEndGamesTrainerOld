@@ -27,7 +27,7 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val layout = LayoutInflater.from(parent?.context).inflate(
                 R.layout.playing_activity_moves_list_single_item, parent, false) as LinearLayout
-        val txtView = layout.findViewById(R.id.moves_list_view_item) as TextView
+        val txtView = layout.findViewById<TextView>(R.id.moves_list_view_item)
 
         layout.removeView(txtView)
         return ViewHolder(txtView)

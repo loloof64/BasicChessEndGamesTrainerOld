@@ -25,7 +25,7 @@ class ExercisesListAdapter(val exercisesList: List<ExerciseRow>,
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val layout = LayoutInflater.from(parent?.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
-        val textView = layout.findViewById(R.id.exercise_list_row_value) as TextView
+        val textView = layout.findViewById<TextView>(R.id.exercise_list_row_value)
         layout.removeView(textView)
         return ViewHolder(textView)
     }
