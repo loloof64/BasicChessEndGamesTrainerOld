@@ -73,4 +73,6 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="exercise_kp_k_I">Roi+Pion/Roi (I)</string>
     <string name="exercise_kp_k_II">Roi+Pion/Roi (II)</string>
     <string name="position_draw">Partie nulle !</string>
+    <string name="white_play_for_win">Les Blancs jouent pour la gagne.</string>
+    <string name="black_play_for_win">Les Noirs jouent pour la gagne.</string>
 </resources>

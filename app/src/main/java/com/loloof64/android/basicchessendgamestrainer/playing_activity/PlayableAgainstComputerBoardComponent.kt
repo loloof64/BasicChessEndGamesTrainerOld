@@ -1,36 +1,52 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
-import android.os.Handler
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.UCICommandAnswerCallback
 import karballo.Board
 import karballo.Move
-import karballo.Piece
-import java.lang.ref.WeakReference
+import karballo.evaluation.Evaluator
 import java.util.logging.Logger
-
-class MyUciCommandCallback(playingComponent: PlayableAgainstComputerBoardComponent) : UCICommandAnswerCallback {
-    private val playingComponentRef:WeakReference<PlayableAgainstComputerBoardComponent> = WeakReference(playingComponent)
-
-    override fun execute(answer: String) {
-        if (playingComponentRef.get()?.isWaitingForPlayerGoal() ?: true) {
-            playingComponentRef.get()?.notifyPlayerGoal(answer)
-        } else {
-            playingComponentRef.get()?.processComponentMove(answer)
-        }
-    }
-}
 
 data class PromotionInfo(val startFile: Int, val startRank: Int,
                          val endFile: Int, val endRank: Int)
 
+data class SquareCoordinates(val file: Int, val rank: Int)
+
+fun Int.convertSquareIndexToCoords(): SquareCoordinates {
+    return SquareCoordinates(file = 7 - this%8, rank = this/8)
+}
+
 class PlayableAgainstComputerBoardComponent(context: Context, override val attrs: AttributeSet?,
-                             defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr) {
+                             defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr),
+                                                    SimpleUciObserver {
+    override fun consumeMove(move: Int) {
+        if (!_waitingForPlayerGoal){
+            val moveFrom = Move.getFromIndex(move).convertSquareIndexToCoords()
+            val moveTo = Move.getToIndex(move).convertSquareIndexToCoords()
+            /////////////////////////
+            Logger.getLogger("loloof64").info("Move from is $moveFrom")
+            Logger.getLogger("loloof64").info("Move to is $moveTo")
+            /////////////////////////
+        }
+    }
+
+    override fun consumeScore(score: Int) {
+        if (_waitingForPlayerGoal){
+            val stringId = if (score > Evaluator.MATE) R.string.white_play_for_mate
+                            else if (score > Evaluator.KNOWN_WIN) R.string.white_play_for_win
+                            else if (score < -Evaluator.KNOWN_WIN) R.string.black_play_for_win
+                            else if (score < -Evaluator.MATE) R.string.black_play_for_mate
+                            else if (score == 0) R.string.should_be_draw
+                            else R.string.empty_string
+            when (context){
+                is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(stringId, false)
+            }
+            _waitingForPlayerGoal = false
+        }
+    }
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
@@ -91,35 +107,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
-    fun Char.toFile(): Int {
-        val intValue = this.toInt()
-        if (intValue < 97 || intValue > 104) throw IllegalArgumentException("ToFile() no applicable for $this")
-        return intValue - 97
-    }
-
-    fun Char.toRank(): Int {
-        val intValue = this.toInt()
-        if (intValue < 49 || intValue > 56) throw IllegalArgumentException("ToRank() no applicable for $this")
-        return intValue - 49
-    }
-
-    fun Char.toPromotionPiece():Int {
-        return when(this) {
-            'p', 'P' -> Piece.PAWN
-            'n', 'N' -> Piece.KNIGHT
-            'b', 'B' -> Piece.BISHOP
-            'r', 'R' -> Piece.ROOK
-            'q', 'Q' -> Piece.QUEEN
-            'k', 'K' -> Piece.KING
-            else -> throw RuntimeException("Unrecognized piece char $this")
-        }.toInt()
-    }
-
-    init {
-        (context.applicationContext as MyApplication).setCallbackForUciCommandAnswer(
-                MyUciCommandCallback(this))
-    }
-
     fun isWaitingForPlayerGoal() = _waitingForPlayerGoal
 
     // Mainly used for serialisation purpose
@@ -129,16 +116,15 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     fun waitForPlayerGoal() {
         _waitingForPlayerGoal = true
-        (context.applicationContext as MyApplication).uciNewGame(_relatedPosition.fen)
-        (context.applicationContext as MyApplication).uciInteract("go")
+        engineInteraction.evaluate(_relatedPosition.fen)
     }
 
     override fun relatedPosition(): Board {
         return _relatedPosition
     }
 
-    override fun replacePositionWith(positionFen: String) {
-        _relatedPosition.setFenMove(positionFen, null)
+    override fun replacePositionWith(fen: String) {
+        _relatedPosition.setFenMove(fen, null)
     }
 
     override fun highlightedTargetCell(): Pair<Int, Int>? {
@@ -324,15 +310,12 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     fun makeComputerPlay(){
         val isComputerToMove = _playerHasWhite != isWhiteToPlay()
         if (isComputerToMove) {
-            val myApp = context.applicationContext as MyApplication
-            myApp.uciInteract("position fen ${_relatedPosition.fen}")
-            myApp.uciInteract("go")
+            engineInteraction.evaluate(_relatedPosition.fen)
         }
     }
 
-    fun processComponentMove(longUCICommandAnswer: String) {
-        val moveStr = longUCICommandAnswer.split("\n").filter { it.isNotEmpty() }.last().split(" ")[1]
-        val chessMovePossibilities = if (moveStr.length > 4) {
+    fun processComponentMove(move: Int) {
+        /*val chessMovePossibilities = if (moveStr.length > 4) {
             val (sFile, sRank, eFile, eRank, promotion) = moveStr.toCharArray()
             val legalMovesStorage = IntArray(MAX_LEGAL_POSITIONS_COUNT)
             _relatedPosition.getLegalMoves(legalMovesStorage)
@@ -384,7 +367,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                 invalidate()
                 checkIfGameFinished()
             }
-        }
+        }*/
     }
 
     fun checkIfGameFinished() {
@@ -411,42 +394,18 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         }
     }
 
-    fun notifyPlayerGoal(longUCICommandAnswer: String) {
-        val commandAnswerParts = longUCICommandAnswer.split("\n")
-        if (commandAnswerParts.isNotEmpty()) {
-            val infoLines = commandAnswerParts.filter { it.isNotEmpty() && it.startsWith("info") }
-            if (infoLines.isNotEmpty()) {
-                Handler(context.mainLooper).post {
-                    Logger.getLogger("BasicChessEndgamesTrainer").info("UCI info is '${infoLines.last()}'")
-                    val isWhiteTurn = _relatedPosition.turn
-
-                    _playerGoal = when (positionResultFromPositionInfo(infoLines.last(), isWhiteTurn)) {
-                        ChessResult.WHITE_WIN -> R.string.white_play_for_mate
-                        ChessResult.BLACK_WIN -> R.string.black_play_for_mate
-                        ChessResult.DRAW -> R.string.should_be_draw
-                        ChessResult.UNDECIDED -> R.string.empty_string
-                    }
-
-                    when (context) {
-                        is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(_playerGoal, alertMode = false)
-                    }
-                    _waitingForPlayerGoal = false
-                }
-            }
-        }
-    }
-
     private fun addMoveToList(move: Int) {
         when (context) {
             is PlayingActivity -> {
+                val isWhiteTurnBeforeMove = _relatedPosition.turn
                 _relatedPosition.doMove(move)
                 val fromSquare = Move.getFromSquare(move)
                 val toSquare = Move.getToSquare(move)
                 val (startFile, startRank) = squareToCoordinates(fromSquare)
                 val (endFile, endRank) = squareToCoordinates(toSquare)
                 val fenAfterMove = _relatedPosition.fen
-                val isWhiteTurn = _relatedPosition.turn
-                if (!hasStartedToWriteMoves() && !isWhiteTurn){
+
+                if (!_startedToWriteMoves && !isWhiteTurnBeforeMove){
                     with(context as PlayingActivity){
                         addPositionInMovesList(getMoveNumber().toString(), "", MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList("..", "",MoveToHighlight(-1,-1,-1,-1))
@@ -461,7 +420,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                 }
                 else {
                     with(context as PlayingActivity){
-                        if (isWhiteTurn) addPositionInMovesList(getMoveNumber().toString(), "",
+                        if (isWhiteTurnBeforeMove) addPositionInMovesList(getMoveNumber().toString(), "",
                                 MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList(
                                 san = Move.sanToFigurines(Move.toSan(_relatedPosition, move))!!,
@@ -550,8 +509,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     private var _playerHasWhite = true
     private var _gameFinished = false
     private var _waitingForPlayerGoal = true
-    private var _playerGoal = R.string.empty_string
     private var _startedToWriteMoves = false
     private var _moveToHighlightFrom:Pair<Int, Int>? = null
     private var _moveToHighlightTo:Pair<Int, Int>? = null
+    private val engineInteraction = EngineInteraction(this)
 }

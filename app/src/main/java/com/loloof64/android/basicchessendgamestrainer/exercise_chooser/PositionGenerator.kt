@@ -75,7 +75,7 @@ val RANK_6 = 5
 val RANK_7 = 6
 val RANK_8 = 7
 
-private val maxLoopsIterations = 150
+private val maxLoopsIterations = 250
 
 fun Int.loops(callback : (Int) -> Unit) {
     for (i in 0 until this) callback(i)

@@ -10,7 +10,6 @@ import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExerciseR
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
-import java.util.*
 
 class ExerciseChooserActivity : AppCompatActivity() {
 
@@ -62,9 +61,6 @@ class ExerciseChooserActivity : AppCompatActivity() {
 
     override fun onStop(){
         super.onStop()
-        if (isFinishing) (application as MyApplication).uciEnd()
     }
-
-    private val _random = Random()
 
 }
