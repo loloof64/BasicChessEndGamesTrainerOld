@@ -12,6 +12,8 @@ import karballo.Color as KColor
 infix fun Int.min(other : Int) = if (this < other) this else other
 infix fun Int.max(other : Int) = if (this > other) this else other
 
+data class SquareCoordinates(val file: Int, val rank: Int)
+
 fun coordinatesToSquare(file: Int, rank: Int) : Long {
     return 1L shl ((7-file) + (8*rank))
 }
@@ -48,8 +50,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     private val rectPaint = Paint()
     private val fontPaint = Paint()
 
-    abstract fun highlightedStartCell() : Pair<Int, Int>?
-    abstract fun highlightedTargetCell() : Pair<Int, Int>?
+    abstract fun highlightedStartCell() : SquareCoordinates?
+    abstract fun highlightedTargetCell() : SquareCoordinates?
 
     fun reverse() {
         reversed = !reversed
@@ -160,8 +162,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     private fun drawHighlightedCells(canvas: Canvas, cellSize: Int) {
         val startCellToHighlight = highlightedStartCell()
         if (startCellToHighlight != null){
-            val fileIndex = startCellToHighlight.first
-            val rankIndex = startCellToHighlight.second
+            val fileIndex = startCellToHighlight.file
+            val rankIndex = startCellToHighlight.rank
 
             val x = (cellSize * (0.5 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
             val y = (cellSize * (0.5 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
@@ -171,8 +173,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
         val targetCellToHighlight = highlightedTargetCell()
         if (targetCellToHighlight != null) {
-            val fileIndex = targetCellToHighlight.first
-            val rankIndex = targetCellToHighlight.second
+            val fileIndex = targetCellToHighlight.file
+            val rankIndex = targetCellToHighlight.rank
 
             val x = (cellSize * (0.5 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
             val y = (cellSize * (0.5 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
@@ -184,8 +186,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     private fun drawCurrentTargetCellGuidingAxis(canvas: Canvas, cellSize: Int){
         val targetCellToHighlight = highlightedTargetCell()
         if (targetCellToHighlight != null) {
-            val fileIndex = targetCellToHighlight.first
-            val rankIndex = targetCellToHighlight.second
+            val fileIndex = targetCellToHighlight.file
+            val rankIndex = targetCellToHighlight.rank
 
             val x = (cellSize * (1 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
             val y = (cellSize * (1 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
@@ -198,17 +200,17 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     }
 
     private fun drawHighlightedMove(canvas: Canvas, cellSize: Int){
-        if (_highlightedMoveFromFile !in 0..7) return
-        if (_highlightedMoveFromRank !in 0..7) return
-        if (_highlightedMoveToFile !in 0..7) return
-        if (_highlightedMoveToRank !in 0..7) return
+        if (_highlightedMoveFrom.file !in 0..7) return
+        if (_highlightedMoveFrom.rank !in 0..7) return
+        if (_highlightedMoveTo.file !in 0..7) return
+        if (_highlightedMoveTo.rank !in 0..7) return
 
         val paint = Paint()
 
-        val fromPointX = (cellSize * if (reversed) (8 - _highlightedMoveFromFile) else (_highlightedMoveFromFile+1)).toFloat()
-        val fromPointY = (cellSize * if (reversed) (_highlightedMoveFromRank+1) else (8 - _highlightedMoveFromRank)).toFloat()
-        val toPointX = (cellSize * if (reversed) (8 - _highlightedMoveToFile) else (_highlightedMoveToFile+1)).toFloat()
-        val toPointY = (cellSize * if (reversed) (_highlightedMoveToRank+1) else (8 - _highlightedMoveToRank)).toFloat()
+        val fromPointX = (cellSize * if (reversed) (8 - _highlightedMoveFrom.file) else (_highlightedMoveFrom.file+1)).toFloat()
+        val fromPointY = (cellSize * if (reversed) (_highlightedMoveFrom.rank+1) else (8 - _highlightedMoveFrom.rank)).toFloat()
+        val toPointX = (cellSize * if (reversed) (8 - _highlightedMoveTo.file) else (_highlightedMoveTo.file+1)).toFloat()
+        val toPointY = (cellSize * if (reversed) (_highlightedMoveTo.rank+1) else (8 - _highlightedMoveTo.rank)).toFloat()
 
         val angleDegrees = Math.toDegrees(Math.atan2(toPointY.toDouble() - fromPointY.toDouble(),
                 toPointX.toDouble() - fromPointX.toDouble())).toFloat()
@@ -252,10 +254,10 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
     open fun setHighlightedMove(fromFile: Int, fromRank: Int,
                            toFile: Int, toRank: Int){
-        _highlightedMoveFromFile = if (fromFile in 0..7) fromFile else -1
-        _highlightedMoveFromRank = if (fromRank in 0..7) fromRank else -1
-        _highlightedMoveToFile = if (toFile in 0..7) toFile else -1
-        _highlightedMoveToRank = if (toRank in 0..7) toRank else -1
+        _highlightedMoveFrom = SquareCoordinates(file =  if (fromFile in 0..7) fromFile else -1,
+                rank = if (fromRank in 0..7) fromRank else -1)
+        _highlightedMoveTo = SquareCoordinates(file = if (toFile in 0..7) toFile else -1,
+                rank = if (toRank in 0..7) toRank else -1)
         invalidate()
     }
 
@@ -266,10 +268,8 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         invalidate()
     }
 
-    private var _highlightedMoveFromFile = -1
-    private var _highlightedMoveFromRank = -1
-    private var _highlightedMoveToFile = -1
-    private var _highlightedMoveToRank = -1
+    private var _highlightedMoveFrom = SquareCoordinates(file = -1, rank = -1)
+    private var _highlightedMoveTo = SquareCoordinates(file = -1, rank = -1)
 
 
 }
