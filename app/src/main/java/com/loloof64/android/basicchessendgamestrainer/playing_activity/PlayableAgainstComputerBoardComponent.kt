@@ -350,6 +350,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         when (context) {
             is PlayingActivity -> {
                 val isWhiteTurnBeforeMove = _relatedPosition.turn
+                val moveSan = Move.toSan(_relatedPosition, move)
                 _relatedPosition.doMove(move)
                 val fromSquare = Move.getFromSquare(move)
                 val toSquare = Move.getToSquare(move)
@@ -361,7 +362,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                     with(context as PlayingActivity){
                         addPositionInMovesList(getMoveNumber().toString(), "", MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList("..", "",MoveToHighlight(-1,-1,-1,-1))
-                        addPositionInMovesList(Move.sanToFigurines(Move.toSan(_relatedPosition, move))!!,
+                        addPositionInMovesList(Move.sanToFigurines(moveSan)!!,
                             fen = fenAfterMove, moveToHighlight = MoveToHighlight(
                             startFile = startFile,
                             startRank = startRank,
@@ -375,7 +376,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                         if (isWhiteTurnBeforeMove) addPositionInMovesList(getMoveNumber().toString(), "",
                                 MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList(
-                                san = Move.sanToFigurines(Move.toSan(_relatedPosition, move))!!,
+                                san = Move.sanToFigurines(moveSan)!!,
                                 fen = fenAfterMove,
                                 moveToHighlight = MoveToHighlight(
                                         startFile = startFile,
