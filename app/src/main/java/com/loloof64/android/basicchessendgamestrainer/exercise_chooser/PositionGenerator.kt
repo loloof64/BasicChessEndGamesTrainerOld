@@ -170,8 +170,9 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
             if (cellNotEmpty) continue
             tempPosition.setPieceAt(coordinatesToSquare(kingFile, kingRank),
                     if (playerHasWhite) 'k' else 'K')
-            // If the enemy king is threatened, will go into another try
+
             tempPosition.turn = !playerHasWhite
+            tempPosition.setCheckFlags()
             val enemyKingInChess = tempPosition.check
             tempPosition.turn = playerHasWhite
             if (enemyKingInChess) continue
@@ -207,8 +208,9 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
                     val isWhitePiece = (pieceKindCount.pieceKind.ofPlayerSide && playerHasWhite)
                     || (!pieceKindCount.pieceKind.ofPlayerSide && !playerHasWhite)
                     tempPosition.setPieceAt(coordinatesToSquare(pieceFile, pieceRank), pieceToStone(pieceKindCount.pieceKind, isWhitePiece))
-                    // If the enemy king is threatened, will go into another try
+                    
                     tempPosition.turn = !playerHasWhite
+                    tempPosition.setCheckFlags()
                     val enemyKingInChess = tempPosition.check
                     tempPosition.turn = playerHasWhite
                     if (enemyKingInChess) continue
