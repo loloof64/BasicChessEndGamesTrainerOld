@@ -7,6 +7,7 @@ import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
 import karballo.Board
 import karballo.Move
+import karballo.search.SearchEngine
 import karballo.evaluation.Evaluator
 import java.util.logging.Logger
 
@@ -43,12 +44,20 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     override fun consumeScore(score: Int) {
         if (_waitingForPlayerGoal){
-            val stringId = if (score > Evaluator.MATE) R.string.white_play_for_mate
-                            else if (score > Evaluator.KNOWN_WIN) R.string.white_play_for_win
-                            else if (score < -Evaluator.KNOWN_WIN) R.string.black_play_for_win
-                            else if (score < -Evaluator.MATE) R.string.black_play_for_mate
-                            else if (score == 0) R.string.should_be_draw
-                            else R.string.empty_string
+            //////////////////////////////
+            println("Score is $score")
+            /////////////////////////////////
+            val MIN_MATE_SCORE = 20500
+            val stringId = if (score > MIN_MATE_SCORE) {
+                if (isWhiteToPlay()) R.string.white_play_for_mate
+                else R.string.black_play_for_mate
+            } else if (score > Evaluator.KNOWN_WIN) {
+                if (isWhiteToPlay()) R.string.white_play_for_win
+                else R.string.black_play_for_win
+            } 
+            else if (score == Evaluator.DRAW) R.string.should_be_draw
+            else R.string.empty_string
+
             when (context){
                 is PlayingActivity -> (context as PlayingActivity).setPlayerGoalTextId(stringId, false)
             }
