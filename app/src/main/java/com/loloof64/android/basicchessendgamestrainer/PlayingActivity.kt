@@ -186,6 +186,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
      * If playerHasWhite is given null, it will be set to the turn of the given fen
      */
     fun newGame(fen: String = standardFEN){
+        disallowPositionNavigation()
         setPlayerGoalTextId(R.string.empty_string, alertMode = false)
         listAdapter.clear()
         lastExercise = fen

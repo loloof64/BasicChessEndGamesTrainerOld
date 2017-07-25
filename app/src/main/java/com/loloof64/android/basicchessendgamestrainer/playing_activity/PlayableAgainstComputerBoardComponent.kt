@@ -44,9 +44,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
     override fun consumeScore(score: Int) {
         if (_waitingForPlayerGoal){
-            //////////////////////////////
-            println("Score is $score")
-            /////////////////////////////////
             val MIN_MATE_SCORE = 20500
             val stringId = if (score > MIN_MATE_SCORE) {
                 if (isWhiteToPlay()) R.string.white_play_for_mate
@@ -336,22 +333,22 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         val isCheckMate = Math.abs(endGameStatus) == 1
         val isDraw = endGameStatus == 99
         if (isCheckMate) {
+            _gameFinished = true
             when(context){
                 is PlayingActivity -> with(context as PlayingActivity){
                     setPlayerGoalTextId(R.string.checkmate, alertMode = true)
                     activatePositionNavigation()
                 }
             }
-            _gameFinished = true
         }
         if (isDraw){
+            _gameFinished = true
             when(context){
                 is PlayingActivity -> with(context as PlayingActivity){
                     setPlayerGoalTextId(R.string.position_draw, alertMode = true)
                     activatePositionNavigation()
                 }
             }
-            _gameFinished = true
         }
     }
 
