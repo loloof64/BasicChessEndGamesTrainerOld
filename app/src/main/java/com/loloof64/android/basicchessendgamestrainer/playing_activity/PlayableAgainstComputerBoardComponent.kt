@@ -357,6 +357,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             is PlayingActivity -> {
                 val isWhiteTurnBeforeMove = _relatedPosition.turn
                 val moveSan = Move.toSan(_relatedPosition, move)
+
+                val moveNumberBeforeMoveCommit = getMoveNumber()
+
                 _relatedPosition.doMove(move)
                 val fromSquare = Move.getFromSquare(move)
                 val toSquare = Move.getToSquare(move)
@@ -366,7 +369,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
                 if (!_startedToWriteMoves && !isWhiteTurnBeforeMove){
                     with(context as PlayingActivity){
-                        addPositionInMovesList(getMoveNumber().toString(), "", MoveToHighlight(-1,-1,-1,-1))
+                        addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "", MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList("..", "",MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList(Move.sanToFigurines(moveSan)!!,
                             fen = fenAfterMove, moveToHighlight = MoveToHighlight(
@@ -379,7 +382,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
                 }
                 else {
                     with(context as PlayingActivity){
-                        if (isWhiteTurnBeforeMove) addPositionInMovesList(getMoveNumber().toString(), "",
+                        if (isWhiteTurnBeforeMove) addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "",
                                 MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList(
                                 san = Move.sanToFigurines(moveSan)!!,
