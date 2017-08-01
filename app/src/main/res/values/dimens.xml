@@ -5,6 +5,5 @@
     <dimen name="promotion_chooser_button_size">50dp</dimen>
     <dimen name="promotion_chooser_button_margin">6dp</dimen>
     <dimen name="playing_activity_fab_padding_top">30dp</dimen>
-    <dimen name="playing_activity_arrows_padding">6dp</dimen>
     <dimen name="playing_activity_fab_size">30dp</dimen>
 </resources>

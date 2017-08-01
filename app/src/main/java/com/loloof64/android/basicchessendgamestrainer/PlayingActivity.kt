@@ -18,6 +18,7 @@ import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
 import kotlinx.android.synthetic.main.activity_playing.*
+import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.PieceType
 import java.lang.ref.WeakReference
 import java.util.*
 
@@ -56,7 +57,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
 
-    override fun reactToPromotionPieceSelection(piece: Int) {
+    override fun reactToPromotionPieceSelection(piece: PieceType) {
         playingBoard.validatePromotionMove(piece)
         playingBoard.checkIfGameFinished()
         if (!playingBoard.gameFinished()) playingBoard.makeComputerPlay()

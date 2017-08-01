@@ -1,79 +1,58 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.playing_activity.coordinatesToSquare
-import karballo.Board
-import karballo.Piece
+import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.*
+import com.loloof64.android.basicchessendgamestrainer.karballo_chess_implementation.Position
 import java.util.*
 import java.util.logging.Logger
 
 class PositionGenerationLoopException : Exception()
 
-data class PieceKind(val pieceType: Int, val ofPlayerSide: Boolean)
+data class PieceKind(val pieceType: PieceType, val ofPlayerSide: Boolean)
 data class PieceKindCount(val pieceKind: PieceKind, val count: Int)
-data class BoardCoordinate(val file: Int, val rank: Int)
 
 /*
  * Constraint based on the piece coordinate and general position consideration
  */
-typealias KingConstraint = (coord: BoardCoordinate, playerHasWhite: Boolean, position: Board) -> Boolean
+typealias KingConstraint = (coord: Square, playerHasWhite: Boolean, position: IPosition) -> Boolean
 
 /*
  * Constraint based on the piece coordinate, both kings positions and general position consideration
  */
-typealias OtherPieceConstraint = (coord: BoardCoordinate, playerHasWhite: Boolean, position: Board,
-                                  playerKingCoord : BoardCoordinate, oppositeKingCoord: BoardCoordinate) -> Boolean
+typealias OtherPieceConstraint = (coord: Square, playerHasWhite: Boolean, position: IPosition,
+                                  playerKingCoord : Square, oppositeKingCoord: Square) -> Boolean
 
 /**
  * Constraint based on the piece kind, its generation index (is it the first, the second, ... ?),
  * and general constraint consideration
  */
-typealias IndexedConstraint = (pieceKind: PieceKind, pieceIndex: Int, coord: BoardCoordinate,
-                               playerHasWhite: Boolean, position: Board) -> Boolean
+typealias IndexedConstraint = (pieceKind: PieceKind, pieceIndex: Int, coord: Square,
+                               playerHasWhite: Boolean, position: IPosition) -> Boolean
 
 /*
  * Constraint based on 2 pieces of the same kind (so taking into account the piece class and
  * the fact that they belong or not to player) and general position consideration
  */
-typealias SameColorPiecesMutualConstraint = (firstBoardCoord: BoardCoordinate,
-                                             secondBoardCoord: BoardCoordinate,
+typealias SameColorPiecesMutualConstraint = (firstBoardCoord: Square,
+                                             secondBoardCoord: Square,
                                              playerHasWhite: Boolean,
-                                             position: Board) -> Boolean
+                                             position: IPosition) -> Boolean
 /**
  * Constraint between both kings
  */
-typealias KingsMutualConstraint = (playerKingCoordinate: BoardCoordinate,
-                                   oppositeKingCoordinate: BoardCoordinate,
-                                   playerHasWhite: Boolean, position: Board) -> Boolean
+typealias KingsMutualConstraint = (playerKingCoordinate: Square,
+                                   oppositeKingCoordinate: Square,
+                                   playerHasWhite: Boolean, position: IPosition) -> Boolean
 
-fun NO_CONSTRAINT(coord: BoardCoordinate, playerHasWhite: Boolean, position: Board) = true
+fun NO_CONSTRAINT(coord: Square, playerHasWhite: Boolean, position: IPosition) = true
 
-fun NO_KINGS_MUTUAL_CONSTRAINT(playerKingCoordinate: BoardCoordinate,
-                               oppositeKingCoordinate: BoardCoordinate,
-                               playerHasWhite: Boolean, position: Board) = true
+fun NO_KINGS_MUTUAL_CONSTRAINT(playerKingCoordinate: Square,
+                               oppositeKingCoordinate: Square,
+                               playerHasWhite: Boolean, position: IPosition) = true
 
 val NO_OTHER_PIECES_GLOBAL_CONSTRAINT = mapOf<PieceKind, OtherPieceConstraint>()
 val NO_OTHER_PIECES_MUTUAL_CONSTRAINT = mapOf<PieceKind, SameColorPiecesMutualConstraint>()
 val NO_OTHER_PIECE_INDEXED_CONSTRAINT = mapOf<PieceKind, IndexedConstraint>()
-
-
-val FILE_A = 0
-val FILE_B = 1
-val FILE_C = 2
-val FILE_D = 3
-val FILE_E = 4
-val FILE_F = 5
-val FILE_G = 6
-val FILE_H = 7
-
-val RANK_1 = 0
-val RANK_2 = 1
-val RANK_3 = 2
-val RANK_4 = 3
-val RANK_5 = 4
-val RANK_6 = 5
-val RANK_7 = 6
-val RANK_8 = 7
 
 private val maxLoopsIterations = 250
 
@@ -87,12 +66,12 @@ fun Int.loops(callback : (Int) -> Unit) {
  */
 val Char.p: PieceKind
         get() = when (this){
-            'P' -> PieceKind(pieceType = Piece.PAWN, ofPlayerSide = true)
-            'N' -> PieceKind(pieceType = Piece.KNIGHT, ofPlayerSide = true)
-            'B' -> PieceKind(pieceType = Piece.BISHOP, ofPlayerSide = true)
-            'R' -> PieceKind(pieceType = Piece.ROOK, ofPlayerSide = true)
-            'Q' -> PieceKind(pieceType = Piece.QUEEN, ofPlayerSide = true)
-            'K' -> PieceKind(pieceType = Piece.KING, ofPlayerSide = true)
+            'P' -> PieceKind(pieceType = PieceType.PAWN, ofPlayerSide = true)
+            'N' -> PieceKind(pieceType = PieceType.KNIGHT, ofPlayerSide = true)
+            'B' -> PieceKind(pieceType = PieceType.BISHOP, ofPlayerSide = true)
+            'R' -> PieceKind(pieceType = PieceType.ROOK, ofPlayerSide = true)
+            'Q' -> PieceKind(pieceType = PieceType.QUEEN, ofPlayerSide = true)
+            'K' -> PieceKind(pieceType = PieceType.KING, ofPlayerSide = true)
             else -> throw IllegalArgumentException("p() not usable for char $this.")
         }
 
@@ -102,12 +81,12 @@ val Char.p: PieceKind
  */
 val Char.e : PieceKind
         get() = when (this){
-            'P' -> PieceKind(pieceType = Piece.PAWN, ofPlayerSide = false)
-            'N' -> PieceKind(pieceType = Piece.KNIGHT, ofPlayerSide = false)
-            'B' -> PieceKind(pieceType = Piece.BISHOP, ofPlayerSide = false)
-            'R' -> PieceKind(pieceType = Piece.ROOK, ofPlayerSide = false)
-            'Q' -> PieceKind(pieceType = Piece.QUEEN, ofPlayerSide = false)
-            'K' -> PieceKind(pieceType = Piece.KING, ofPlayerSide = false)
+            'P' -> PieceKind(pieceType = PieceType.PAWN, ofPlayerSide = false)
+            'N' -> PieceKind(pieceType = PieceType.KNIGHT, ofPlayerSide = false)
+            'B' -> PieceKind(pieceType = PieceType.BISHOP, ofPlayerSide = false)
+            'R' -> PieceKind(pieceType = PieceType.ROOK, ofPlayerSide = false)
+            'Q' -> PieceKind(pieceType = PieceType.QUEEN, ofPlayerSide = false)
+            'K' -> PieceKind(pieceType = PieceType.KING, ofPlayerSide = false)
             else -> throw IllegalArgumentException("e() not usable for char $this.")
         }
 
@@ -120,8 +99,7 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
                         val otherPiecesIndexedConstraint: Map<PieceKind, IndexedConstraint>) {
 
     fun generatePosition(playerHasWhite: Boolean = true): String {
-        _position.fen = "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1"
-        _position.moveNumber = 1
+        _position = Position("8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1")
 
         try {
             placeKings(playerHasWhite)
@@ -130,29 +108,28 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
             return ""
         }
 
-        Logger.getLogger("BasicChessEndgamesTrainer").info("Generated position is '${_position.fen}'")
+        Logger.getLogger("BasicChessEndgamesTrainer").info("Generated position is '${_position.toFen()}'")
 
-        return _position.fen
+        return _position.toFen()
     }
 
-    private var playerKingCoords = BoardCoordinate(-1,-1)
-    private var oppositeKingCoords = BoardCoordinate(-1,-1)
+    private var playerKingCoords: Square? = null
+    private var oppositeKingCoords: Square? = null
 
     private fun placeKings(playerHasWhite: Boolean){
-        playerKingCoords = BoardCoordinate(-1,-1)
-        oppositeKingCoords = BoardCoordinate(-1,-1)
+        playerKingCoords = null
+        oppositeKingCoords = null
         var loopSuccess = false
         for (iters in 0..maxLoopsIterations){ // setting up player king
             val kingFile = _random.nextInt(8)
             val kingRank = _random.nextInt(8)
 
-            val tempPosition = Board()
-            tempPosition.fen = _position.fen
-            tempPosition.setPieceAt(coordinatesToSquare(kingFile, kingRank),
-                    if (playerHasWhite) 'K' else 'k')
-            if (playerKingConstraint(BoardCoordinate(kingFile, kingRank), playerHasWhite, tempPosition)) {
-                _position.fen = tempPosition.fen
-                playerKingCoords = BoardCoordinate(file = kingFile, rank = kingRank)
+            val tempPosition = Position(_position.toFen())
+            tempPosition.setPieceAtSquare(Square(kingFile, kingRank),
+                    if (playerHasWhite) Piece.WHITE_KING else Piece.BLACK_KING)
+            if (playerKingConstraint(Square(kingFile, kingRank), playerHasWhite, tempPosition)) {
+                _position = Position(tempPosition.toFen())
+                playerKingCoords = Square(kingFile, kingRank)
                 loopSuccess = true
                 break
             }
@@ -164,24 +141,20 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
             val kingFile = _random.nextInt(8)
             val kingRank = _random.nextInt(8)
 
-            val tempPosition = Board()
-            tempPosition.fen = _position.fen
-            val cellNotEmpty = tempPosition.getPieceAt(coordinatesToSquare(kingFile, kingRank)) != '.'
+            val tempPosition = Position(_position.toFen())
+            val cellNotEmpty = tempPosition.getPieceAtSquare(Square(kingFile, kingRank)) != null
             if (cellNotEmpty) continue
-            tempPosition.setPieceAt(coordinatesToSquare(kingFile, kingRank),
-                    if (playerHasWhite) 'k' else 'K')
+            tempPosition.setPieceAtSquare(Square(kingFile, kingRank),
+                    if (playerHasWhite) Piece.BLACK_KING else Piece.WHITE_KING)
 
-            tempPosition.turn = !playerHasWhite
-            tempPosition.setCheckFlags()
-            val enemyKingInChess = tempPosition.check
-            tempPosition.turn = playerHasWhite
+            val enemyKingInChess = tempPosition.kingInChess(if (playerHasWhite) Color.BLACK else Color.WHITE)
             if (enemyKingInChess) continue
 
-            if (oppositeKingConstraint(BoardCoordinate(kingFile, kingRank), playerHasWhite, tempPosition)
-                    && kingsMutualConstraint(playerKingCoords, BoardCoordinate(file = kingFile, rank = kingRank),
+            if (oppositeKingConstraint(Square(kingFile, kingRank), playerHasWhite, tempPosition)
+                    && kingsMutualConstraint(playerKingCoords!!, Square(kingFile, kingRank),
                     playerHasWhite, tempPosition)) {
-                oppositeKingCoords = BoardCoordinate(kingFile, kingRank)
-                _position.fen = tempPosition.fen
+                oppositeKingCoords = Square(kingFile, kingRank)
+                _position = Position(tempPosition.toFen())
                 loopSuccess = true
                 break
             }
@@ -191,7 +164,7 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
 
     private fun placeOtherPieces(playerHasWhite: Boolean){
         otherPiecesCount.forEach { pieceKindCount ->
-            val savedCoordinates = arrayListOf<BoardCoordinate>()
+            val savedCoordinates = arrayListOf<Square>()
             val pieceKindConstraint = otherPiecesGlobalConstraint[pieceKindCount.pieceKind]
             val pieceKindMutualConstraint = otherPiecesMutualConstraint[pieceKindCount.pieceKind]
             pieceKindCount.count.loops { index ->
@@ -199,20 +172,16 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
                 for (loopIter in 0..maxLoopsIterations) {
                     val pieceFile = _random.nextInt(8)
                     val pieceRank = _random.nextInt(8)
-                    val currentCoordinate = BoardCoordinate(pieceFile, pieceRank)
+                    val currentCoordinate = Square(pieceFile, pieceRank)
 
-                    val tempPosition = Board()
-                    tempPosition.fen = _position.fen
-                    val cellNotEmpty = tempPosition.getPieceAt(coordinatesToSquare(pieceFile, pieceRank)) != '.'
+                    val tempPosition = Position(_position.toFen())
+                    val cellNotEmpty = tempPosition.getPieceAtSquare(Square(pieceFile, pieceRank)) != null
                     if (cellNotEmpty) continue
                     val isWhitePiece = (pieceKindCount.pieceKind.ofPlayerSide && playerHasWhite)
                     || (!pieceKindCount.pieceKind.ofPlayerSide && !playerHasWhite)
-                    tempPosition.setPieceAt(coordinatesToSquare(pieceFile, pieceRank), pieceToStone(pieceKindCount.pieceKind, isWhitePiece))
+                    tempPosition.setPieceAtSquare(Square(pieceFile, pieceRank), Piece(pieceType = pieceKindCount.pieceKind.pieceType, color = if (isWhitePiece) Color.WHITE else Color.BLACK))
                     
-                    tempPosition.turn = !playerHasWhite
-                    tempPosition.setCheckFlags()
-                    val enemyKingInChess = tempPosition.check
-                    tempPosition.turn = playerHasWhite
+                    val enemyKingInChess = tempPosition.kingInChess(if (playerHasWhite) Color.BLACK else Color.WHITE)
                     if (enemyKingInChess) continue
 
                     // If for any previous piece of same kind, mutual constraint is not respected, will go into another try
@@ -221,12 +190,12 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
 
                     val pieceKindIndexConstraint = otherPiecesIndexedConstraint[pieceKindCount.pieceKind]
                     if (pieceKindIndexConstraint != null && !pieceKindIndexConstraint(pieceKindCount.pieceKind, index,
-                            BoardCoordinate(pieceFile, pieceRank),
+                            Square(pieceFile, pieceRank),
                             playerHasWhite, tempPosition)) continue
 
-                    if (pieceKindConstraint == null || pieceKindConstraint(currentCoordinate, playerHasWhite, tempPosition, playerKingCoords, oppositeKingCoords)){
-                        _position.fen = tempPosition.fen
-                        savedCoordinates += BoardCoordinate(pieceFile, pieceRank)
+                    if (pieceKindConstraint == null || pieceKindConstraint(currentCoordinate, playerHasWhite, tempPosition, playerKingCoords!!, oppositeKingCoords!!)){
+                        _position = Position(tempPosition.toFen())
+                        savedCoordinates += Square(pieceFile, pieceRank)
                         loopSuccess = true
                         break
                     }
@@ -236,26 +205,14 @@ class PositionGenerator(val playerKingConstraint: KingConstraint,
         }
     }
 
-    private fun pieceToStone(pieceKind: PieceKind, whitePiece: Boolean): Char {
-        return when(pieceKind.pieceType){
-            Piece.PAWN -> if (whitePiece) 'P' else 'p'
-            Piece.KNIGHT -> if (whitePiece) 'N' else 'n'
-            Piece.BISHOP -> if (whitePiece) 'B' else 'b'
-            Piece.ROOK -> if (whitePiece) 'R' else 'r'
-            Piece.QUEEN -> if (whitePiece) 'Q' else 'q'
-            Piece.KING -> if (whitePiece) 'K' else 'k'
-            else -> '.'
-        }
-    }
-
-    private val _position = Board()
+    private var _position : IPosition = Position()
     private val _random = Random()
 }
 
 val KRRvK_PositionGenerator = PositionGenerator(
      playerKingConstraint = ::NO_CONSTRAINT,
      oppositeKingConstraint = {(file, rank), _, position ->
-         (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
+         (file in Square.FILE_C..Square.FILE_F) && (rank in Square.RANK_3..Square.RANK_6)
      },
      kingsMutualConstraint = ::NO_KINGS_MUTUAL_CONSTRAINT,
      otherPiecesCount = arrayOf(PieceKindCount('R'.p, 2)),
@@ -267,7 +224,7 @@ val KRRvK_PositionGenerator = PositionGenerator(
 val KQvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
         oppositeKingConstraint = {(file, rank), _, position ->
-            (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
+            (file in Square.FILE_C..Square.FILE_F) && (rank in Square.RANK_3..Square.RANK_6)
         },
         kingsMutualConstraint = ::NO_KINGS_MUTUAL_CONSTRAINT,
         otherPiecesCount = arrayOf(PieceKindCount('Q'.p, 1)),
@@ -279,7 +236,7 @@ val KQvK_PositionGenerator = PositionGenerator(
 val KRvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
         oppositeKingConstraint = {(file, rank), _, position ->
-            (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
+            (file in Square.FILE_C..Square.FILE_F) && (rank in Square.RANK_3..Square.RANK_6)
         },
         kingsMutualConstraint = ::NO_KINGS_MUTUAL_CONSTRAINT,
         otherPiecesCount = arrayOf(PieceKindCount('R'.p, 1)),
@@ -292,7 +249,7 @@ val KRvK_PositionGenerator = PositionGenerator(
 val KBBvK_PositionGenerator = PositionGenerator(
         playerKingConstraint = ::NO_CONSTRAINT,
         oppositeKingConstraint = {(file, rank), _, position ->
-            (file in FILE_C..FILE_F) && (rank in RANK_3..RANK_6)
+            (file in Square.FILE_C..Square.FILE_F) && (rank in Square.RANK_3..Square.RANK_6)
         },
         kingsMutualConstraint = ::NO_KINGS_MUTUAL_CONSTRAINT,
         otherPiecesCount = arrayOf(PieceKindCount('B'.p, 2)),
@@ -307,18 +264,18 @@ val KBBvK_PositionGenerator = PositionGenerator(
 
 val KPvK_I_PositionGenerator = PositionGenerator(
         playerKingConstraint = {(file, rank), playerHasWhite, _ ->
-            (rank == if (playerHasWhite) RANK_6 else RANK_3)
-            && (file in FILE_B..FILE_G)
+            (rank == if (playerHasWhite) Square.RANK_6 else Square.RANK_3)
+            && (file in Square.FILE_B..Square.FILE_G)
         },
         oppositeKingConstraint = {(_, rank), playerHasWhite, _ ->
-            rank == if (playerHasWhite) RANK_8 else RANK_1
+            rank == if (playerHasWhite) Square.RANK_8 else Square.RANK_1
         },
         kingsMutualConstraint = {(playerKingFile, _), (oppositeKingFile, _), playerHasWhite, position ->
             playerKingFile == oppositeKingFile
         },
         otherPiecesCount = arrayOf(PieceKindCount('P'.p, 1)),
         otherPiecesGlobalConstraint = mapOf('P'.p to {(pieceFile, pieceRank), playerHasWhite, position, (playerKingFile, _), _ ->
-            (pieceRank == if (playerHasWhite) RANK_5 else RANK_4)
+            (pieceRank == if (playerHasWhite) Square.RANK_5 else Square.RANK_4)
             && (pieceFile == playerKingFile)
         }),
         otherPiecesMutualConstraint = NO_OTHER_PIECES_MUTUAL_CONSTRAINT,
@@ -327,17 +284,17 @@ val KPvK_I_PositionGenerator = PositionGenerator(
 
 val KPvK_II_PositionGenerator = PositionGenerator(
         playerKingConstraint = {(_, rank), playerHasWhite, _ ->
-            rank == if (playerHasWhite) RANK_1 else RANK_8
+            rank == if (playerHasWhite) Square.RANK_1 else Square.RANK_8
         },
         oppositeKingConstraint = {(_, rank), playerHasWhite, _ ->
-            rank == if (playerHasWhite) RANK_4 else RANK_5
+            rank == if (playerHasWhite) Square.RANK_4 else Square.RANK_5
         },
         kingsMutualConstraint = {(playerKingFile, _), (oppositeKingFile, _), playerHasWhite, position ->
             Math.abs(playerKingFile - oppositeKingFile) <= 1
         },
         otherPiecesCount = arrayOf(PieceKindCount('P'.e, 1)),
         otherPiecesGlobalConstraint = mapOf('P'.e to {(pieceFile, pieceRank), playerHasWhite, position, (playerKingFile, _), _ ->
-            (pieceRank == if (playerHasWhite) RANK_5 else RANK_4)
+            (pieceRank == if (playerHasWhite) Square.RANK_5 else Square.RANK_4)
             && (pieceFile == playerKingFile)
         }),
         otherPiecesMutualConstraint = NO_OTHER_PIECES_MUTUAL_CONSTRAINT,
