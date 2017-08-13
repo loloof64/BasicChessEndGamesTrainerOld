@@ -286,8 +286,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
 
             setWaitingForPlayerGoalFlag(waitingForPlayerGoal)
             invalidate()
-            val computerToPlay = _playerHasWhite != isWhiteToPlay()
-            if (computerToPlay) makeComputerPlay()
+            val weMustNotLetComputerPlay = _gameFinished || playerHasWhite == isWhiteToPlay()
+            if (!weMustNotLetComputerPlay) makeComputerPlay()
         }
         catch (e:IllegalArgumentException) {
             Logger.getLogger("BasicChessEndgamesTrainer").severe("Position $fen is invalid and could not be load.")
