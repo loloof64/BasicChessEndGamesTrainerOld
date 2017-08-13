@@ -40,7 +40,9 @@
 
 
 
-[TAB]D\'abord, vous devez choisir un type de finale dans l\'écran menu. Ensuite vous arrivez à l\'écran de jeu,
+[TAB]D\'abord, vous devez choisir un type de finale dans l\'écran menu : quand la finale est dans une
+        ligne verte l\'objectif est de gagner, et quand la finale considérée est dans une ligne rouge
+        l\'objectif est d\'annuler. Ensuite vous arrivez à l\'écran de jeu,
 avec une position aléatoire basée sur le type de finale choisi. La couleur qui vous est attribuée
 est aussi déterminée de manière aléatoire.[CR]
 
@@ -61,7 +63,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
 [TAB]Les fichiers du projet sont disponibles à l\'adresse https://goo.gl/KDKig0.[CR][CR]
 
 
-[TAB]Developpée par Laurent Bernabe en 2017.
+[TAB]Developpée par Laurent Bernabe en 2017. Ce projet utilise une version personalisée du projet Karballo : https://goo.gl/JLLMiz.
 </string>
     <string name="action_help">Aide</string>
     <string name="position_repetitions_draw">Nulle par répétitions !</string>

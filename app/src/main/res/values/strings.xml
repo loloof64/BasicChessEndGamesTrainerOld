@@ -37,7 +37,8 @@
 [TAB]Generates basic chess endgames and let you play them again computer (at its best level).[CR][CR][CR]
 
 
-[TAB]First, you have to select a chess endgame kind in the menu screen. Then you will get into the playing screen,
+[TAB]First, you have to select a chess endgame kind in the menu screen : when the endgame is in a green line you have to win, and
+        when the endgame is on a red line you have to draw. Then you will get into the playing screen,
 with a random position based on the endgame you chose. The color you have is also determined randomly.
 You are given your goal : knowing you always start the game.[CR][CR][CR]
 
@@ -57,7 +58,7 @@ of endgame.[CR][CR]
 [TAB]You can find the project files at https://goo.gl/KDKig0.[CR][CR]
 
 
-[TAB]Developed by Laurent Bernabe in 2017.
+[TAB]Developed by Laurent Bernabe in 2017. This project use a custom version of the Karballo project : https://goo.gl/JLLMiz.
 </string>
     <string name="action_help">Help</string>
     <string name="position_repetitions_draw">Draw by threefold repetition !</string>
