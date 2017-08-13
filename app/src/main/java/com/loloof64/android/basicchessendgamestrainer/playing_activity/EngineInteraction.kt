@@ -1,40 +1,30 @@
-package com.loloof64.android.basicchessendgamestrainer.karballo_chess_implementation
+package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
-import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.IMove
-import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.IEngine
-import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.SimpleUciObserver
-
-import karballo.search.SearchObserver
-import karballo.search.SearchStatusInfo
-import karballo.search.SearchEngine
-import karballo.search.SearchParameters
 import karballo.Config
+import karballo.search.SearchEngine
+import karballo.search.SearchObserver
+import karballo.search.SearchParameters
+import karballo.search.SearchStatusInfo
 
-class EngineInteraction : IEngine, SearchObserver {
+class EngineInteraction(val observer: SimpleUciObserver) : SearchObserver {
 
     init {
         engine.setObserver(this)
     }
 
     override fun bestMove(bestMove: Int, ponder: Int) {
-        observer.consumeMove(Move.getMoveFromIndex(bestMove))
+        observer.consumeMove(bestMove)
     }
 
     override fun info(info: SearchStatusInfo) {
         observer.consumeScore(info.score)
     }
 
-    override fun evaluate(positionFen: String) {
+    fun evaluate(positionFen: String) {
         engine.init()
         engine.board.fen = positionFen
         engine.go(searchParameters)
     }
-
-    override fun setUciObserver(observer: SimpleUciObserver) {
-        this.observer = observer
-    }
-
-    private lateinit var observer: SimpleUciObserver
 
 
     companion object {
@@ -50,4 +40,9 @@ class EngineInteraction : IEngine, SearchObserver {
             searchParameters.isInfinite = false
         }
     }
+}
+
+interface SimpleUciObserver {
+    fun consumeMove(move: Int)
+    fun consumeScore(score: Int)
 }

@@ -66,7 +66,7 @@ of endgame.[CR][CR]
     <string name="new_exercise">New exercise</string>
     <string name="exercise_kp_k_I">King+Pawn/King (I)</string>
     <string name="exercise_kp_k_II">King+Pawn/King (II)</string>
-    <string name="position_draw_missing_material">Draw by missing material !</string>
+    <string name="position_draw">Draw !</string>
     <string name="white_play_for_win">White play for win.</string>
     <string name="black_play_for_win">Black play for win.</string>
 </resources>

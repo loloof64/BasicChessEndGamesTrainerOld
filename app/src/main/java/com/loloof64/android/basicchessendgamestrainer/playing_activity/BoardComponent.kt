@@ -1,22 +1,27 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
-import android.graphics.Paint
-import android.graphics.Canvas
-import android.graphics.Rect
-import android.graphics.Typeface
-import android.graphics.Color as AndColor
+import android.graphics.*
 import android.support.graphics.drawable.VectorDrawableCompat
 import android.util.AttributeSet
 import android.view.View
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.Color as BoardColor
-import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.Square
-import com.loloof64.android.basicchessendgamestrainer.chess_abstraction.IPosition
-import com.loloof64.android.basicchessendgamestrainer.karballo_chess_implementation.Position as KPosition   
+import karballo.Board
+import karballo.Color as KColor
 
 infix fun Int.min(other : Int) = if (this < other) this else other
 infix fun Int.max(other : Int) = if (this > other) this else other
+
+data class SquareCoordinates(val file: Int, val rank: Int)
+
+fun coordinatesToSquare(file: Int, rank: Int) : Long {
+    return 1L shl ((7-file) + (8*rank))
+}
+
+fun squareToCoordinates(squareIndex: Long) : Pair<Int, Int> {
+    val powerOf2 = (Math.log(squareIndex.toDouble()) / Math.log(2.0)).toInt()
+    return Pair(7-(powerOf2%8), powerOf2/8)
+}
 
 abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, defStyleAttr: Int) : View(context, attrs, defStyleAttr) {
 
@@ -38,15 +43,15 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
         return minAvailableSpacePercentage
     }
 
-    protected abstract fun relatedPosition() : IPosition
+    protected abstract fun relatedPosition() : Board
     protected abstract fun replacePositionWith(positionFEN : String): Unit
 
     protected var reversed = false
     private val rectPaint = Paint()
     private val fontPaint = Paint()
 
-    abstract fun highlightedStartCell() : Square?
-    abstract fun highlightedTargetCell() : Square?
+    abstract fun highlightedStartCell() : SquareCoordinates?
+    abstract fun highlightedTargetCell() : SquareCoordinates?
 
     fun reverse() {
         reversed = !reversed
@@ -118,9 +123,9 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     private fun drawPieces(canvas: Canvas, cellSize: Int) {
         for (cellRank in (0 until 8)) {
             for (cellFile in (0 until 8)) {
-                val piece = relatedPosition().getPieceAtSquare(Square(file = cellFile, rank = cellRank))
-                if (piece != null) {
-                    val imageRes = when (piece.toFen()) {
+                val piece = relatedPosition().getPieceAt(coordinatesToSquare(file = cellFile, rank = cellRank))
+                if (piece != '.') {
+                    val imageRes = when (piece) {
                         'P' -> R.drawable.chess_pl
                         'p' -> R.drawable.chess_pd
                         'N' -> R.drawable.chess_nl
@@ -147,7 +152,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     }
 
     private fun drawPlayerTurn(canvas: Canvas, cellSize: Int) {
-        val color = if (relatedPosition().getPlayerTurn() == BoardColor.WHITE) ColorARGB(255, 255, 255, 255) else ColorARGB(255, 0, 0, 0)
+        val color = if (relatedPosition().turn) ColorARGB(255, 255, 255, 255) else ColorARGB(255, 0, 0, 0)
         val location = (8.5 * cellSize).toFloat()
         val locationEnd = (location + cellSize * 0.5).toFloat()
         rectPaint.setARGB(color.alpha, color.red, color.green, color.blue)
@@ -215,7 +220,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
         val arrowLength = distance * 0.15f
 
-        paint.color = AndColor.parseColor("#FEAC22")
+        paint.color = Color.parseColor("#FEAC22")
         paint.strokeWidth = cellSize * 0.1f
 
         canvas.save()
@@ -249,22 +254,22 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
     open fun setHighlightedMove(fromFile: Int, fromRank: Int,
                            toFile: Int, toRank: Int){
-        _highlightedMoveFrom = Square(file =  if (fromFile in 0..7) fromFile else -1,
+        _highlightedMoveFrom = SquareCoordinates(file =  if (fromFile in 0..7) fromFile else -1,
                 rank = if (fromRank in 0..7) fromRank else -1)
-        _highlightedMoveTo = Square(file = if (toFile in 0..7) toFile else -1,
+        _highlightedMoveTo = SquareCoordinates(file = if (toFile in 0..7) toFile else -1,
                 rank = if (toRank in 0..7) toRank else -1)
         invalidate()
     }
 
-    fun toFEN(): String = relatedPosition().toFen()
+    fun toFEN(): String = relatedPosition().fen
 
     fun setFromFen(boardFen: String) {
         replacePositionWith(boardFen)
         invalidate()
     }
 
-    private var _highlightedMoveFrom = Square(file = -1, rank = -1)
-    private var _highlightedMoveTo = Square(file = -1, rank = -1)
+    private var _highlightedMoveFrom = SquareCoordinates(file = -1, rank = -1)
+    private var _highlightedMoveTo = SquareCoordinates(file = -1, rank = -1)
 
 
 }
