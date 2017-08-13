@@ -329,27 +329,24 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     fun checkIfGameFinished() {
-        val endGameStatus = _relatedPosition.isEndGame
-        val isCheckMate = Math.abs(endGameStatus) == 1
-        val isDraw = endGameStatus == 99
-        if (isCheckMate) {
-            _gameFinished = true
-            when(context){
-                is PlayingActivity -> with(context as PlayingActivity){
-                    setPlayerGoalTextId(R.string.checkmate, alertMode = true)
-                    activatePositionNavigation()
+        fun checkIfGameFinished(finishMessageId: Int, finishTest: Board.() -> Boolean) : Boolean {
+            if (_relatedPosition.finishTest()){
+                _gameFinished = true
+                when(context){
+                    is PlayingActivity -> with(context as PlayingActivity){
+                        setPlayerGoalTextId(finishMessageId, alertMode = true)
+                        activatePositionNavigation()
+                    }
                 }
             }
+            return _gameFinished
         }
-        if (isDraw){
-            _gameFinished = true
-            when(context){
-                is PlayingActivity -> with(context as PlayingActivity){
-                    setPlayerGoalTextId(R.string.position_draw, alertMode = true)
-                    activatePositionNavigation()
-                }
-            }
-        }
+
+        if (!checkIfGameFinished(R.string.checkmate){ isMate })
+            if (!checkIfGameFinished(R.string.missing_material_draw){ isDrawByMissingMatingMaterial() })
+                if (!checkIfGameFinished(R.string.position_repetitions_draw){ isDrawByThreeFoldsRepetition() })
+                    if (!checkIfGameFinished(R.string.stalemate){ isDrawByStaleMate()})
+                        if (!checkIfGameFinished(R.string.fiftyMoveDraw){ isDrawByFiftyMovesRule() }){}
     }
 
     private fun addMoveToList(move: Int) {
