@@ -138,7 +138,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
                         'q' -> R.drawable.chess_qd
                         'K' -> R.drawable.chess_kl
                         'k' -> R.drawable.chess_kd
-                        else -> R.drawable.red_cross
+                        else -> throw IllegalArgumentException("Unrecognized piece fen $piece !")
                     }
                     val x = (cellSize * (0.5 + (if (reversed) 7 - cellFile else cellFile))).toInt()
                     val y = (cellSize * (0.5 + (if (reversed) cellRank else 7 - cellRank))).toInt()
