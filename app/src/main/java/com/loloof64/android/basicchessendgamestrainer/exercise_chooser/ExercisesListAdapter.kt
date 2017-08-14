@@ -1,6 +1,6 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
-import android.graphics.Color
+import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -31,11 +31,16 @@ class ExercisesListAdapter(val exercisesList: List<ExerciseRow>,
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+        fun getColor(colorId: Int) : Int {
+            val context = MyApplication.getApplicationContext()
+            return ResourcesCompat.getColor(context.resources, colorId, null)
+        }
+
         holder?.textView?.text = MyApplication.getApplicationContext().getString(exercisesList[position].textId)
         holder?.textView?.setOnClickListener{ itemClickListener.onClick(position) }
         holder?.textView?.setBackgroundColor(
-                if (exercisesList[position].mustWin) Color.parseColor("#50DF50")
-                else Color.parseColor("#DF5050")
+                if (exercisesList[position].mustWin) getColor(R.color.exercise_chooser_winning_color)
+                else getColor(R.color.exercise_chooser_nullifying_color)
         )
     }
 

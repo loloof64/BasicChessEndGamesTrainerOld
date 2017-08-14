@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="playing_activity_fab_bg">#41ce66</color>
+    <color name="exercise_chooser_winning_color">#50DF50</color>
+    <color name="exercise_chooser_nullifying_color">#ffc02c</color>
 </resources>

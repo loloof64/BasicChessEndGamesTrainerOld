@@ -34,7 +34,8 @@
 
 
 [TAB]First, you have to select a chess endgame kind in the menu screen : when the endgame is in a green line you have to win, and
-        when the endgame is on a red line you have to draw. Then you will get into the playing screen,
+        when the endgame is on a orange line you have to draw.[CR]
+        [TAB]Then you will get into the playing screen,
 with a random position based on the endgame you chose. The color you have is also determined randomly.
 You are given your goal : knowing you always start the game.[CR][CR][CR]
 
