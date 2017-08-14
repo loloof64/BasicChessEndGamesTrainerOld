@@ -56,7 +56,6 @@ val NO_OTHER_PIECES_GLOBAL_CONSTRAINT = mapOf<PieceKind, OtherPieceConstraint>()
 val NO_OTHER_PIECES_MUTUAL_CONSTRAINT = mapOf<PieceKind, SameColorPiecesMutualConstraint>()
 val NO_OTHER_PIECE_INDEXED_CONSTRAINT = mapOf<PieceKind, IndexedConstraint>()
 
-
 val FILE_A = 0
 val FILE_B = 1
 val FILE_C = 2
