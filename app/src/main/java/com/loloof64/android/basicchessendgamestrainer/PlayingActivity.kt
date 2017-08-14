@@ -77,6 +77,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playing_board_history_back.setOnClickListener { listAdapter.goBackInHistory() }
         playing_board_history_forward.setOnClickListener { listAdapter.goForwardInHistory() }
 
+        fab_restart_exercise.setOnClickListener { restartLastExercise() }
+        fab_reverse_board.setOnClickListener { reverseBoard() }
+        fab_new_exercise.setOnClickListener { newExercise() }
+
         generatorIndex = intent.extras?.getInt(generatorIndexKey) ?: 0
         val generatedPosition = availableGenerators[generatorIndex].second.generatePosition(random.nextBoolean())
         if (generatedPosition.isNotEmpty()) {
@@ -243,10 +247,6 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         listAdapter.switchingPosition = false
         playing_board_history_back.visibility = View.INVISIBLE
         playing_board_history_forward.visibility = View.INVISIBLE
-    }
-
-    fun getAllPositions(): List<String>{
-        return listAdapter.items.map { it.relatedFen }
     }
 
     override fun onBackPressed() {
