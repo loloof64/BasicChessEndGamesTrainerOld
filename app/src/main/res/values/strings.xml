@@ -1,7 +1,5 @@
 <resources>
     <string name="app_name">Basic Chess Endgames</string>
-    <string name="title_activity_exercise_chooser">Exercise Chooser</string>
-    <string name="action_settings">Settings</string>
     <string name="main_menu_select_exercise">Select your exercise</string>
     <string name="exercise_kq_k">King+Queen/King</string>
     <string name="exercise_krr_k">King+2Rooks/King</string>
@@ -19,7 +17,6 @@
     <string name="black_play_for_mate">Black play for mate</string>
     <string name="should_be_draw">It should be draw</string>
     <string name="exercise_kr_k">King+Rook/King</string>
-    <string name="custom_generator">Custom generator</string>
     <string name="position_generation_error">Failed to generate position !</string>
     <string name="restarting_exercise_alert_title">Restart exercise ?</string>
     <string name="restarting_exercise_alert_message">About to restart exercise : are you sure ?</string>
@@ -28,7 +25,6 @@
     <string name="new_exercise_alert_title">New exercise</string>
     <string name="new_exercise_alert_message">About to start a new exercise : are you sure ?</string>
     <string name="empty_string" />
-    <string name="san_chess_pieces">PNBRQK</string>
     <string name="quit_exercise_confirmation_title">Quit current exercise ?</string>
     <string name="quit_exercise_confirmation_message">Are you sure you want to quit current exercise ?</string>
     <string name="back_in_history">Back in history</string>
