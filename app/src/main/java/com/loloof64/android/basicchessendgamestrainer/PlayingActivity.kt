@@ -178,7 +178,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         Toast.makeText(this, R.string.illegal_move, Toast.LENGTH_SHORT).show()
     }
 
-    fun reverseBoard(view: View) {
+    fun reverseBoard() {
         playingBoard.reverse()
     }
 
@@ -193,7 +193,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playingBoard.new_game(fen)
     }
 
-    fun restartLastExercise(view: View){
+    fun restartLastExercise(){
         AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.restarting_exercise_alert_title)
@@ -205,7 +205,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .show()
     }
 
-    fun newExercise(view: View){
+    fun newExercise(){
         AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.new_exercise_alert_title)

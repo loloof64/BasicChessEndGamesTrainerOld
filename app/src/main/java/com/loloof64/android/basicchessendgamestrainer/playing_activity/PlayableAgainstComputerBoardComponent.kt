@@ -7,7 +7,6 @@ import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
 import karballo.Board
 import karballo.Move
-import karballo.search.SearchEngine
 import karballo.evaluation.Evaluator
 import java.util.logging.Logger
 
@@ -137,8 +136,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
         return _relatedPosition
     }
 
-    override fun replacePositionWith(fen: String) {
-        _relatedPosition.setFenMove(fen, null)
+    override fun replacePositionWith(positionFEN: String) {
+        _relatedPosition.setFenMove(positionFEN, null)
     }
 
     override fun highlightedTargetCell(): SquareCoordinates? {
