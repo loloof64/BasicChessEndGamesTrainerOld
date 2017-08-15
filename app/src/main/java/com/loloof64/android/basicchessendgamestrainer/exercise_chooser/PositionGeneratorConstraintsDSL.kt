@@ -11,7 +11,6 @@ open class PositionConstraint {
 
 fun positionGenerator(init: Generator.() -> Unit) = Generator().apply(init)
 
-@Suppress("UNUSED")
 class Generator : PositionConstraint() {
     fun kingsIndividualConstraints(constraint: KingsIndividualConstraint.()->Unit){
 
@@ -39,7 +38,6 @@ class Generator : PositionConstraint() {
     }
 }
 
-@Suppress("UNUSED")
 class KingsIndividualConstraint : PositionConstraint() {
     fun playerKing(constraint: SingleKingConstraint.() -> Boolean){
 
@@ -50,25 +48,28 @@ class KingsIndividualConstraint : PositionConstraint() {
     }
 }
 
-@Suppress("UNUSED")
 class KingsMutualConstraint(val playerKingCoordinate: BoardCoordinate,
                             val oppositeKingCoordinate: BoardCoordinate,
                             val playerHasWhite: Boolean) : PositionConstraint()
 
-@Suppress("UNUSED")
 class OtherPiecesCountConstraint : PositionConstraint()
 
-@Suppress("UNUSED")
-class OtherPiecesGlobalConstraint(val coord: BoardCoordinate,
-                                  val playerHasWhite: Boolean,
-                                  val playerKingCoord : BoardCoordinate,
-                                  val oppositeKingCoord: BoardCoordinate) : PositionConstraint()
+class OtherPiecesGlobalConstraint(val pieceKind: PieceKind,
+                                  val constraint: GlobalConstraint.() -> Boolean) : PositionConstraint()
+class GlobalConstraint(val location: BoardCoordinate,
+                       val playerHasWhite: Boolean,
+                       val playerKingCoord : BoardCoordinate,
+                       val oppositeKingCoord: BoardCoordinate) : PositionConstraint()
 
-class OtherPiecesMutualConstraint : PositionConstraint()
+class OtherPiecesMutualConstraint(val firstPieceLocation: BoardCoordinate,
+                                  val secondPieceLocation: BoardCoordinate,
+                                  val playerHasWhite: Boolean) : PositionConstraint()
 
-class OtherPiecesIndexedConstraint : PositionConstraint()
+class OtherPiecesIndexedConstraint(val pieceKind: PieceKind, val constraint: IndexedConstraint.() -> Boolean) : PositionConstraint()
 
-@Suppress("UNUSED")
+class IndexedConstraint(val apparitionIndex: Int, val location: BoardCoordinate,
+                        val playerHasWhite: Boolean) : PositionConstraint()
+
 class SingleKingConstraint(val location: BoardCoordinate, val playerHasWhite: Boolean) : PositionConstraint()
 
 enum class PieceType {
@@ -79,10 +80,10 @@ enum class Side {
     player, computer
 }
 
-@Suppress("UNUSED") data class PieceKind(val pieceType: PieceType, val side: Side)
-@Suppress("UNUSED") data class PieceKindCount(val pieceKind: PieceKind, val count: Int)
+data class PieceKind(val pieceType: PieceType, val side: Side)
+data class PieceKindCount(val pieceKind: PieceKind, val count: Int)
 
-@Suppress("UNUSED") data class BoardCoordinate(val file: Int, val rank: Int) {
+data class BoardCoordinate(val file: Int, val rank: Int) {
     companion object {
         val FILE_A = 0
         val FILE_B = 1
@@ -104,8 +105,16 @@ enum class Side {
     }
 }
 
-@Suppress("UNUSED") infix fun PieceType.belongingTo(owner: Side) = PieceKind(pieceType = this, side = owner)
-@Suppress("UNUSED") infix fun PieceKind.inCount(instances: Int) = PieceKindCount(pieceKind = this, count = instances)
+infix fun PieceType.belongingTo(owner: Side) = PieceKind(pieceType = this, side = owner)
+
+infix fun PieceKind.inCount(instances: Int) = PieceKindCount(pieceKind = this, count = instances)
+
+infix fun PieceKind.constrainedBy(constraint: GlobalConstraint.() -> Boolean) =
+        OtherPiecesGlobalConstraint(pieceKind = this, constraint = constraint)
+
+infix fun PieceKind.constrainedByIndex(constraint: IndexedConstraint.() -> Boolean) =
+        OtherPiecesIndexedConstraint(pieceKind = this, constraint = constraint)
+
 
 val exercice_1 = positionGenerator {
     kingsIndividualConstraints {
@@ -125,14 +134,26 @@ val exercice_1 = positionGenerator {
     }
 
     otherPiecesGlobalConstraint {
-
+        PieceType.pawn belongingTo Side.computer constrainedBy {
+            (location.rank == if (playerHasWhite) BoardCoordinate.RANK_5 else BoardCoordinate.RANK_4)
+                    && (location.file == playerKingCoord.file)
+        }
     }
 
     otherPiecesIndexedConstraint {
-
+        PieceType.pawn belongingTo  Side.player constrainedByIndex {
+            location.file == apparitionIndex && location.rank == when(apparitionIndex){
+                in 0..3 -> apparitionIndex + 1
+                in 4..6 -> 7 - apparitionIndex
+                in 7..8 -> BoardCoordinate.RANK_2
+                else -> throw IllegalArgumentException()
+            }
+        }
     }
 
     otherPiecesMutualConstraint {
-
+        val firstSquareIsBlack = (firstPieceLocation.file + firstPieceLocation.rank) % 2 > 0
+        val secondSquareIsBlack = (secondPieceLocation.file + secondPieceLocation.rank) % 2 > 0
+        firstSquareIsBlack != secondSquareIsBlack
     }
 }
