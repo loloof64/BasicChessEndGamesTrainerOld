@@ -73,4 +73,5 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="missing_material_draw">Partie nulle par insuffisance matérielle !</string>
     <string name="white_play_for_win">Les Blancs jouent pour le gain.</string>
     <string name="black_play_for_win">Les Noirs jouent pour le gain.</string>
+    <string name="exercise_kppp_kppp">Roi+Pions/Roi+3Pions</string>
 </resources>

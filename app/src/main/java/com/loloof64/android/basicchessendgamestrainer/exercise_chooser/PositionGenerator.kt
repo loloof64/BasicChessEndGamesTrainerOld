@@ -46,6 +46,7 @@ class PositionGenerator(private val constraints : PositionConstraints) {
             tempPosition.fen = _position.fen
             tempPosition.setPieceAt(coordinatesToSquare(kingFile, kingRank),
                     if (playerHasWhite) 'K' else 'k')
+
             if (constraints.checkPlayerKingConstraint(BoardCoordinate(kingFile, kingRank), playerHasWhite)) {
                 _position.fen = tempPosition.fen
                 playerKingCoords = BoardCoordinate(file = kingFile, rank = kingRank)

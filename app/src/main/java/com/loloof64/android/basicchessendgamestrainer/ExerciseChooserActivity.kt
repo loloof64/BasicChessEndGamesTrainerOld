@@ -31,12 +31,14 @@ class ExerciseChooserActivity : AppCompatActivity() {
     }
 
     private fun generateExercisesList() : List<ExerciseRow> {
+        //TODO remove code duplication (as in ExercisesList)
         return listOf(R.string.exercise_krr_k to true,
                 R.string.exercise_kq_k to true,
                 R.string.exercise_kr_k to true,
                 R.string.exercise_kbb_k to true,
                 R.string.exercise_kp_k_I to true,
-                R.string.exercise_kp_k_II to false).map { ExerciseRow(it.first, it.second) }
+                R.string.exercise_kp_k_II to false,
+                R.string.exercise_kppp_kppp to true).map { ExerciseRow(it.first, it.second) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

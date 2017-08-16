@@ -68,4 +68,5 @@ of endgame.[CR][CR]
     <string name="missing_material_draw">Draw by missing material !</string>
     <string name="white_play_for_win">White play for win.</string>
     <string name="black_play_for_win">Black play for win.</string>
+    <string name="exercise_kppp_kppp">King+3Pawns/King+3Pawns</string>
 </resources>
