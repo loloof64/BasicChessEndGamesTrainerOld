@@ -15,6 +15,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerator
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
 import kotlinx.android.synthetic.main.activity_playing.*
@@ -82,7 +83,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         fab_new_exercise.setOnClickListener { newExercise() }
 
         generatorIndex = intent.extras?.getInt(generatorIndexKey) ?: 0
-        val generatedPosition = availableGenerators[generatorIndex].second.generatePosition(random.nextBoolean())
+        val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].second).generatePosition(random.nextBoolean())
         if (generatedPosition.isNotEmpty()) {
             newGame(generatedPosition)
         }
@@ -215,7 +216,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setTitle(R.string.new_exercise_alert_title)
                 .setMessage(R.string.new_exercise_alert_message)
                 .setPositiveButton(R.string.yes, {_, _ ->
-                    val generatedPosition = availableGenerators[generatorIndex].second.generatePosition(random.nextBoolean())
+                    val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].second).generatePosition(random.nextBoolean())
                     newGame(generatedPosition)
                 })
                 .setNegativeButton(R.string.no, null)
@@ -233,8 +234,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playerGoalTextId = textID
         playerGoalInAlertMode = alertMode
         label_player_goal.text = resources.getString(textID)
-        if (alertMode) label_player_goal.setTextColor(Color.parseColor("#FA2323"))
-        else label_player_goal.setTextColor(Color.parseColor("#000000"))
+        if (alertMode) label_player_goal.setTextColor(Color.parseColor("#FA2323")) //TODO use color ressource instead
+        else label_player_goal.setTextColor(Color.parseColor("#000000"))  //TODO use color ressource instead
     }
 
     fun activatePositionNavigation(){

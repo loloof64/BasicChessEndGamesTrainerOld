@@ -13,7 +13,7 @@ fun Int.loops(callback : (Int) -> Unit) {
     for (i in 0 until this) callback(i)
 }
 
-class PositionGenerator(val constraints : PositionConstraints) {
+class PositionGenerator(private val constraints : PositionConstraints) {
 
     fun generatePosition(playerHasWhite: Boolean = true): String {
         _position.fen = "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1"
