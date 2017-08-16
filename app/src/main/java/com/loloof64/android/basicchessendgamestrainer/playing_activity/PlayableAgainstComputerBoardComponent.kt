@@ -306,7 +306,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
             _moveToHighlightTo = null
             updateHighlightedMove()
 
-            _relatedPosition.fen = startFen
+            if (startFen.isNotEmpty()) _relatedPosition.fen = startFen
             _playerHasWhite = isWhiteToPlay()
             waitForPlayerGoal()
             invalidate()

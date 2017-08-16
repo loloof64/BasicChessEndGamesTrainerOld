@@ -90,6 +90,7 @@ class PositionGenerator(private val constraints : PositionConstraints) {
 
     private fun placeOtherPieces(playerHasWhite: Boolean){
         constraints.otherPiecesCountsConstraint.forEach { (kind, count) ->
+
             val savedCoordinates = arrayListOf<BoardCoordinate>()
             count.loops { index ->
                 var loopSuccess = false
@@ -102,8 +103,9 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                     tempPosition.fen = _position.fen
                     val cellNotEmpty = tempPosition.getPieceAt(coordinatesToSquare(pieceFile, pieceRank)) != '.'
                     if (cellNotEmpty) continue
-                    val isWhitePiece = ((kind.side == Side.player) && playerHasWhite)
-                    || ((kind.side != Side.player) && !playerHasWhite)
+                    val isAPieceOfPlayer = kind.side == Side.player
+                    val isWhitePiece = (isAPieceOfPlayer && playerHasWhite)
+                        || (!isAPieceOfPlayer && !playerHasWhite)
                     tempPosition.setPieceAt(coordinatesToSquare(pieceFile, pieceRank), pieceToStone(kind, isWhitePiece))
                     
                     tempPosition.turn = !playerHasWhite

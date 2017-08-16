@@ -5,7 +5,7 @@ fun positionGenerator(init: PositionConstraints.() -> Unit) = PositionConstraint
 class PositionConstraints {
     private var kingsIndividualConstraintInstance: KingsIndividualConstraint.() -> Unit = { true }
     private var kingsMutualConstraintInstance: KingsMutualConstraint.() -> Boolean = { true }
-    private var otherPiecesCountConstraintInstance: OtherPiecesCountConstraints.() -> Unit = {}
+    private var otherPiecesCountConstraintInstance = OtherPiecesCountConstraints()
     private var otherPiecesGlobalConstraintInstance: OtherPiecesGlobalConstraint.() -> Unit = {}
     private var otherPiecesMutualConstraintInstance: OtherPiecesMutualConstraint.() -> Unit = {}
     private var otherPiecesIndexedConstraintInstance: OtherPiecesIndexedConstraint.() -> Unit = {}
@@ -27,7 +27,7 @@ class PositionConstraints {
     }
 
     val otherPiecesCountsConstraint : Iterator<PieceKindCount>
-        get() = otherPiecesCountsConstraint.iterator()
+        get() = otherPiecesCountConstraintInstance.iterator()
 
     fun checkOtherPieceGlobalConstraint(pieceKind: PieceKind,
                                         location: BoardCoordinate,
@@ -61,7 +61,7 @@ class PositionConstraints {
     }
 
     fun otherPiecesCount(constraint: OtherPiecesCountConstraints.() -> Unit) {
-        otherPiecesCountConstraintInstance = constraint
+        otherPiecesCountConstraintInstance.constraint()
     }
 
     fun otherPiecesGlobalConstraint(constraint: OtherPiecesGlobalConstraint.() -> Unit) {
@@ -135,7 +135,7 @@ class OtherPiecesGlobalConstraint(val location: BoardCoordinate,
 
     fun checkConstraint(pieceKind: PieceKind) : Boolean {
         // If no constraint available then condition is considered as met.
-        return allConstraints[pieceKind]?.invoke(this) == true
+        return allConstraints[pieceKind]?.invoke(this) ?: true
     }
 }
 
@@ -154,7 +154,7 @@ class OtherPiecesMutualConstraint(val firstPieceLocation: BoardCoordinate,
 
     fun checkConstraint(pieceKind: PieceKind): Boolean {
         // If no constraint available then condition is considered as met.
-        return allConstraints[pieceKind]?.invoke(this) == true
+        return allConstraints[pieceKind]?.invoke(this) ?: true
     }
 }
 /**
@@ -172,8 +172,8 @@ class OtherPiecesIndexedConstraint(val apparitionIndex: Int,
     }
 
     fun checkConstraint(pieceKind: PieceKind): Boolean {
-        // If no constraint available then condition is considered as met.
-        return allConstraints[pieceKind]?.invoke(this) == true
+        // If no constraint available then condition is considered as met
+        return allConstraints[pieceKind]?.invoke(this) ?: true
     }
 }
 

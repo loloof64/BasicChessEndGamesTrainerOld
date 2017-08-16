@@ -12,7 +12,6 @@ val KRRvK_PositionGenerator = positionGenerator {
 
     otherPiecesCount {
         add(PieceType.rook belongingTo Side.player inCount 2)
-        add(PieceType.pawn belongingTo Side.player inCount 3)
     }
 }
 

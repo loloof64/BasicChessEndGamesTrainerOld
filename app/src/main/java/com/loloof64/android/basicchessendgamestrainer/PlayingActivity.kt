@@ -22,7 +22,7 @@ import kotlinx.android.synthetic.main.activity_playing.*
 import java.lang.ref.WeakReference
 import java.util.*
 
-class SpaceLeftAndRightItemDecorator(val space: Int): RecyclerView.ItemDecoration(){
+class SpaceLeftAndRightItemDecorator(private val space: Int): RecyclerView.ItemDecoration(){
     override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
         outRect?.left = space
         outRect?.right = space
@@ -183,14 +183,14 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         Toast.makeText(this, R.string.illegal_move, Toast.LENGTH_SHORT).show()
     }
 
-    fun reverseBoard() {
+    private fun reverseBoard() {
         playingBoard.reverse()
     }
 
     /**
      * If playerHasWhite is given null, it will be set to the turn of the given fen
      */
-    fun newGame(fen: String = standardFEN){
+    private fun newGame(fen: String = standardFEN){
         disallowPositionNavigation()
         setPlayerGoalTextId(R.string.empty_string, alertMode = false)
         listAdapter.clear()
@@ -198,19 +198,20 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playingBoard.new_game(fen)
     }
 
-    fun restartLastExercise(){
+    private fun restartLastExercise(){
         AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.restarting_exercise_alert_title)
                 .setMessage(R.string.restarting_exercise_alert_message)
                 .setPositiveButton(R.string.yes, {_, _ ->
-                    newGame(lastExercise)
+                    val exercise = lastExercise
+                    if (exercise != null) newGame(exercise)
                 })
                 .setNegativeButton(R.string.no, null)
                 .show()
     }
 
-    fun newExercise(){
+    private fun newExercise(){
         AlertDialog.Builder(this)
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.new_exercise_alert_title)
@@ -262,7 +263,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .show()
     }
 
-    private lateinit var lastExercise:String
+    private var lastExercise:String? = null
     private var generatorIndex: Int = 0
     private var random = Random()
     private var playerGoalTextId: Int = -1
