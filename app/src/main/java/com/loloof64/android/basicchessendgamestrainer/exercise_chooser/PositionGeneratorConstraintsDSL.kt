@@ -1,9 +1,11 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
+@Suppress("UNUSED")
 fun positionGenerator(init: PositionConstraints.() -> Unit) = PositionConstraints().apply(init)
 
+@Suppress("UNUSED")
 class PositionConstraints {
-    private var kingsIndividualConstraintInstance: KingsIndividualConstraint.() -> Unit = { true }
+    private var kingsIndividualConstraintInstance: KingsIndividualConstraint.() -> Unit = {}
     private var kingsMutualConstraintInstance: KingsMutualConstraint.() -> Boolean = { true }
     private var otherPiecesCountConstraintInstance = OtherPiecesCountConstraints()
     private var otherPiecesGlobalConstraintInstance: OtherPiecesGlobalConstraint.() -> Unit = {}
@@ -80,6 +82,7 @@ class PositionConstraints {
 /*
  * Constraint based on the both kings coordinates
  */
+@Suppress("UNUSED")
 class KingsIndividualConstraint {
     private var playerKingConstraint: SingleKingConstraint.() -> Boolean = { true }
     private var computerKingConstraint: SingleKingConstraint.() -> Boolean = { true }
@@ -102,6 +105,7 @@ class KingsIndividualConstraint {
 /**
  * Constraint between both kings
  */
+@Suppress("UNUSED")
 class KingsMutualConstraint(val playerKingCoordinate: BoardCoordinate,
                             val computerKingCoordinate: BoardCoordinate,
                             val playerHasWhite: Boolean)
@@ -122,11 +126,12 @@ class OtherPiecesCountConstraints {
 /*
  * Constraint based on the piece coordinate, and both kings positions
  */
+@Suppress("UNUSED")
 class OtherPiecesGlobalConstraint(val location: BoardCoordinate,
                                   val playerHasWhite: Boolean,
                                   val playerKingLocation : BoardCoordinate,
                                   val computerKingLocation: BoardCoordinate) {
-    var allConstraints: MutableMap<PieceKind, OtherPiecesGlobalConstraint.() -> Boolean> = mutableMapOf()
+    private var allConstraints: MutableMap<PieceKind, OtherPiecesGlobalConstraint.() -> Boolean> = mutableMapOf()
         private set
 
     fun add(pieceKind: PieceKind, constraint: OtherPiecesGlobalConstraint.() -> Boolean){
@@ -142,6 +147,7 @@ class OtherPiecesGlobalConstraint(val location: BoardCoordinate,
 /*
  * Constraint based on 2 pieces of the same kind.
  */
+@Suppress("UNUSED")
 class OtherPiecesMutualConstraint(val firstPieceLocation: BoardCoordinate,
                                   val secondPieceLocation: BoardCoordinate,
                                   val playerHasWhite: Boolean) {
@@ -160,6 +166,7 @@ class OtherPiecesMutualConstraint(val firstPieceLocation: BoardCoordinate,
 /**
  * Constraint based on the piece kind, its generation index (is it the first, the second, ... ?)
  */
+@Suppress("UNUSED")
 class OtherPiecesIndexedConstraint(val apparitionIndex: Int,
                                    val location: BoardCoordinate,
                                    val playerHasWhite: Boolean) {
@@ -178,13 +185,16 @@ class OtherPiecesIndexedConstraint(val apparitionIndex: Int,
 }
 
 
+@Suppress("UNUSED")
 class IndexedConstraint(val apparitionIndex: Int,
                         val location: BoardCoordinate,
                         val playerHasWhite: Boolean)
 
+@Suppress("UNUSED")
 class SingleKingConstraint(val location: BoardCoordinate,
                            val playerHasWhite: Boolean)
 
+@Suppress("UNUSED")
 class MutualConstraint(val firstPieceLocation: BoardCoordinate,
                        val secondPieceLocation: BoardCoordinate,
                        val playerHasWhite: Boolean)
@@ -200,6 +210,7 @@ enum class Side {
 data class PieceKind(val pieceType: PieceType, val side: Side)
 data class PieceKindCount(val pieceKind: PieceKind, val count: Int)
 
+@Suppress("UNUSED")
 data class BoardCoordinate(val file: Int, val rank: Int) {
     companion object {
         val FILE_A = 0
@@ -222,5 +233,8 @@ data class BoardCoordinate(val file: Int, val rank: Int) {
     }
 }
 
+@Suppress("UNUSED")
 infix fun PieceType.belongingTo(owner: Side) = PieceKind(pieceType = this, side = owner)
+
+@Suppress("UNUSED")
 infix fun PieceKind.inCount(instances: Int) = PieceKindCount(pieceKind = this, count = instances)

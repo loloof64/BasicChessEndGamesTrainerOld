@@ -30,6 +30,9 @@ class SpaceLeftAndRightItemDecorator(private val space: Int): RecyclerView.ItemD
 
 class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment.Companion.Listener {
 
+    @Suppress("DEPRECATION")
+    private fun findColor(colorResId: Int): Int = resources.getColor(colorResId)
+
     companion object {
         val currentPositionkey = "CurrentPosition"
         val playerHasWhiteKey = "PlayerHasWhite"
@@ -234,8 +237,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playerGoalTextId = textID
         playerGoalInAlertMode = alertMode
         label_player_goal.text = resources.getString(textID)
-        if (alertMode) label_player_goal.setTextColor(resources.getColor(R.color.player_goal_label_alert_color))
-        else label_player_goal.setTextColor(resources.getColor(R.color.player_goal_label_standard_color))
+        if (alertMode) label_player_goal.setTextColor(findColor(R.color.player_goal_label_alert_color))
+        else label_player_goal.setTextColor(findColor(R.color.player_goal_label_standard_color))
     }
 
     fun activatePositionNavigation(){

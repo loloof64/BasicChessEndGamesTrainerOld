@@ -11,7 +11,7 @@ class MyApplication: Application(){
             appContext = ctx
         }
 
-        lateinit var appContext: Context
+        private lateinit var appContext: Context
     }
 
     override fun onCreate() {

@@ -12,11 +12,11 @@ import com.loloof64.android.basicchessendgamestrainer.R
 class ExerciseRow(val textId: Int, val mustWin: Boolean)
 
 interface ItemClickListener {
-    fun onClick(position: Int):Unit
+    fun onClick(position: Int)
 }
 
-class ExercisesListAdapter(val exercisesList: List<ExerciseRow>,
-                           val itemClickListener: ItemClickListener) :
+class ExercisesListAdapter(private val exercisesList: List<ExerciseRow>,
+                           private val itemClickListener: ItemClickListener) :
         RecyclerView.Adapter<ExercisesListAdapter.Companion.ViewHolder>(){
 
     companion object {

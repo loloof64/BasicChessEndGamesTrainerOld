@@ -16,10 +16,13 @@ data class MoveToHighlight(val startFile: Int, val startRank : Int,
 
 abstract class ItemClickListener {
     abstract fun onClick(weakRefContext: WeakReference<Context>, position: Int,
-                         positionFen: String, moveToHighlight: MoveToHighlight):Unit
+                         positionFen: String, moveToHighlight: MoveToHighlight)
 }
 
-class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClickListener: ItemClickListener) : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHolder>() {
+class MovesListAdapter(private val weakRefContext: WeakReference<Context>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHolder>() {
+    @Suppress("DEPRECATION")
+    private fun getColor(colorResId: Int): Int = MyApplication.getApplicationContext().resources.getColor(colorResId)
+
     companion object {
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
     }
@@ -34,14 +37,15 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        holder?.textView?.text = inputsList[position].san
-        holder?.textView?.setBackgroundColor(MyApplication.getApplicationContext().resources.getColor(
+        val currentPosition = holder?.adapterPosition ?: 0
+        holder?.textView?.text = inputsList[currentPosition].san
+        holder?.textView?.setBackgroundColor(getColor(
                 if (position == _selectedNavigationItem && _switchingPositionFeatureActive) R.color.moves_history_cell_selected_color
                 else R.color.moves_history_cell_standard_color
         ))
         if (position%3 > 0) {
             holder?.textView?.setOnClickListener {
-                _selectedNavigationItem = position
+                _selectedNavigationItem = currentPosition
                 updateHostView()
                 update()
             }
