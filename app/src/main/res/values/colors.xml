@@ -3,4 +3,17 @@
     <color name="playing_activity_fab_bg">#41ce66</color>
     <color name="exercise_chooser_winning_color">#50DF50</color>
     <color name="exercise_chooser_nullifying_color">#ffc02c</color>
+    <color name="player_goal_label_standard_color">#000</color>
+    <color name="player_goal_label_alert_color">#FA2323</color>
+    <color name="chess_board_font_color">#FFF</color>
+    <color name="chess_board_background_color">#653300</color>
+    <color name="chess_board_white_cells_color">#ffcc66</color>
+    <color name="chess_board_black_cells_color">#996633</color>
+    <color name="chess_board_white_player_turn_color">#FFF</color>
+    <color name="chess_board_black_player_turn_color">#000</color>
+    <color name="chess_board_move_start_cell_highlighting">#b99b0000</color>
+    <color name="chess_board_move_current_cell_highlighting">#b900ff00</color>
+    <color name="chess_board_highlighted_move_arrow_color">#FEAC22</color>
+    <color name="moves_history_cell_standard_color">#CDCDCD</color>
+    <color name="moves_history_cell_selected_color">#FFDD26</color>
 </resources>

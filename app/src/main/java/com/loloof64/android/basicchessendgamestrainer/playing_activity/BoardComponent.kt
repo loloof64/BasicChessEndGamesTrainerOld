@@ -1,7 +1,10 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Canvas
+import android.graphics.Paint
+import android.graphics.Rect
+import android.graphics.Typeface
 import android.support.graphics.drawable.VectorDrawableCompat
 import android.util.AttributeSet
 import android.view.View
@@ -23,12 +26,10 @@ fun squareToCoordinates(squareIndex: Long) : Pair<Int, Int> {
     return Pair(7-(powerOf2%8), powerOf2/8)
 }
 
-abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, defStyleAttr: Int) : View(context, attrs, defStyleAttr) {
+abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : View(context, attrs, defStyleAttr) {
 
     constructor(context: Context, attrs: AttributeSet) : this(context, attrs, 0)
     constructor(context: Context) : this(context, null, 0)
-
-    data class ColorARGB(val alpha: Int, val red: Int, val green: Int, val blue: Int)
 
     private val minAvailableSpacePercentage:Int
 
@@ -44,7 +45,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     }
 
     protected abstract fun relatedPosition() : Board
-    protected abstract fun replacePositionWith(positionFEN : String): Unit
+    protected abstract fun replacePositionWith(positionFEN : String)
 
     protected var reversed = false
     private val rectPaint = Paint()
@@ -75,7 +76,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     }
 
     private fun drawBackground(canvas: Canvas) {
-        rectPaint.setARGB(255, 102, 51, 0)
+        rectPaint.color = resources.getColor(R.color.chess_board_background_color)
         canvas.drawRect(0.toFloat(), 0.toFloat(), measuredWidth.toFloat(), measuredHeight.toFloat(), rectPaint)
     }
 
@@ -83,10 +84,10 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
         for (row in 0 until 8) {
             for (col in 0 until 8) {
-                val color = if ((row + col) % 2 == 0) ColorARGB(255, 255, 204, 102) else ColorARGB(255, 153, 102, 51)
+                val color = if ((row + col) % 2 == 0) R.color.chess_board_white_cells_color else R.color.chess_board_black_cells_color
                 val x = (cellSize / 2 + col * cellSize).toFloat()
                 val y = (cellSize / 2 + row * cellSize).toFloat()
-                rectPaint.setARGB(color.alpha, color.red, color.green, color.blue)
+                rectPaint.color = resources.getColor(color)
                 canvas.drawRect(x, y, x + cellSize, y + cellSize, rectPaint)
             }
         }
@@ -102,7 +103,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
             val y2 = (cellSize * 8.9).toFloat()
             val x = (cellSize * 0.9 + file * cellSize).toFloat()
 
-            fontPaint.setARGB(255, 255, 255, 255)
+            fontPaint.color = resources.getColor(R.color.chess_board_font_color)
 
             canvas.drawText("$letter", x, y1, fontPaint)
             canvas.drawText("$letter", x, y2, fontPaint)
@@ -113,7 +114,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
             val x2 = (cellSize * 8.65).toFloat()
             val y = (cellSize * 1.2 + rank * cellSize).toFloat()
 
-            fontPaint.setARGB(255, 255, 255, 255)
+            fontPaint.color = resources.getColor(R.color.chess_board_font_color)
 
             canvas.drawText("$digit", x1, y, fontPaint)
             canvas.drawText("$digit", x2, y, fontPaint)
@@ -152,10 +153,10 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
     }
 
     private fun drawPlayerTurn(canvas: Canvas, cellSize: Int) {
-        val color = if (relatedPosition().turn) ColorARGB(255, 255, 255, 255) else ColorARGB(255, 0, 0, 0)
+        val color = if (relatedPosition().turn) R.color.chess_board_white_player_turn_color else R.color.chess_board_black_player_turn_color
         val location = (8.5 * cellSize).toFloat()
         val locationEnd = (location + cellSize * 0.5).toFloat()
-        rectPaint.setARGB(color.alpha, color.red, color.green, color.blue)
+        rectPaint.color = resources.getColor(color)
         canvas.drawRect(location, location, locationEnd, locationEnd, rectPaint)
     }
 
@@ -167,7 +168,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
             val x = (cellSize * (0.5 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
             val y = (cellSize * (0.5 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
-            rectPaint.setARGB(185, 255, 0, 0)
+            rectPaint.color = resources.getColor(R.color.chess_board_move_start_cell_highlighting)
             canvas.drawRect(x, y, x + cellSize, y + cellSize, rectPaint)
         }
 
@@ -178,7 +179,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
             val x = (cellSize * (0.5 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
             val y = (cellSize * (0.5 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
-            rectPaint.setARGB(185, 0, 255, 0)
+            rectPaint.color = resources.getColor(R.color.chess_board_move_current_cell_highlighting)
             canvas.drawRect(x, y, x + cellSize, y + cellSize, rectPaint)
         }
     }
@@ -191,7 +192,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
             val x = (cellSize * (1 + (if (reversed) 7 - fileIndex else fileIndex))).toFloat()
             val y = (cellSize * (1 + (if (reversed) rankIndex else 7 - rankIndex))).toFloat()
-            rectPaint.setARGB(185, 0, 255, 0)
+            rectPaint.color = resources.getColor(R.color.chess_board_move_current_cell_highlighting)
             rectPaint.strokeWidth = cellSize * 0.1f
 
             canvas.drawLine(0f, y, width.toFloat(), y, rectPaint)
@@ -220,7 +221,7 @@ abstract class BoardComponent(context: Context, open val attrs: AttributeSet?, d
 
         val arrowLength = distance * 0.15f
 
-        paint.color = Color.parseColor("#FEAC22")
+        paint.color = resources.getColor(R.color.chess_board_highlighted_move_arrow_color)
         paint.strokeWidth = cellSize * 0.1f
 
         canvas.save()

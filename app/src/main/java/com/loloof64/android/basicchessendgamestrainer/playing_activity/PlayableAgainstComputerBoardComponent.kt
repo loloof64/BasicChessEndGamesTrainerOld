@@ -17,7 +17,7 @@ fun Int.convertSquareIndexToCoords(): SquareCoordinates {
     return SquareCoordinates(file = 7 - this%8, rank = this/8)
 }
 
-class PlayableAgainstComputerBoardComponent(context: Context, override val attrs: AttributeSet?,
+class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSet?,
                              defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr),
                                                     SimpleUciObserver {
     override fun consumeMove(move: Int) {
@@ -79,45 +79,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, override val attrs
     }
 
     companion object {
-
-        enum class ChessResult {
-            WHITE_WIN, BLACK_WIN, DRAW, UNDECIDED
-        }
-
         val MAX_LEGAL_POSITIONS_COUNT = 250
-
-        /**
-         * Gets the expected game result from a uci position info line (line starting with info).
-         * @param positionInfoLine - String - the info line to convert.
-         * @param whiteToMove - Boolean - true if was white to move when the evaluation was done, false otherwise.
-         * @return ChessResult - ChessResult constant.
-         */
-        fun positionResultFromPositionInfo(positionInfoLine: String, whiteToMove: Boolean): ChessResult {
-            val infoLineStartingAtScore = positionInfoLine.split("score ").last()
-            val positionResult = if (infoLineStartingAtScore.startsWith("mate")) {
-                val movesCount = Integer.parseInt(infoLineStartingAtScore.split(" ")[1])
-                if (whiteToMove) {
-                    if (movesCount > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
-                }
-                else {
-                    if (movesCount > 0) ChessResult.BLACK_WIN else ChessResult.WHITE_WIN
-                }
-            } else {
-                val score = Integer.parseInt(infoLineStartingAtScore.split(" ")[1])
-                if (Math.abs(score) > 1000){
-                    if (whiteToMove) {
-                        if (score > 0) ChessResult.WHITE_WIN else ChessResult.BLACK_WIN
-                    }
-                    else {
-                        if (score > 0) ChessResult.BLACK_WIN else ChessResult.WHITE_WIN
-                    }
-
-                } else {
-                    if (Math.abs(score) < 50) ChessResult.DRAW else ChessResult.UNDECIDED
-                }
-            }
-            return positionResult
-        }
     }
 
     fun isWaitingForPlayerGoal() = _waitingForPlayerGoal

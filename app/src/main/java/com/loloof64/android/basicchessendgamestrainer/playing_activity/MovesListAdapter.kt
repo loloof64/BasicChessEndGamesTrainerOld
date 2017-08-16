@@ -1,12 +1,12 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
-import android.graphics.Color
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
 import java.lang.ref.WeakReference
 
@@ -35,10 +35,10 @@ class MovesListAdapter(val weakRefContext: WeakReference<Context>, val itemClick
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
         holder?.textView?.text = inputsList[position].san
-        holder?.textView?.setBackgroundColor(
-                if (position == _selectedNavigationItem && _switchingPositionFeatureActive) Color.parseColor("#FFDD26")
-                else Color.parseColor("#CDCDCD")
-        )
+        holder?.textView?.setBackgroundColor(MyApplication.getApplicationContext().resources.getColor(
+                if (position == _selectedNavigationItem && _switchingPositionFeatureActive) R.color.moves_history_cell_selected_color
+                else R.color.moves_history_cell_standard_color
+        ))
         if (position%3 > 0) {
             holder?.textView?.setOnClickListener {
                 _selectedNavigationItem = position

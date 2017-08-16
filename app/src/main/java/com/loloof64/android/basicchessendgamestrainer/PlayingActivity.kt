@@ -3,7 +3,6 @@ package com.loloof64.android.basicchessendgamestrainer
 import android.content.Context
 import android.content.Intent
 import android.content.res.Configuration
-import android.graphics.Color
 import android.graphics.Rect
 import android.os.Bundle
 import android.support.v7.app.AlertDialog
@@ -235,8 +234,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         playerGoalTextId = textID
         playerGoalInAlertMode = alertMode
         label_player_goal.text = resources.getString(textID)
-        if (alertMode) label_player_goal.setTextColor(Color.parseColor("#FA2323")) //TODO use color ressource instead
-        else label_player_goal.setTextColor(Color.parseColor("#000000"))  //TODO use color ressource instead
+        if (alertMode) label_player_goal.setTextColor(resources.getColor(R.color.player_goal_label_alert_color))
+        else label_player_goal.setTextColor(resources.getColor(R.color.player_goal_label_standard_color))
     }
 
     fun activatePositionNavigation(){
