@@ -29,7 +29,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                 
                 handler.post {
                     addMoveToList(move)
-                    _relatedPosition.doMove(move)
                     _moveToHighlightFrom = moveFrom
                     _moveToHighlightTo = moveTo
                     updateHighlightedMove()
@@ -179,7 +178,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                             } else {
                                 updateHighlightedMove()
                                 addMoveToList(matchingMoves[0])
-                                _relatedPosition.doMove(matchingMoves[0])
                             }
                         }
 
@@ -313,6 +311,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     private fun addMoveToList(move: Int) {
         when (context) {
             is PlayingActivity -> {
+
                 val isWhiteTurnBeforeMove = _relatedPosition.turn
                 val moveSan = Move.toSan(_relatedPosition, move)
 
@@ -325,6 +324,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                 val (endFile, endRank) = squareToCoordinates(toSquare)
                 val fenAfterMove = _relatedPosition.fen
 
+                // Registering move san into history
                 if (!_startedToWriteMoves && !isWhiteTurnBeforeMove){
                     with(context as PlayingActivity){
                         addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "", MoveToHighlight(-1,-1,-1,-1))
@@ -367,9 +367,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                         rank = _pendingPromotionInfo!!.startRank)
                 val endSquare = coordinatesToSquare(file = _pendingPromotionInfo!!.endFile,
                         rank = _pendingPromotionInfo!!.endRank)
-                val matchingMoves = IntArray(MAX_LEGAL_POSITIONS_COUNT)
+                var matchingMoves = IntArray(MAX_LEGAL_POSITIONS_COUNT)
                 _relatedPosition.getLegalMoves(matchingMoves)
-                matchingMoves.filter { currentMove ->
+                matchingMoves = matchingMoves.filter { currentMove ->
                     val currentMoveStartSquare = Move.getFromSquare(currentMove)
                     val currentMoveEndSquare = Move.getToSquare(currentMove)
                     val isPromotion = Move.isPromotion(currentMove)
@@ -379,12 +379,11 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                     && currentMoveEndSquare == endSquare
                     && isPromotion
                     && promotionPiece == promotedPieceType
-                }
+                }.toIntArray()
                 if (matchingMoves.isEmpty()) Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
                 else {
                     val move = matchingMoves[0]
                     addMoveToList(move)
-                    _relatedPosition.doMove(move)
                 }
                 _pendingPromotionInfo = null
                 _highlightedTargetCell = null
