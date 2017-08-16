@@ -94,12 +94,12 @@ val KPvK_II = positionGenerator {
     }
 
     otherPiecesCount {
-        add(PieceType.pawn belongingTo Side.player inCount 1)
+        add(PieceType.pawn belongingTo Side.computer inCount 1)
     }
 
     otherPiecesGlobalConstraint {
         add(pieceKind = PieceType.pawn belongingTo Side.computer) {
-            (location.rank == if (playerHasWhite) BoardCoordinate.RANK_5 else BoardCoordinate.RANK_4)
+            (location.rank in if (playerHasWhite) BoardCoordinate.RANK_3..BoardCoordinate.RANK_5 else BoardCoordinate.RANK_4..BoardCoordinate.RANK_6)
             && (location.file == playerKingLocation.file)
         }
     }
@@ -138,12 +138,14 @@ val KPPPvKPPP = positionGenerator {
     }
 }
 
-val availableGenerators = arrayOf(
-        R.string.exercise_krr_k to KRRvK,
-        R.string.exercise_kq_k to KQvK,
-        R.string.exercise_kr_k to KRvK,
-        R.string.exercise_kbb_k to KBBvK,
-        R.string.exercise_kp_k_I to KPvK_I,
-        R.string.exercise_kp_k_II to KPvK_II,
-        R.string.exercise_kppp_kppp to KPPPvKPPP
+data class ExerciseInfo(val constraints: PositionConstraints, val textId: Int, val mustWin: Boolean)
+
+val availableGenerators = listOf(
+        ExerciseInfo(mustWin = true, textId = R.string.exercise_krr_k, constraints = KRRvK),
+        ExerciseInfo(mustWin = true, textId = R.string.exercise_kq_k, constraints = KQvK),
+        ExerciseInfo(mustWin = true, textId = R.string.exercise_kr_k, constraints =  KRvK),
+        ExerciseInfo(mustWin = true, textId = R.string.exercise_kbb_k, constraints = KBBvK),
+        ExerciseInfo(mustWin = true, textId = R.string.exercise_kp_k_I, constraints =  KPvK_I),
+        ExerciseInfo(mustWin = false, textId = R.string.exercise_kp_k_II, constraints = KPvK_II),
+        ExerciseInfo(mustWin = true, textId = R. string.exercise_kppp_kppp, constraints = KPPPvKPPP)
 )

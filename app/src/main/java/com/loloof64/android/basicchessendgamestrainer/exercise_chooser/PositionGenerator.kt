@@ -98,7 +98,7 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                 for (loopIter in 0..maxLoopsIterations) {
                     val pieceFile = _random.nextInt(8)
                     val pieceRank = _random.nextInt(8)
-                    val currentCoordinate = BoardCoordinate(pieceFile, pieceRank)
+                    val currentPieceCoordinate = BoardCoordinate(pieceFile, pieceRank)
 
                     val tempPosition = Board()
                     tempPosition.fen = _position.fen
@@ -116,13 +116,13 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                     if (enemyKingInChess) continue
 
                     // If for any previous piece of same kind, mutual constraint is not respected, will go into another try
-                    if (savedCoordinates.any { !constraints.checkOtherPieceMutualConstraint(kind, it, currentCoordinate, playerHasWhite) }) continue
+                    if (savedCoordinates.any { !constraints.checkOtherPieceMutualConstraint(kind, it, currentPieceCoordinate, playerHasWhite) }) continue
 
                     if (!constraints.checkOtherPieceIndexedConstraint(kind, index,
                             BoardCoordinate(pieceFile, pieceRank),
                             playerHasWhite)) continue
 
-                    if (constraints.checkOtherPieceGlobalConstraint(kind, currentCoordinate, playerHasWhite, playerKingCoords, oppositeKingCoords)){
+                    if (constraints.checkOtherPieceGlobalConstraint(kind, currentPieceCoordinate, playerHasWhite, playerKingCoords, oppositeKingCoords)){
                         _position.fen = tempPosition.fen
                         savedCoordinates += BoardCoordinate(pieceFile, pieceRank)
                         loopSuccess = true

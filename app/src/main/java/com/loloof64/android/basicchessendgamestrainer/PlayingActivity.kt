@@ -85,7 +85,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         fab_new_exercise.setOnClickListener { newExercise() }
 
         generatorIndex = intent.extras?.getInt(generatorIndexKey) ?: 0
-        val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].second).generatePosition(random.nextBoolean())
+        val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
         if (generatedPosition.isNotEmpty()) {
             newGame(generatedPosition)
         }
@@ -219,7 +219,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setTitle(R.string.new_exercise_alert_title)
                 .setMessage(R.string.new_exercise_alert_message)
                 .setPositiveButton(R.string.yes, {_, _ ->
-                    val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].second).generatePosition(random.nextBoolean())
+                    val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
                     newGame(generatedPosition)
                 })
                 .setNegativeButton(R.string.no, null)

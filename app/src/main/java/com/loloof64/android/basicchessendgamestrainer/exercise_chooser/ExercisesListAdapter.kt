@@ -9,13 +9,11 @@ import android.widget.TextView
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
 
-class ExerciseRow(val textId: Int, val mustWin: Boolean)
-
 interface ItemClickListener {
     fun onClick(position: Int)
 }
 
-class ExercisesListAdapter(private val exercisesList: List<ExerciseRow>,
+class ExercisesListAdapter(private val exercisesList: List<ExerciseInfo>,
                            private val itemClickListener: ItemClickListener) :
         RecyclerView.Adapter<ExercisesListAdapter.Companion.ViewHolder>(){
 

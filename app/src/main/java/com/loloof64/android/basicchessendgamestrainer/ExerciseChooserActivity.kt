@@ -6,9 +6,9 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExerciseRow
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
 
 class ExerciseChooserActivity : AppCompatActivity() {
@@ -18,7 +18,7 @@ class ExerciseChooserActivity : AppCompatActivity() {
         setContentView(R.layout.activity_exercise_chooser)
 
         exercisesListView.layoutManager = LinearLayoutManager(this)
-        exercisesListView.adapter = ExercisesListAdapter(generateExercisesList(), object : ItemClickListener {
+        exercisesListView.adapter = ExercisesListAdapter(availableGenerators, object : ItemClickListener {
             override fun onClick(position: Int) {
                 val intent = Intent(this@ExerciseChooserActivity, PlayingActivity::class.java)
                 val bundle = Bundle()
@@ -28,17 +28,6 @@ class ExerciseChooserActivity : AppCompatActivity() {
             }
         })
 
-    }
-
-    private fun generateExercisesList() : List<ExerciseRow> {
-        //TODO remove code duplication (as in ExercisesList)
-        return listOf(R.string.exercise_krr_k to true,
-                R.string.exercise_kq_k to true,
-                R.string.exercise_kr_k to true,
-                R.string.exercise_kbb_k to true,
-                R.string.exercise_kp_k_I to true,
-                R.string.exercise_kp_k_II to false,
-                R.string.exercise_kppp_kppp to true).map { ExerciseRow(it.first, it.second) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
