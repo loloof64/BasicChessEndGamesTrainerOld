@@ -10,6 +10,8 @@ import karballo.Move
 import karballo.evaluation.Evaluator
 import java.util.logging.Logger
 
+val MIN_MATE_SCORE = 21000
+
 data class PromotionInfo(val startFile: Int, val startRank: Int,
                          val endFile: Int, val endRank: Int)
 
@@ -42,7 +44,11 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
 
     override fun consumeScore(score: Int) {
         if (_waitingForPlayerGoal){
-            val MIN_MATE_SCORE = 20500
+
+            ////////////////////////////////////////////
+            Logger.getLogger("loloof64").info("Position score is $score")
+            ////////////////////////////////////////////
+
             val stringId = if (score > MIN_MATE_SCORE) {
                 if (isWhiteToPlay()) R.string.white_play_for_mate
                 else R.string.black_play_for_mate

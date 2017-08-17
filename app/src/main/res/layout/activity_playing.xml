@@ -21,14 +21,14 @@
         android:src="@mipmap/ic_swap_vert"
         android:contentDescription="@string/reverse_board"
         android:layout_marginTop="@dimen/playing_activity_fab_padding_top"
-        android:layout_below="@+id/label_player_goal"
+        android:layout_below="@+id/playing_board_history_back"
         android:background="@color/playing_activity_fab_bg"
         android:id="@+id/fab_reverse_board" />
 
     <ImageButton
         android:layout_width="@dimen/playing_activity_fab_size"
         android:layout_height="@dimen/playing_activity_fab_size"
-        android:layout_below="@+id/label_player_goal"
+        android:layout_below="@+id/playing_board_history_back"
         android:contentDescription="@string/restart_exercise"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
@@ -42,7 +42,7 @@
     <ImageButton
         android:layout_width="@dimen/playing_activity_fab_size"
         android:layout_height="@dimen/playing_activity_fab_size"
-        android:layout_below="@+id/label_player_goal"
+        android:layout_below="@+id/playing_board_history_back"
         android:contentDescription="@string/new_exercise"
         android:layout_marginLeft="16dp"
         android:layout_marginStart="16dp"
@@ -59,9 +59,7 @@
         android:background="@null"
         android:padding="@dimen/playing_activity_arrows_padding"
         android:src="@mipmap/ic_arrow_back"
-        android:layout_below="@+id/playingBoard"
-        android:layout_toRightOf="@+id/label_player_goal"
-        android:layout_toEndOf="@+id/label_player_goal"
+        android:layout_below="@id/label_player_goal"
         android:visibility="invisible"
         android:contentDescription="@string/back_in_history"
         android:id="@+id/playing_board_history_back"/>
@@ -72,8 +70,8 @@
         android:background="@null"
         android:padding="@dimen/playing_activity_arrows_padding"
         android:src="@mipmap/ic_arrow_forward"
-        android:layout_below="@+id/playingBoard"
-        android:layout_toRightOf="@+id/playing_board_history_back"
+        android:layout_below="@id/label_player_goal"
+        android:layout_toRightOf="@id/playing_board_history_back"
         android:layout_toEndOf="@+id/playing_board_history_back"
         android:visibility="invisible"
         android:contentDescription="@string/forward_in_history"
