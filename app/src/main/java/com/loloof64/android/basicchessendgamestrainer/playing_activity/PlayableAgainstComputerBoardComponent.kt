@@ -90,11 +90,11 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     fun isWaitingForPlayerGoal() = _waitingForPlayerGoal
 
     // Mainly used for serialisation purpose
-    fun setWaitingForPlayerGoalFlag(waiting: Boolean){
+    private fun setWaitingForPlayerGoalFlag(waiting: Boolean){
         _waitingForPlayerGoal = waiting
     }
 
-    fun waitForPlayerGoal() {
+    private fun waitForPlayerGoal() {
         _waitingForPlayerGoal = true
         engineInteraction.evaluate(_relatedPosition.fen)
     }
@@ -196,6 +196,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                     }
                     _highlightedStartCell = null
                     _highlightedTargetCell = null
+
+                    performClick()
                 }
                 MotionEvent.ACTION_DOWN -> {
                     val movedPiece = _relatedPosition.getPieceAt(coordinatesToSquare(file = file, rank = rank))
@@ -220,6 +222,10 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
         }
 
         return true
+    }
+
+    override fun performClick(): Boolean {
+        return super.performClick()
     }
 
     fun playerHasWhite() = _playerHasWhite
@@ -401,7 +407,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     fun gameFinished() = _gameFinished
     fun hasStartedToWriteMoves() = _startedToWriteMoves
 
-    fun getMoveNumber(): Int {
+    private fun getMoveNumber(): Int {
         return (_relatedPosition.moveNumber / 2) + 1
     }
 
