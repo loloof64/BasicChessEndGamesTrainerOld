@@ -70,11 +70,13 @@ class MovesListAdapter(private val weakRefContext: WeakReference<Context>, priva
         if (_switchingPositionFeatureActive){
             if (_selectedNavigationItem > 1) {
                 _selectedNavigationItem -= 1
-                if (_selectedNavigationItem % 3 == 0){ // pointing a move number
+                val pointingToAMoveNumber = _selectedNavigationItem % 3 == 0
+                val pointingToAMoveAnnotation = items[_selectedNavigationItem].san == ".."
+                if (pointingToAMoveNumber){
                     if (_selectedNavigationItem > 1) _selectedNavigationItem -= 1 // going further back
                     else _selectedNavigationItem += 1 //cancelling
                 }
-                if (items[_selectedNavigationItem].san == ".."){ // pointing to a 'non-move'
+                if (pointingToAMoveAnnotation){
                     _selectedNavigationItem += 1 // cancelling one step
                 }
                 updateHostView()
@@ -87,7 +89,8 @@ class MovesListAdapter(private val weakRefContext: WeakReference<Context>, priva
         if (_switchingPositionFeatureActive){
             if (_selectedNavigationItem < (inputsList.size - 1)) {
                 _selectedNavigationItem += 1
-                if (_selectedNavigationItem % 3 == 0){ // pointing a move number
+                val pointingToAMoveAnnotation = _selectedNavigationItem % 3 == 0
+                if (pointingToAMoveAnnotation){
                     if (_selectedNavigationItem < (inputsList.size - 1)) _selectedNavigationItem += 1 // going further
                     else _selectedNavigationItem -= 1 // cancelling
                 }
