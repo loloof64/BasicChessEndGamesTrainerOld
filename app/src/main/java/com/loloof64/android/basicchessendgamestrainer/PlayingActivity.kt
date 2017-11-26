@@ -14,6 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import com.github.bhlangonijr.chesslib.PieceType
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerator
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
@@ -59,7 +60,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
 
-    override fun reactToPromotionPieceSelection(piece: Int) {
+    override fun reactToPromotionPieceSelection(piece: PieceType) {
         playingBoard.validatePromotionMove(piece)
         playingBoard.checkIfGameFinished()
         if (!playingBoard.gameFinished()) playingBoard.makeComputerPlay()
@@ -106,19 +107,19 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putStringArray(adapterSanItemsKey, listAdapter.items.map { it.san }.toTypedArray())
         outState?.putStringArray(adapterFenItemsKey, listAdapter.items.map { it.relatedFen }.toTypedArray())
         outState?.putBoolean(startedToWriteMovesKey, playingBoard.hasStartedToWriteMoves())
-        outState?.putInt(moveToHighlightFromFileKey, playingBoard.getMoveToHighlightFromFile())
-        outState?.putInt(moveToHighlightFromRankKey, playingBoard.getMoveToHighlightFromRank())
-        outState?.putInt(moveToHighlightToFileKey, playingBoard.getMoveToHighlightToFile())
-        outState?.putInt(moveToHighlightToRankKey, playingBoard.getMoveToHighlightToRank())
+        outState?.putInt(moveToHighlightFromFileKey, playingBoard.getMoveToHighlightFromFile() ?: -1)
+        outState?.putInt(moveToHighlightFromRankKey, playingBoard.getMoveToHighlightFromRank() ?: -1)
+        outState?.putInt(moveToHighlightToFileKey, playingBoard.getMoveToHighlightToFile() ?: -1)
+        outState?.putInt(moveToHighlightToRankKey, playingBoard.getMoveToHighlightToRank() ?: -1)
         outState?.putBoolean(switchingPositionAllowedKey, listAdapter.switchingPosition)
         outState?.putIntArray(registedHighlitedMovesStartFilesKey,
-                listAdapter.items.map { it.moveToHighlight.startFile }.toIntArray())
+                listAdapter.items.map { it.moveToHighlight?.startFile ?: -1 }.toIntArray())
         outState?.putIntArray(registedHighlitedMovesStartRanksKey,
-                listAdapter.items.map { it.moveToHighlight.startRank }.toIntArray())
+                listAdapter.items.map { it.moveToHighlight?.startRank ?: -1 }.toIntArray())
         outState?.putIntArray(registedHighlitedMovesEndFilesKey,
-                listAdapter.items.map { it.moveToHighlight.endFile }.toIntArray())
+                listAdapter.items.map { it.moveToHighlight?.endFile ?: -1 }.toIntArray())
         outState?.putIntArray(registedHighlitedMovesEndRanksKey,
-                listAdapter.items.map { it.moveToHighlight.endRank }.toIntArray())
+                listAdapter.items.map { it.moveToHighlight?.endRank ?: -1 }.toIntArray())
         outState?.putInt(selectedNavigationItemKey, listAdapter.selectedNavigationItem)
     }
 
@@ -226,7 +227,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .show()
     }
 
-    fun addPositionInMovesList(san: String, fen: String, moveToHighlight: MoveToHighlight) {
+    fun addPositionInMovesList(san: String, fen: String, moveToHighlight: MoveToHighlight?) {
         listAdapter.addPosition(san, fen, moveToHighlight)
         moves_list_view.post {
             moves_list_view.smoothScrollToPosition(listAdapter.itemCount)
@@ -272,17 +273,22 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     private var playerGoalInAlertMode = false
     private val listAdapter = MovesListAdapter(WeakReference(this), object : ItemClickListener() {
         override fun onClick(weakRefContext: WeakReference<Context>, position: Int,
-                             positionFen: String, moveToHighlight: MoveToHighlight) {
+                             positionFen: String, moveToHighlight: MoveToHighlight?) {
             if (weakRefContext.get() != null){
                 when(weakRefContext.get()){
                     is PlayingActivity -> {
                         with(weakRefContext.get() as PlayingActivity){
                             playingBoard.setFromFen(positionFen)
-                            playingBoard.setHighlightedMove(moveToHighlight.startFile,
-                                    moveToHighlight.startRank,
-                                    moveToHighlight.endFile,
-                                    moveToHighlight.endRank)
-                            moves_list_view.smoothScrollToPosition(position)
+                            if (moveToHighlight != null) {
+                                playingBoard.setHighlightedMove(moveToHighlight.startFile,
+                                        moveToHighlight.startRank,
+                                        moveToHighlight.endFile,
+                                        moveToHighlight.endRank)
+                                moves_list_view.smoothScrollToPosition(position)
+                            }
+                            else {
+                                playingBoard.clearHighlightedMove()
+                            }
                         }
                     }
                 }

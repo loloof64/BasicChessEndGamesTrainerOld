@@ -3,36 +3,78 @@ package com.loloof64.android.basicchessendgamestrainer.playing_activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
+import com.github.bhlangonijr.chesslib.*
+import com.github.bhlangonijr.chesslib.move.Move
+import com.github.bhlangonijr.chesslib.move.MoveGenerator
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
-import karballo.Board
-import karballo.Move
-import karballo.evaluation.Evaluator
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.buildSquare
+import java.lang.Math.abs
 import java.util.logging.Logger
 
-val MIN_MATE_SCORE = 21000
+val MIN_MATE_SCORE = 1000
+val MIN_DRAW_SCORE = 10
+val MIN_KNOWN_WIN = 250
+
+fun String.toFan(forWhite: Boolean): String{
+    val fan = this
+    with(fan){
+        replace("N", if (forWhite) "\u2658" else "\u265E")
+        replace("B", if (forWhite) "\u2657" else "\u265D")
+        replace("R", if (forWhite) "\u2656" else "\u265C")
+        replace("Q", if (forWhite) "\u2655" else "\u265B")
+        replace("K", if (forWhite) "\u2654" else "\u265A")
+    }
+    return fan
+}
 
 data class PromotionInfo(val startFile: Int, val startRank: Int,
                          val endFile: Int, val endRank: Int)
 
-fun Int.convertSquareIndexToCoords(): SquareCoordinates {
-    return SquareCoordinates(file = 7 - this%8, rank = this/8)
-}
-
 class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSet?,
                              defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr),
                                                     SimpleUciObserver {
-    override fun consumeMove(move: Int) {
+
+    fun isDrawByRepetitions():Boolean {
+        val historySize = _relatedPosition.history.size
+        val i = Math.min(historySize - 1, _relatedPosition.getHalfMoveCounter())
+        var rept = 0
+        if (historySize >= 4) {
+            val lastKey = _relatedPosition.getHistory().get(historySize - 1)
+            var x = 2
+            while (x <= i) {
+                val k = _relatedPosition.getHistory().get(historySize - x - 1)
+                if (k == lastKey) {
+                    rept++
+                    if (rept >= 2) {
+                        return true
+                    }
+                }
+                x += 2
+            }
+        }
+        return false
+    }
+
+    private fun getSANforMoveInCurrentPosition(move: Move): String {
+        val legalMoves = MoveGenerator.getInstance().generateLegalMoves(_relatedPosition)
+        val legalMovesSANs = legalMoves.toSANArray()
+        var matchingSAN = ""
+        legalMoves.forEachIndexed{index, currMove ->
+            if (currMove == move) matchingSAN = legalMovesSANs[index]
+        }
+
+        return matchingSAN
+    }
+
+    override fun consumeMove(move: Move) {
         if (!_waitingForPlayerGoal){
             val isComputerToMove = _playerHasWhite != isWhiteToPlay()
             if (isComputerToMove){
-                val moveFrom = Move.getFromIndex(move).convertSquareIndexToCoords()
-                val moveTo = Move.getToIndex(move).convertSquareIndexToCoords()
-                
                 handler.post {
-                    addMoveToList(move)
-                    _moveToHighlightFrom = moveFrom
-                    _moveToHighlightTo = moveTo
+                    addMoveToList(move, getSANforMoveInCurrentPosition(move))
+                    _moveToHighlightFrom = move.from
+                    _moveToHighlightTo = move.to
                     updateHighlightedMove()
 
                     invalidate()
@@ -45,18 +87,14 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     override fun consumeScore(score: Int) {
         if (_waitingForPlayerGoal){
 
-            ////////////////////////////////////////////
-            Logger.getLogger("loloof64").info("Position score is $score")
-            ////////////////////////////////////////////
-
-            val stringId = if (score > MIN_MATE_SCORE) {
+            val stringId = if (abs(score) > MIN_MATE_SCORE) {
                 if (isWhiteToPlay()) R.string.white_play_for_mate
                 else R.string.black_play_for_mate
-            } else if (score > Evaluator.KNOWN_WIN) {
+            } else if (abs(score) > MIN_KNOWN_WIN) {
                 if (isWhiteToPlay()) R.string.white_play_for_win
                 else R.string.black_play_for_win
             } 
-            else if (score == Evaluator.DRAW) R.string.should_be_draw
+            else if (abs(score) <= MIN_DRAW_SCORE) R.string.should_be_draw
             else R.string.empty_string
 
             when (context){
@@ -77,14 +115,11 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                 .PlayableAgainstComputerBoardComponent_min_dimension_percentage, 100)
         typedArray.recycle()
         minSpacePercentage = computed
+        EngineInteraction.setUciObserver(this)
     }
 
     override fun computeMinAvailableSpacePercentage():Int {
         return minSpacePercentage
-    }
-
-    companion object {
-        val MAX_LEGAL_POSITIONS_COUNT = 250
     }
 
     fun isWaitingForPlayerGoal() = _waitingForPlayerGoal
@@ -96,7 +131,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
 
     private fun waitForPlayerGoal() {
         _waitingForPlayerGoal = true
-        engineInteraction.evaluate(_relatedPosition.fen)
+        EngineInteraction.evaluate(_relatedPosition.fen)
     }
 
     override fun relatedPosition(): Board {
@@ -104,7 +139,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     }
 
     override fun replacePositionWith(positionFEN: String) {
-        _relatedPosition.setFenMove(positionFEN, null)
+        _relatedPosition.loadFromFEN(positionFEN)
     }
 
     override fun highlightedTargetCell(): SquareCoordinates? {
@@ -136,7 +171,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     private var _pendingPromotionInfo:PromotionInfo? = null
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
-        val whiteTurn = _relatedPosition.turn
+        val whiteTurn = _relatedPosition.sideToMove == Side.WHITE
         val notPlayerTurn = _playerHasWhite != whiteTurn
         if (notPlayerTurn || _gameFinished) return true
 
@@ -160,18 +195,25 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                         val endFile = _highlightedTargetCell!!.file
                         val endRank = _highlightedTargetCell!!.rank
 
-                        val legalMovesStore = IntArray(MAX_LEGAL_POSITIONS_COUNT)
-                        relatedPosition().getLegalMoves(legalMovesStore)
-                        val matchingMoves = legalMovesStore.filter { move ->
-                            val matchingMoveStartCell = Move.getFromSquare(move)
-                            val matchingMoveEndCell = Move.getToSquare(move)
-                            val playerMoveStartCell = coordinatesToSquare(startFile, startRank)
-                            val playerMoveEndCell = coordinatesToSquare(endFile, endRank)
+                        val legalMovesList = MoveGenerator.getInstance().generateLegalMoves(_relatedPosition)
+                        val matchingMoves = legalMovesList.filter { move ->
+                            val matchingMoveStartCell = move.from
+                            val matchingMoveEndCell = move.to
+                            val playerMoveStartCell = buildSquare(startRank, startFile)
+                            val playerMoveEndCell = buildSquare(endRank, endFile)
+
+                            /////////////////////////////////
+                            println("($matchingMoveStartCell, $matchingMoveEndCell) => ($playerMoveStartCell, $playerMoveEndCell)")
+                            ///////////////////////////////////
 
                             (matchingMoveStartCell == playerMoveStartCell) && (matchingMoveEndCell == playerMoveEndCell)
                         }
 
-                        val isPromotionMove = matchingMoves.isNotEmpty() && Move.isPromotion(matchingMoves[0])
+                        ////////////////////
+                        matchingMoves.forEach { move -> println("(${move.from}, ${move.to})") }
+                        ////////////////////
+
+                        val isPromotionMove = matchingMoves.isNotEmpty() && matchingMoves[0].promotion != Piece.NONE
 
                         if (isPromotionMove) {
                             _pendingPromotionInfo = PromotionInfo(startFile, startRank, endFile, endRank)
@@ -183,7 +225,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                                 if (!sameCellSelected) reactForIllegalMove()
                             } else {
                                 updateHighlightedMove()
-                                addMoveToList(matchingMoves[0])
+                                val move = matchingMoves[0]
+                                addMoveToList(move, getSANforMoveInCurrentPosition(move))
                             }
                         }
 
@@ -200,12 +243,11 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                     performClick()
                 }
                 MotionEvent.ACTION_DOWN -> {
-                    val movedPiece = _relatedPosition.getPieceAt(coordinatesToSquare(file = file, rank = rank))
-                    val isOccupiedSquare = movedPiece != '.'
-                    val isWhiteTurn = _relatedPosition.turn
-                    val isWhitePiece = movedPiece.isUpperCase()
-                    val isBlackPiece = movedPiece.isLowerCase()
-                    val isOneOfOurPiece = (isWhiteTurn && isWhitePiece) || (!isWhiteTurn && isBlackPiece)
+                    val movedPiece = _relatedPosition.getPiece(buildSquare(file = file, rank = rank))
+                    val isOccupiedSquare = movedPiece != Piece.NONE
+                    val isWhiteTurn = _relatedPosition.sideToMove == Side.WHITE
+                    val isWhitePiece = movedPiece.pieceSide == Side.WHITE
+                    val isOneOfOurPiece = (isWhiteTurn && isWhitePiece) || (!isWhiteTurn && !isWhitePiece)
 
                     _highlightedTargetCell = if (isOccupiedSquare && isOneOfOurPiece) SquareCoordinates(file = file, rank = rank) else null
                     _highlightedStartCell = _highlightedTargetCell
@@ -222,10 +264,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
         }
 
         return true
-    }
-
-    override fun performClick(): Boolean {
-        return super.performClick()
     }
 
     fun playerHasWhite() = _playerHasWhite
@@ -246,13 +284,13 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                     }
                 }
             }
-            _relatedPosition.setFenMove(fen, lastMove = _relatedPosition.lastMoveSan)
+            _relatedPosition.loadFromFEN(fen)
             _playerHasWhite = playerHasWhite
             _startedToWriteMoves = hasStartedToWriteMoves
             _moveToHighlightFrom = if (moveToHighlightFromFile in 0..7 &&
-                    moveToHighlightFromRank in 0..7) SquareCoordinates(file = moveToHighlightFromFile, rank = moveToHighlightFromRank) else null
+                    moveToHighlightFromRank in 0..7) buildSquare(file = moveToHighlightFromFile, rank = moveToHighlightFromRank) else null
             _moveToHighlightTo = if (moveToHighlightToFile in 0..7 &&
-                    moveToHighlightToRank in 0..7) SquareCoordinates(file = moveToHighlightToFile, rank = moveToHighlightToRank) else null
+                    moveToHighlightToRank in 0..7) buildSquare(file = moveToHighlightToFile, rank = moveToHighlightToRank) else null
             updateHighlightedMove()
 
             setWaitingForPlayerGoalFlag(waitingForPlayerGoal)
@@ -278,7 +316,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
             _moveToHighlightTo = null
             updateHighlightedMove()
 
-            if (startFen.isNotEmpty()) _relatedPosition.fen = startFen
+            EngineInteraction.startNewGame()
+            if (startFen.isNotEmpty()) _relatedPosition.loadFromFEN(startFen)
             _playerHasWhite = isWhiteToPlay()
             waitForPlayerGoal()
             invalidate()
@@ -289,13 +328,13 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     }
 
     fun isWhiteToPlay() : Boolean {
-        return _relatedPosition.turn
+        return _relatedPosition.sideToMove == Side.WHITE
     }
 
     fun makeComputerPlay(){
         val isComputerToMove = _playerHasWhite != isWhiteToPlay()
         if (isComputerToMove) {
-            engineInteraction.evaluate(_relatedPosition.fen)
+            EngineInteraction.evaluate(_relatedPosition.fen)
         }
     }
 
@@ -313,56 +352,51 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
             return _gameFinished
         }
 
-        if (!checkIfGameFinished(R.string.checkmate){ isMate })
-            if (!checkIfGameFinished(R.string.missing_material_draw){ isDrawByMissingMatingMaterial() })
-                if (!checkIfGameFinished(R.string.position_repetitions_draw){ isDrawByThreeFoldsRepetition() })
-                    if (!checkIfGameFinished(R.string.stalemate){ isDrawByStaleMate()})
-                        if (!checkIfGameFinished(R.string.fiftyMoveDraw){ isDrawByFiftyMovesRule() }){}
+        if (!checkIfGameFinished(R.string.checkmate){ _relatedPosition.isMated })
+            if (!checkIfGameFinished(R.string.missing_material_draw){ _relatedPosition.isInsufficientMaterial })
+                if (!checkIfGameFinished(R.string.position_repetitions_draw){ isDrawByRepetitions() })
+                    if (!checkIfGameFinished(R.string.stalemate){ _relatedPosition.isStaleMate })
+                        if (!checkIfGameFinished(R.string.fiftyMoveDraw){ _relatedPosition.moveCounter >= 100 }){}
     }
 
-    private fun addMoveToList(move: Int) {
+    private fun addMoveToList(move: Move, moveSan: String) {
         when (context) {
             is PlayingActivity -> {
 
-                val isWhiteTurnBeforeMove = _relatedPosition.turn
-                val moveSan = Move.toSan(_relatedPosition, move)
+                val isWhiteTurnBeforeMove = _relatedPosition.sideToMove == Side.WHITE
 
                 val moveNumberBeforeMoveCommit = getMoveNumber()
 
                 _relatedPosition.doMove(move)
-                val fromSquare = Move.getFromSquare(move)
-                val toSquare = Move.getToSquare(move)
-                val (startFile, startRank) = squareToCoordinates(fromSquare)
-                val (endFile, endRank) = squareToCoordinates(toSquare)
                 val fenAfterMove = _relatedPosition.fen
+
+                val moveToHighlight = MoveToHighlight(
+                        startFile = move.from.file.ordinal,
+                        startRank = move.from.rank.ordinal,
+                        endFile = move.to.file.ordinal,
+                        endRank = move.to.rank.ordinal
+                )
 
                 // Registering move san into history
                 if (!_startedToWriteMoves && !isWhiteTurnBeforeMove){
                     with(context as PlayingActivity){
                         addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "", MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList("..", "",MoveToHighlight(-1,-1,-1,-1))
-                        addPositionInMovesList(Move.sanToFigurines(moveSan)!!,
-                            fen = fenAfterMove, moveToHighlight = MoveToHighlight(
-                            startFile = startFile,
-                            startRank = startRank,
-                            endFile = endFile,
-                            endRank = endRank
-                        ))
+                        addPositionInMovesList(moveSan.toFan(isWhiteTurnBeforeMove),
+                            fen = fenAfterMove, moveToHighlight = moveToHighlight)
                     }
                 }
                 else {
                     with(context as PlayingActivity){
+                        //////////////////////////
+                        println("movesan is $moveSan")
+                        //////////////////////////////
                         if (isWhiteTurnBeforeMove) addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "",
                                 MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList(
-                                san = Move.sanToFigurines(moveSan)!!,
+                                san = moveSan.toFan(isWhiteTurnBeforeMove),
                                 fen = fenAfterMove,
-                                moveToHighlight = MoveToHighlight(
-                                        startFile = startFile,
-                                        startRank = startRank,
-                                        endFile = endFile,
-                                        endRank = endRank
-                                )
+                                moveToHighlight = moveToHighlight
                         )
                     }
                 }
@@ -371,31 +405,30 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
         _startedToWriteMoves = true
     }
 
-    fun validatePromotionMove(promotedPieceType: Int) {
+    fun validatePromotionMove(promotedPieceType: PieceType) {
         when(_pendingPromotionInfo) {
             null -> {}
             else -> {
-                val startSquare = coordinatesToSquare(file = _pendingPromotionInfo!!.startFile,
+
+                val startSquare = buildSquare(file = _pendingPromotionInfo!!.startFile,
                         rank = _pendingPromotionInfo!!.startRank)
-                val endSquare = coordinatesToSquare(file = _pendingPromotionInfo!!.endFile,
+                val endSquare = buildSquare(file = _pendingPromotionInfo!!.endFile,
                         rank = _pendingPromotionInfo!!.endRank)
-                var matchingMoves = IntArray(MAX_LEGAL_POSITIONS_COUNT)
-                _relatedPosition.getLegalMoves(matchingMoves)
-                matchingMoves = matchingMoves.filter { currentMove ->
-                    val currentMoveStartSquare = Move.getFromSquare(currentMove)
-                    val currentMoveEndSquare = Move.getToSquare(currentMove)
-                    val isPromotion = Move.isPromotion(currentMove)
-                    val promotionPiece = Move.getPiecePromoted(currentMove)
+                val legalMovesList = MoveGenerator.getInstance().generateLegalMoves(_relatedPosition)
+                val matchingMoves = legalMovesList.filter { currentMove ->
+                    val currentMoveStartSquare = currentMove.from
+                    val currentMoveEndSquare = currentMove.to
+                    val promotionPiece = currentMove.promotion
 
                     currentMoveStartSquare == startSquare
                     && currentMoveEndSquare == endSquare
-                    && isPromotion
+                    && promotionPiece != Piece.NONE
                     && promotionPiece == promotedPieceType
-                }.toIntArray()
+                }
                 if (matchingMoves.isEmpty()) Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
                 else {
                     val move = matchingMoves[0]
-                    addMoveToList(move)
+                    addMoveToList(move, getSANforMoveInCurrentPosition(move))
                 }
                 _pendingPromotionInfo = null
                 _highlightedTargetCell = null
@@ -408,40 +441,47 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     fun hasStartedToWriteMoves() = _startedToWriteMoves
 
     private fun getMoveNumber(): Int {
-        return (_relatedPosition.moveNumber / 2) + 1
+        return _relatedPosition.moveCounter
     }
 
     override fun setHighlightedMove(fromFile: Int, fromRank: Int, toFile: Int, toRank: Int) {
+        if (fromFile !in 0..7) throw IllegalArgumentException()
+        if (fromRank !in 0..7) throw IllegalArgumentException()
+        if (toFile !in 0..7) throw IllegalArgumentException()
+        if (toRank !in 0..7) throw IllegalArgumentException()
+
         super.setHighlightedMove(fromFile, fromRank, toFile, toRank)
-        _moveToHighlightFrom = SquareCoordinates(file = fromFile, rank = fromRank)
-        _moveToHighlightTo = SquareCoordinates(file = toFile, rank = toRank)
+        _moveToHighlightFrom = buildSquare(file = fromFile, rank = fromRank)
+        _moveToHighlightTo = buildSquare(file = toFile, rank = toRank)
     }
 
-    fun getMoveToHighlightFromFile() = if (_moveToHighlightFrom != null) _moveToHighlightFrom!!.file
-                                    else -1
+    fun getMoveToHighlightFromFile():Int? = _moveToHighlightFrom?.file?.ordinal
 
-    fun getMoveToHighlightFromRank() = if (_moveToHighlightFrom != null) _moveToHighlightFrom!!.rank
-                                    else -1
+    fun getMoveToHighlightFromRank():Int? = _moveToHighlightFrom?.rank?.ordinal
 
-    fun getMoveToHighlightToFile() = if (_moveToHighlightTo != null) _moveToHighlightTo!!.file
-                                    else -1
+    fun getMoveToHighlightToFile():Int? = _moveToHighlightTo?.file?.ordinal
 
-    fun getMoveToHighlightToRank() = if (_moveToHighlightTo != null) _moveToHighlightTo!!.rank
-                                    else -1
+    fun getMoveToHighlightToRank():Int? = _moveToHighlightTo?.rank?.ordinal
 
     private fun updateHighlightedMove(){
-        setHighlightedMove(
-                _moveToHighlightFrom?.file ?: -1, _moveToHighlightFrom?.rank ?: -1,
-                _moveToHighlightTo?.file ?: -1, _moveToHighlightTo?.rank ?: -1
-        )
-        invalidate()
+        val from = _moveToHighlightFrom
+        val to = _moveToHighlightTo
+        if (from != null && to != null){
+            setHighlightedMove(
+                    from.file.ordinal, from.rank.ordinal,
+                    to.file.ordinal, to.rank.ordinal
+            )
+        }
+        else {
+            clearHighlightedMove()
+        }
+
     }
 
     private var _playerHasWhite = true
     private var _gameFinished = false
     private var _waitingForPlayerGoal = true
     private var _startedToWriteMoves = false
-    private var _moveToHighlightFrom:SquareCoordinates? = null
-    private var _moveToHighlightTo:SquareCoordinates? = null
-    private val engineInteraction = EngineInteraction(this)
+    private var _moveToHighlightFrom:Square? = null
+    private var _moveToHighlightTo:Square? = null
 }

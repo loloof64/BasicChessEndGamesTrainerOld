@@ -1,9 +1,9 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
-import com.loloof64.android.basicchessendgamestrainer.playing_activity.coordinatesToSquare
-import karballo.Board
+import com.github.bhlangonijr.chesslib.*
 import java.util.*
 import java.util.logging.Logger
+import com.github.bhlangonijr.chesslib.Side as LibSide
 
 class PositionGenerationLoopException : Exception()
 
@@ -13,11 +13,25 @@ fun Int.loops(callback : (Int) -> Unit) {
     for (i in 0 until this) callback(i)
 }
 
+fun buildSquare(rank: Int, file: Int) =
+        Square.encode(Rank.values()[rank], File.values()[file])
+
+fun pieceKindToPiece(kind: PieceKind, whitePiece: Boolean): Piece =
+        when(kind.pieceType){
+            PieceType.pawn -> if (whitePiece) Piece.WHITE_PAWN else Piece.BLACK_PAWN
+            PieceType.knight -> if (whitePiece) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT
+            PieceType.bishop -> if (whitePiece) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP
+            PieceType.rook -> if (whitePiece) Piece.WHITE_ROOK else Piece.BLACK_ROOK
+            PieceType.queen -> if (whitePiece) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN
+            PieceType.king -> if (whitePiece) Piece.WHITE_KING else Piece.BLACK_KING
+        }
+
 class PositionGenerator(private val constraints : PositionConstraints) {
 
     fun generatePosition(playerHasWhite: Boolean = true): String {
-        _position.fen = "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1"
-        _position.moveNumber = 1
+        _position.loadFromFEN( "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1")
+        _position.halfMoveCounter = 0
+        _position.moveCounter = 1
 
         try {
             placeKings(playerHasWhite)
@@ -43,12 +57,12 @@ class PositionGenerator(private val constraints : PositionConstraints) {
             val kingRank = _random.nextInt(8)
 
             val tempPosition = Board()
-            tempPosition.fen = _position.fen
-            tempPosition.setPieceAt(coordinatesToSquare(kingFile, kingRank),
-                    if (playerHasWhite) 'K' else 'k')
+            tempPosition.loadFromFEN(_position.fen)
+            tempPosition.setPiece(if (playerHasWhite) Piece.WHITE_KING else Piece.BLACK_KING,
+                    Square.encode(Rank.values()[kingRank], File.values()[kingFile]))
 
             if (constraints.checkPlayerKingConstraint(BoardCoordinate(kingFile, kingRank), playerHasWhite)) {
-                _position.fen = tempPosition.fen
+                _position.loadFromFEN(tempPosition.fen)
                 playerKingCoords = BoardCoordinate(file = kingFile, rank = kingRank)
                 loopSuccess = true
                 break
@@ -62,16 +76,14 @@ class PositionGenerator(private val constraints : PositionConstraints) {
             val kingRank = _random.nextInt(8)
 
             val tempPosition = Board()
-            tempPosition.fen = _position.fen
-            val cellNotEmpty = tempPosition.getPieceAt(coordinatesToSquare(kingFile, kingRank)) != '.'
+            tempPosition.loadFromFEN(_position.fen)
+            val cellNotEmpty = tempPosition.getPiece(buildSquare(kingRank, kingFile)) != Piece.NONE
             if (cellNotEmpty) continue
-            tempPosition.setPieceAt(coordinatesToSquare(kingFile, kingRank),
-                    if (playerHasWhite) 'k' else 'K')
+            tempPosition.setPiece(if (playerHasWhite) Piece.BLACK_KING else Piece.WHITE_KING, buildSquare(kingRank, kingFile))
 
-            tempPosition.turn = !playerHasWhite
-            tempPosition.setCheckFlags()
-            val enemyKingInChess = tempPosition.check
-            tempPosition.turn = playerHasWhite
+            tempPosition.sideToMove = if (playerHasWhite) LibSide.BLACK else LibSide.WHITE
+            val enemyKingInChess = tempPosition.isKingAttacked()
+            tempPosition.sideToMove = if (playerHasWhite) LibSide.WHITE else LibSide.BLACK
             if (enemyKingInChess) continue
 
             if (constraints.checkComputerKingConstraint(BoardCoordinate(kingFile, kingRank), playerHasWhite)
@@ -81,7 +93,7 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                     playerHasWhite
             )) {
                 oppositeKingCoords = BoardCoordinate(kingFile, kingRank)
-                _position.fen = tempPosition.fen
+                _position.loadFromFEN(tempPosition.fen)
                 loopSuccess = true
                 break
             }
@@ -101,18 +113,17 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                     val currentPieceCoordinate = BoardCoordinate(pieceFile, pieceRank)
 
                     val tempPosition = Board()
-                    tempPosition.fen = _position.fen
-                    val cellNotEmpty = tempPosition.getPieceAt(coordinatesToSquare(pieceFile, pieceRank)) != '.'
+                    tempPosition.loadFromFEN(_position.fen)
+                    val cellNotEmpty = tempPosition.getPiece(buildSquare(pieceRank, pieceFile)) != Piece.NONE
                     if (cellNotEmpty) continue
                     val isAPieceOfPlayer = kind.side == Side.player
                     val isWhitePiece = (isAPieceOfPlayer && playerHasWhite)
                         || (!isAPieceOfPlayer && !playerHasWhite)
-                    tempPosition.setPieceAt(coordinatesToSquare(pieceFile, pieceRank), pieceToStone(kind, isWhitePiece))
+                    tempPosition.setPiece(pieceKindToPiece(kind, isWhitePiece), buildSquare(pieceRank, pieceFile))
                     
-                    tempPosition.turn = !playerHasWhite
-                    tempPosition.setCheckFlags()
-                    val enemyKingInChess = tempPosition.check
-                    tempPosition.turn = playerHasWhite
+                    tempPosition.sideToMove = if (playerHasWhite) LibSide.BLACK else LibSide.WHITE
+                    val enemyKingInChess = tempPosition.isKingAttacked()
+                    tempPosition.sideToMove = if (playerHasWhite) LibSide.WHITE else LibSide.BLACK
                     if (enemyKingInChess) continue
 
                     // If for any previous piece of same kind, mutual constraint is not respected, will go into another try
@@ -123,7 +134,7 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                             playerHasWhite)) continue
 
                     if (constraints.checkOtherPieceGlobalConstraint(kind, currentPieceCoordinate, playerHasWhite, playerKingCoords, oppositeKingCoords)){
-                        _position.fen = tempPosition.fen
+                        _position.loadFromFEN(tempPosition.fen)
                         savedCoordinates += BoardCoordinate(pieceFile, pieceRank)
                         loopSuccess = true
                         break
@@ -131,17 +142,6 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                 }
                 if (!loopSuccess) throw PositionGenerationLoopException()
             }
-        }
-    }
-
-    private fun pieceToStone(pieceKind: PieceKind, whitePiece: Boolean): Char {
-        return when(pieceKind.pieceType){
-            PieceType.pawn -> if (whitePiece) 'P' else 'p'
-            PieceType.knight -> if (whitePiece) 'N' else 'n'
-            PieceType.bishop -> if (whitePiece) 'B' else 'b'
-            PieceType.rook -> if (whitePiece) 'R' else 'r'
-            PieceType.queen -> if (whitePiece) 'Q' else 'q'
-            PieceType.king -> if (whitePiece) 'K' else 'k'
         }
     }
 

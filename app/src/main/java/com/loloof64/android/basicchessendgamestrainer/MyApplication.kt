@@ -7,15 +7,16 @@ class MyApplication: Application(){
 
     companion object {
         fun getApplicationContext() = appContext
-        fun setApplicationContext(ctx: Context){
+        fun setApplicationContext(ctx: Context) {
             appContext = ctx
         }
 
-        private lateinit var appContext: Context
+        lateinit var appContext: Context
     }
 
     override fun onCreate() {
         super.onCreate()
         setApplicationContext(this)
     }
+
 }

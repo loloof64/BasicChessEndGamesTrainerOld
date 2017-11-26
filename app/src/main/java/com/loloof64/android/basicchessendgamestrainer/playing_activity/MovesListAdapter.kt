@@ -10,13 +10,13 @@ import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
 import java.lang.ref.WeakReference
 
-data class RowInput(val san:String, val relatedFen: String, val moveToHighlight: MoveToHighlight)
+data class RowInput(val san:String, val relatedFen: String, val moveToHighlight: MoveToHighlight?)
 data class MoveToHighlight(val startFile: Int, val startRank : Int,
                            val endFile: Int, val endRank : Int)
 
 abstract class ItemClickListener {
     abstract fun onClick(weakRefContext: WeakReference<Context>, position: Int,
-                         positionFen: String, moveToHighlight: MoveToHighlight)
+                         positionFen: String, moveToHighlight: MoveToHighlight?)
 }
 
 class MovesListAdapter(private val weakRefContext: WeakReference<Context>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHolder>() {
@@ -56,7 +56,7 @@ class MovesListAdapter(private val weakRefContext: WeakReference<Context>, priva
         return inputsList.size
     }
 
-    fun addPosition(san: String, fen: String, moveToHighlight: MoveToHighlight){
+    fun addPosition(san: String, fen: String, moveToHighlight: MoveToHighlight?){
         inputsList.add(RowInput(san, fen, moveToHighlight))
         update()
     }

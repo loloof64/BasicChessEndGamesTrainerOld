@@ -16,4 +16,5 @@
     <color name="chess_board_highlighted_move_arrow_color">#FEAC22</color>
     <color name="moves_history_cell_standard_color">#CDCDCD</color>
     <color name="moves_history_cell_selected_color">#FFDD26</color>
+    <color name="circular_progressbar_color">#c91512</color>
 </resources>

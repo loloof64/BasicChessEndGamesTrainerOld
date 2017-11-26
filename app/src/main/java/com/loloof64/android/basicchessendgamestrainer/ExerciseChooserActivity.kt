@@ -9,6 +9,7 @@ import android.view.MenuItem
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
+import com.loloof64.android.basicchessendgamestrainer.playing_activity.EngineInteraction
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
 
 class ExerciseChooserActivity : AppCompatActivity() {
@@ -16,6 +17,8 @@ class ExerciseChooserActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_chooser)
+
+        EngineInteraction.copyStockfishIntoInternalMemoryIfNecessary()
 
         exercisesListView.layoutManager = LinearLayoutManager(this)
         exercisesListView.adapter = ExercisesListAdapter(availableGenerators, object : ItemClickListener {
@@ -28,6 +31,11 @@ class ExerciseChooserActivity : AppCompatActivity() {
             }
         })
 
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EngineInteraction.initStockfishProcess()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -46,11 +54,8 @@ class ExerciseChooserActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
-    override fun onStop(){
+    override fun onStop() {
+        EngineInteraction.closeProcess()
         super.onStop()
     }
 

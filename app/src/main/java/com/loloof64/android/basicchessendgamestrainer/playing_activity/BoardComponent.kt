@@ -8,23 +8,16 @@ import android.graphics.Typeface
 import android.support.graphics.drawable.VectorDrawableCompat
 import android.util.AttributeSet
 import android.view.View
+import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.Piece
+import com.github.bhlangonijr.chesslib.Side
 import com.loloof64.android.basicchessendgamestrainer.R
-import karballo.Board
-import karballo.Color as KColor
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.buildSquare
 
 infix fun Int.min(other : Int) = if (this < other) this else other
 infix fun Int.max(other : Int) = if (this > other) this else other
 
 data class SquareCoordinates(val file: Int, val rank: Int)
-
-fun coordinatesToSquare(file: Int, rank: Int) : Long {
-    return 1L shl ((7-file) + (8*rank))
-}
-
-fun squareToCoordinates(squareIndex: Long) : Pair<Int, Int> {
-    val powerOf2 = (Math.log(squareIndex.toDouble()) / Math.log(2.0)).toInt()
-    return Pair(7-(powerOf2%8), powerOf2/8)
-}
 
 abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAttr: Int) : View(context, attrs, defStyleAttr) {
 
@@ -127,21 +120,21 @@ abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAt
     private fun drawPieces(canvas: Canvas, cellSize: Int) {
         for (cellRank in (0 until 8)) {
             for (cellFile in (0 until 8)) {
-                val piece = relatedPosition().getPieceAt(coordinatesToSquare(file = cellFile, rank = cellRank))
-                if (piece != '.') {
+                val piece = relatedPosition().getPiece(buildSquare(cellRank, cellFile))
+                if (piece != Piece.NONE) {
                     val imageRes = when (piece) {
-                        'P' -> R.drawable.chess_pl
-                        'p' -> R.drawable.chess_pd
-                        'N' -> R.drawable.chess_nl
-                        'n' -> R.drawable.chess_nd
-                        'B' -> R.drawable.chess_bl
-                        'b' -> R.drawable.chess_bd
-                        'R' -> R.drawable.chess_rl
-                        'r' -> R.drawable.chess_rd
-                        'Q' -> R.drawable.chess_ql
-                        'q' -> R.drawable.chess_qd
-                        'K' -> R.drawable.chess_kl
-                        'k' -> R.drawable.chess_kd
+                        Piece.WHITE_PAWN -> R.drawable.chess_pl
+                        Piece.BLACK_PAWN -> R.drawable.chess_pd
+                        Piece.WHITE_KNIGHT -> R.drawable.chess_nl
+                        Piece.BLACK_KNIGHT -> R.drawable.chess_nd
+                        Piece.WHITE_BISHOP -> R.drawable.chess_bl
+                        Piece.BLACK_BISHOP -> R.drawable.chess_bd
+                        Piece.WHITE_ROOK -> R.drawable.chess_rl
+                        Piece.BLACK_ROOK -> R.drawable.chess_rd
+                        Piece.WHITE_QUEEN -> R.drawable.chess_ql
+                        Piece.BLACK_QUEEN -> R.drawable.chess_qd
+                        Piece.WHITE_KING -> R.drawable.chess_kl
+                        Piece.BLACK_KING -> R.drawable.chess_kd
                         else -> throw IllegalArgumentException("Unrecognized piece fen $piece !")
                     }
                     val x = (cellSize * (0.5 + (if (reversed) 7 - cellFile else cellFile))).toInt()
@@ -156,7 +149,7 @@ abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAt
     }
 
     private fun drawPlayerTurn(canvas: Canvas, cellSize: Int) {
-        val color = if (relatedPosition().turn) R.color.chess_board_white_player_turn_color else R.color.chess_board_black_player_turn_color
+        val color = if (relatedPosition().sideToMove == Side.WHITE) R.color.chess_board_white_player_turn_color else R.color.chess_board_black_player_turn_color
         val location = (8.5 * cellSize).toFloat()
         val locationEnd = (location + cellSize * 0.5).toFloat()
         rectPaint.color = getColor(color)
@@ -204,17 +197,20 @@ abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAt
     }
 
     private fun drawHighlightedMove(canvas: Canvas, cellSize: Int){
-        if (_highlightedMoveFrom.file !in 0..7) return
-        if (_highlightedMoveFrom.rank !in 0..7) return
-        if (_highlightedMoveTo.file !in 0..7) return
-        if (_highlightedMoveTo.rank !in 0..7) return
+        val from = _highlightedMoveFrom
+        val to = _highlightedMoveTo
+        if (from == null || to == null) return
+        if (from.file !in 0..7) return
+        if (from.rank !in 0..7) return
+        if (to.file !in 0..7) return
+        if (to.rank !in 0..7) return
 
         val paint = Paint()
 
-        val fromPointX = (cellSize * if (reversed) (8 - _highlightedMoveFrom.file) else (_highlightedMoveFrom.file+1)).toFloat()
-        val fromPointY = (cellSize * if (reversed) (_highlightedMoveFrom.rank+1) else (8 - _highlightedMoveFrom.rank)).toFloat()
-        val toPointX = (cellSize * if (reversed) (8 - _highlightedMoveTo.file) else (_highlightedMoveTo.file+1)).toFloat()
-        val toPointY = (cellSize * if (reversed) (_highlightedMoveTo.rank+1) else (8 - _highlightedMoveTo.rank)).toFloat()
+        val fromPointX = (cellSize * if (reversed) (8 - from.file) else (from.file+1)).toFloat()
+        val fromPointY = (cellSize * if (reversed) (from.rank+1) else (8 - from.rank)).toFloat()
+        val toPointX = (cellSize * if (reversed) (8 - to.file) else (to.file+1)).toFloat()
+        val toPointY = (cellSize * if (reversed) (to.rank+1) else (8 - to.rank)).toFloat()
 
         val angleDegrees = Math.toDegrees(Math.atan2(toPointY.toDouble() - fromPointY.toDouble(),
                 toPointX.toDouble() - fromPointX.toDouble())).toFloat()
@@ -265,6 +261,12 @@ abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAt
         invalidate()
     }
 
+    fun clearHighlightedMove(){
+        _highlightedMoveFrom = null
+        _highlightedMoveTo = null
+        invalidate()
+    }
+
     fun toFEN(): String = relatedPosition().fen
 
     fun setFromFen(boardFen: String) {
@@ -272,8 +274,8 @@ abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAt
         invalidate()
     }
 
-    private var _highlightedMoveFrom = SquareCoordinates(file = -1, rank = -1)
-    private var _highlightedMoveTo = SquareCoordinates(file = -1, rank = -1)
+    private var _highlightedMoveFrom:SquareCoordinates? = null
+    private var _highlightedMoveTo:SquareCoordinates? = null
 
 
 }

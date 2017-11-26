@@ -60,7 +60,8 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
 [TAB]Les fichiers du projet sont disponibles à l\'adresse https://goo.gl/KDKig0.[CR][CR]
 
 
-[TAB]Developpée par Laurent Bernabe en 2017. Ce projet utilise une version personalisée du projet Karballo : https://goo.gl/JLLMiz
+[TAB]Developpée par Laurent Bernabe en 2017. Ce projet utilise le moteur d'échecs stockfish 8,
+        une version forkée par loloof64 de chessLib (https://github.com/loloof64/chesslib),
         et des images provenant du site Wikimedia Commons (https://goo.gl/DPdkMw).
 </string>
     <string name="action_help">Aide</string>
@@ -73,5 +74,6 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="missing_material_draw">Partie nulle par insuffisance matérielle !</string>
     <string name="white_play_for_win">Les Blancs jouent pour le gain.</string>
     <string name="black_play_for_win">Les Noirs jouent pour le gain.</string>
-    <string name="exercise_kppp_kppp">Roi+Pions/Roi+3Pions</string>
+    <string name="exercise_kppp_kppp">Roi+3Pions/Roi+3Pions</string>
+    <string name="loading_stockfish">Chargement du moteur Stockfish</string>
 </resources>

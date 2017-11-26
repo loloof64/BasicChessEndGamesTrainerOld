@@ -8,8 +8,8 @@ import android.support.v7.app.AlertDialog.Builder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import com.github.bhlangonijr.chesslib.PieceType
 import com.loloof64.android.basicchessendgamestrainer.R
-import karballo.Piece
 import java.lang.ref.WeakReference
 
 class PromotionPieceChooserDialogFragment : DialogFragment() {
@@ -28,7 +28,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         }
 
         interface Listener {
-            fun reactToPromotionPieceSelection(piece: Int) : Unit
+            fun reactToPromotionPieceSelection(piece: PieceType)
         }
     }
 
@@ -80,10 +80,10 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         when(context) {
             is Listener -> {
                 listener = context
-                queenPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.QUEEN)
-                rookPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.ROOK)
-                bishopPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.BISHOP)
-                knightPromotionListener = PromotionButtonOnClickListener(listener as Listener, Piece.KNIGHT)
+                queenPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.QUEEN)
+                rookPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.ROOK)
+                bishopPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.BISHOP)
+                knightPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.KNIGHT)
             }
             else -> throw IllegalArgumentException("Context must use PromotionPieceChooseDialogFragment.Listener trait !")
         }
@@ -92,7 +92,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
 }
 
 class PromotionButtonOnClickListener(listener: PromotionPieceChooserDialogFragment.Companion.Listener,
-                                     val promotionPiece: Int) : View.OnClickListener {
+                                     val promotionPiece: PieceType) : View.OnClickListener {
 
     override fun onClick(relatedView: View?) {
         refListener.get()?.reactToPromotionPieceSelection(promotionPiece)
