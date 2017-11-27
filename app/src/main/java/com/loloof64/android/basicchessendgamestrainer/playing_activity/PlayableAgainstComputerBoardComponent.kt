@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import com.github.bhlangonijr.chesslib.*
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveGenerator
+import com.github.bhlangonijr.chesslib.move.MoveList
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.buildSquare
@@ -16,16 +17,12 @@ val MIN_MATE_SCORE = 1000
 val MIN_DRAW_SCORE = 10
 val MIN_KNOWN_WIN = 250
 
-fun String.toFan(forWhite: Boolean): String{
-    val fan = this
-    with(fan){
-        replace("N", if (forWhite) "\u2658" else "\u265E")
-        replace("B", if (forWhite) "\u2657" else "\u265D")
-        replace("R", if (forWhite) "\u2656" else "\u265C")
-        replace("Q", if (forWhite) "\u2655" else "\u265B")
-        replace("K", if (forWhite) "\u2654" else "\u265A")
-    }
-    return fan
+fun String.getFANforMove(move: Move): String {
+    val board = Board()
+    board.loadFromFEN(this)
+    val moveList = MoveList(board.fen)
+    moveList.add(move)
+    return moveList.toFANArray()[0]
 }
 
 data class PromotionInfo(val startFile: Int, val startRank: Int,
@@ -56,26 +53,15 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
         return false
     }
 
-    private fun getSANforMoveInCurrentPosition(move: Move): String {
-        val legalMoves = MoveGenerator.getInstance().generateLegalMoves(_relatedPosition)
-        val legalMovesSANs = legalMoves.toSANArray()
-        var matchingSAN = ""
-        legalMoves.forEachIndexed{index, currMove ->
-            if (currMove == move) matchingSAN = legalMovesSANs[index]
-        }
-
-        return matchingSAN
-    }
-
     override fun consumeMove(move: Move) {
         if (!_waitingForPlayerGoal){
             val isComputerToMove = _playerHasWhite != isWhiteToPlay()
             if (isComputerToMove){
                 handler.post {
-                    addMoveToList(move, getSANforMoveInCurrentPosition(move))
+                    addMoveToList(move, _relatedPosition.fen.getFANforMove(move))
                     _moveToHighlightFrom = move.from
                     _moveToHighlightTo = move.to
-                    updateHighlightedMove()
+                     updateHighlightedMove()
 
                     invalidate()
                     checkIfGameFinished()
@@ -202,16 +188,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                             val playerMoveStartCell = buildSquare(startRank, startFile)
                             val playerMoveEndCell = buildSquare(endRank, endFile)
 
-                            /////////////////////////////////
-                            println("($matchingMoveStartCell, $matchingMoveEndCell) => ($playerMoveStartCell, $playerMoveEndCell)")
-                            ///////////////////////////////////
-
                             (matchingMoveStartCell == playerMoveStartCell) && (matchingMoveEndCell == playerMoveEndCell)
                         }
-
-                        ////////////////////
-                        matchingMoves.forEach { move -> println("(${move.from}, ${move.to})") }
-                        ////////////////////
 
                         val isPromotionMove = matchingMoves.isNotEmpty() && matchingMoves[0].promotion != Piece.NONE
 
@@ -226,7 +204,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                             } else {
                                 updateHighlightedMove()
                                 val move = matchingMoves[0]
-                                addMoveToList(move, getSANforMoveInCurrentPosition(move))
+                                addMoveToList(move, _relatedPosition.fen.getFANforMove(move))
                             }
                         }
 
@@ -359,7 +337,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                         if (!checkIfGameFinished(R.string.fiftyMoveDraw){ _relatedPosition.moveCounter >= 100 }){}
     }
 
-    private fun addMoveToList(move: Move, moveSan: String) {
+    private fun addMoveToList(move: Move, moveFan: String) {
         when (context) {
             is PlayingActivity -> {
 
@@ -382,19 +360,16 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                     with(context as PlayingActivity){
                         addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "", MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList("..", "",MoveToHighlight(-1,-1,-1,-1))
-                        addPositionInMovesList(moveSan.toFan(isWhiteTurnBeforeMove),
+                        addPositionInMovesList(moveFan,
                             fen = fenAfterMove, moveToHighlight = moveToHighlight)
                     }
                 }
                 else {
                     with(context as PlayingActivity){
-                        //////////////////////////
-                        println("movesan is $moveSan")
-                        //////////////////////////////
                         if (isWhiteTurnBeforeMove) addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "",
                                 MoveToHighlight(-1,-1,-1,-1))
                         addPositionInMovesList(
-                                san = moveSan.toFan(isWhiteTurnBeforeMove),
+                                san = moveFan,
                                 fen = fenAfterMove,
                                 moveToHighlight = moveToHighlight
                         )
@@ -428,7 +403,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                 if (matchingMoves.isEmpty()) Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
                 else {
                     val move = matchingMoves[0]
-                    addMoveToList(move, getSANforMoveInCurrentPosition(move))
+                    addMoveToList(move, _relatedPosition.fen.getFANforMove(move))
                 }
                 _pendingPromotionInfo = null
                 _highlightedTargetCell = null
