@@ -138,6 +138,18 @@ val KPPPvKPPP = positionGenerator {
     }
 }
 
+val KNBvK = positionGenerator {
+    computerKing {
+        location.file in (BoardCoordinate.FILE_C .. BoardCoordinate.FILE_F)
+        && location.rank in (BoardCoordinate.RANK_3 .. BoardCoordinate.RANK_6)
+    }
+
+    otherPiecesCount {
+        add(PieceType.knight belongingTo Side.player inCount 1)
+        add(PieceType.bishop belongingTo Side.player inCount 1)
+    }
+}
+
 data class ExerciseInfo(val constraints: PositionConstraints, val textId: Int, val mustWin: Boolean)
 
 val availableGenerators = listOf(
@@ -147,5 +159,6 @@ val availableGenerators = listOf(
         ExerciseInfo(mustWin = true, textId = R.string.exercise_kbb_k, constraints = KBBvK),
         ExerciseInfo(mustWin = true, textId = R.string.exercise_kp_k_I, constraints =  KPvK_I),
         ExerciseInfo(mustWin = false, textId = R.string.exercise_kp_k_II, constraints = KPvK_II),
-        ExerciseInfo(mustWin = true, textId = R. string.exercise_kppp_kppp, constraints = KPPPvKPPP)
+        ExerciseInfo(mustWin = true, textId = R. string.exercise_kppp_kppp, constraints = KPPPvKPPP),
+        ExerciseInfo(mustWin = true, textId = R.string.exercise_knb_k, constraints = KNBvK)
 )

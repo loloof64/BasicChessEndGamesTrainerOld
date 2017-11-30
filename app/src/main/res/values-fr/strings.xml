@@ -60,8 +60,8 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
 [TAB]Les fichiers du projet sont disponibles à l\'adresse https://goo.gl/KDKig0.[CR][CR]
 
 
-[TAB]Developpée par Laurent Bernabe en 2017. Ce projet utilise le moteur d'échecs stockfish 8,
-        une version forkée par loloof64 de chessLib (https://github.com/loloof64/chesslib),
+[TAB]Developpée par Laurent Bernabé en 2017. Ce projet utilise le moteur d\'échecs stockfish 8,
+        une version forkée par Laurent Bernabé de chessLib (https://github.com/loloof64/chesslib),
         et des images provenant du site Wikimedia Commons (https://goo.gl/DPdkMw).
 </string>
     <string name="action_help">Aide</string>
@@ -71,6 +71,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="new_exercise">Nouvel exercice</string>
     <string name="exercise_kp_k_I">Roi+Pion/Roi (I)</string>
     <string name="exercise_kp_k_II">Roi+Pion/Roi (II)</string>
+    <string name="exercise_knb_k">Roi+Cavalier+Fou/Roi</string>
     <string name="missing_material_draw">Partie nulle par insuffisance matérielle !</string>
     <string name="white_play_for_win">Les Blancs jouent pour le gain.</string>
     <string name="black_play_for_win">Les Noirs jouent pour le gain.</string>
