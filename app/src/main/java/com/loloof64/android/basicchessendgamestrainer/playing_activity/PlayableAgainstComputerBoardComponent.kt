@@ -250,7 +250,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                        gameFinished: Boolean, waitingForPlayerGoal: Boolean,
                        hasStartedToWriteMoves: Boolean,
                        moveToHighlightFromFile: Int, moveToHighlightFromRank: Int,
-                       moveToHighlightToFile: Int, moveToHighlightToRank: Int){
+                       moveToHighlightToFile: Int, moveToHighlightToRank: Int,
+                       blacksAreDown: Boolean){
         try {
             _gameFinished = gameFinished
             when(context){
@@ -262,6 +263,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                     }
                 }
             }
+            setBlackDown(blacksAreDown)
             _relatedPosition.loadFromFEN(fen)
             _playerHasWhite = playerHasWhite
             _startedToWriteMoves = hasStartedToWriteMoves

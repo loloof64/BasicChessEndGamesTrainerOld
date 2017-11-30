@@ -55,6 +55,12 @@ abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAt
         invalidate()
     }
 
+    fun areBlackDown():Boolean = reversed
+
+    fun setBlackDown(yes: Boolean) {
+        reversed = yes
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int){
         val widthSize = MeasureSpec.getSize(widthMeasureSpec)
         val heightSize = MeasureSpec.getSize(heightMeasureSpec)

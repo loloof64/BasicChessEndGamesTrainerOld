@@ -56,6 +56,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val registedHighlitedMovesEndFilesKey = "RegistedHighlitedMovesEndFiles"
         val registedHighlitedMovesEndRanksKey = "RegistedHighlitedMovesEndRanks"
         val selectedNavigationItemKey = "SelectedNavigationItem"
+        val blacksAreDownKey = "BlacksAreDown"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
@@ -123,6 +124,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         outState?.putIntArray(registedHighlitedMovesEndRanksKey,
                 listAdapter.items.map { it.moveToHighlight?.endRank ?: -1 }.toIntArray())
         outState?.putInt(selectedNavigationItemKey, listAdapter.selectedNavigationItem)
+        outState?.putBoolean(blacksAreDownKey, playingBoard.areBlackDown())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -136,7 +138,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                     moveToHighlightFromFile = savedInstanceState.getInt(moveToHighlightFromFileKey),
                     moveToHighlightFromRank = savedInstanceState.getInt(moveToHighlightFromRankKey),
                     moveToHighlightToFile = savedInstanceState.getInt(moveToHighlightToFileKey),
-                    moveToHighlightToRank = savedInstanceState.getInt(moveToHighlightToRankKey)
+                    moveToHighlightToRank = savedInstanceState.getInt(moveToHighlightToRankKey),
+                    blacksAreDown = savedInstanceState.getBoolean(blacksAreDownKey)
             )
             lastExercise = savedInstanceState.getString(lastExerciseKey)
             setPlayerGoalTextId(savedInstanceState.getInt(playerGoalIDKey),
