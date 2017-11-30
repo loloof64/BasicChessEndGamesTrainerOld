@@ -71,4 +71,5 @@ of endgame.[CR][CR]
     <string name="black_play_for_win">Black play for win.</string>
     <string name="exercise_kppp_kppp">King+3Pawns/King+3Pawns</string>
     <string name="loading_stockfish">Loading Stockfish engine</string>
+    <string name="exercise_knb_k">King+Knight+Bishop/King</string>
 </resources>
