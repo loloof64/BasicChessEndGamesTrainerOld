@@ -300,7 +300,10 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
             updateHighlightedMove()
 
             EngineInteraction.startNewGame()
-            if (startFen.isNotEmpty()) _relatedPosition.loadFromFEN(startFen)
+            if (startFen.isNotEmpty()) {
+                _relatedPosition.loadFromFEN(startFen)
+                _blackStartedTheGame = _relatedPosition.sideToMove == Side.BLACK
+            }
             _playerHasWhite = isWhiteToPlay()
             waitForPlayerGoal()
             invalidate()
@@ -420,7 +423,9 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     fun hasStartedToWriteMoves() = _startedToWriteMoves
 
     private fun getMoveNumber(): Int {
-        return _relatedPosition.moveCounter
+        val c = _relatedPosition.moveCounter
+        return if (_blackStartedTheGame) ((c-(c%2))/2) + 1
+            else (c / 2) + 1
     }
 
     override fun setHighlightedMove(fromFile: Int, fromRank: Int, toFile: Int, toRank: Int) {
@@ -463,4 +468,5 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     private var _startedToWriteMoves = false
     private var _moveToHighlightFrom:Square? = null
     private var _moveToHighlightTo:Square? = null
+    private var _blackStartedTheGame = false
 }
