@@ -33,11 +33,6 @@ class ExerciseChooserActivity : AppCompatActivity() {
 
     }
 
-    override fun onStart() {
-        super.onStart()
-        EngineInteraction.initStockfishProcess()
-    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_exercise_chooser, menu)
         return true
@@ -52,11 +47,6 @@ class ExerciseChooserActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
-    }
-
-    override fun onStop() {
-        EngineInteraction.closeProcess()
-        super.onStop()
     }
 
 }

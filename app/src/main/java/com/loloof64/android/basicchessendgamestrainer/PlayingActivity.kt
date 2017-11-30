@@ -85,6 +85,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         fab_reverse_board.setOnClickListener { reverseBoard() }
         fab_new_exercise.setOnClickListener { newExercise() }
 
+        EngineInteraction.initStockfishProcessIfNotDoneYet()
+
         generatorIndex = intent.extras?.getInt(generatorIndexKey) ?: 0
         val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
         if (generatedPosition.isNotEmpty()) {
@@ -264,6 +266,16 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 })
                 .setNegativeButton(R.string.no, null)
                 .show()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EngineInteraction.initStockfishProcessIfNotDoneYet()
+    }
+
+    override fun onStop() {
+        EngineInteraction.closeStockfishProcess()
+        super.onStop()
     }
 
     private var lastExercise:String? = null

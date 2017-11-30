@@ -161,6 +161,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
         val notPlayerTurn = _playerHasWhite != whiteTurn
         if (notPlayerTurn || _gameFinished) return true
 
+        _waitingForPlayerGoal = false
+
         val x = event.x
         val y = event.y
         val action = event.action
@@ -217,8 +219,6 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                     }
                     _highlightedStartCell = null
                     _highlightedTargetCell = null
-
-                    performClick()
                 }
                 MotionEvent.ACTION_DOWN -> {
                     val movedPiece = _relatedPosition.getPiece(buildSquare(file = file, rank = rank))

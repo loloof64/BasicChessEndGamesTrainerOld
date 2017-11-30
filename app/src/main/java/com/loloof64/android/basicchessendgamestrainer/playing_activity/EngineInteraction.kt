@@ -1,13 +1,12 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import com.github.bhlangonijr.chesslib.move.Move
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.buildSquare
-import java.io.File
-import java.io.FileOutputStream
-import java.io.PrintWriter
-import java.util.*
+import java.io.*
 
 fun String.asMove(): Move {
     fun Char.toFile() = this.toInt() - 'a'.toInt()
@@ -19,25 +18,57 @@ fun String.asMove(): Move {
     )
 }
 
+fun runOnUI(block : () -> Unit){
+    Handler(Looper.getMainLooper()).post(block)
+}
+
+class ProcessCommunicator(process: Process) : Runnable {
+
+    override fun run(){
+        while(!mustStop) {
+            val line = processInput.readLine()
+            if (line != null) EngineInteraction.processOutput(line)
+        }
+    }
+
+    fun sendCommand(command: String){
+        processWriter.println(command)
+        processWriter.flush()
+    }
+
+    fun stop(){
+        mustStop = true
+        processWriter.close()
+        processInput.close()
+    }
+
+    private var mustStop = false
+    private val processWriter: PrintWriter = PrintWriter(process.outputStream)
+    private val processInput: BufferedReader = BufferedReader(InputStreamReader(process.inputStream))
+}
+
 object EngineInteraction {
 
-    private fun sendOutput(outputString: String) {
+    fun processOutput(outputString: String) {
         val bestMoveLineRegex = Regex("""^bestmove ([a-h][1-8][a-h][1-8])""")
         val scoreRegex = Regex("""score (cp|mate) (\d+)""")
         if (scoreRegex.containsMatchIn(outputString)) {
                 val scoreMatcher = scoreRegex.find(outputString)
                 val scoreType = scoreMatcher?.groups?.get(1)?.value
                 val scoreValue = scoreMatcher?.groups?.get(2)?.value
-                when (scoreType){
-                    "cp" -> uciObserver.consumeScore(Integer.parseInt(scoreValue))
-                    "mate" -> uciObserver.consumeScore(MIN_MATE_SCORE)
+                runOnUI{
+                    when (scoreType){
+                        "cp" -> uciObserver.consumeScore(Integer.parseInt(scoreValue))
+                        "mate" -> uciObserver.consumeScore(MIN_MATE_SCORE)
+                    }
                 }
         }
         else if (bestMoveLineRegex.containsMatchIn(outputString)) {
                 val moveStr = bestMoveLineRegex.find(outputString)?.groups?.get(1)?.value
-                uciObserver.consumeMove(moveStr!!.asMove())
+                runOnUI { uciObserver.consumeMove(moveStr!!.asMove()) }
         }
         else {
+            println("Unrecognized uci output '$outputString'")
         }
     }
 
@@ -67,8 +98,8 @@ object EngineInteraction {
         Runtime.getRuntime().exec("/system/bin/chmod 744 $localStockfishPath")
     }
 
-    private lateinit var processWriter: PrintWriter
     private lateinit var uciObserver: SimpleUciObserver
+    private lateinit var processCommunicator: ProcessCommunicator
 
     private val stockfishName by lazy {
         @Suppress("DEPRECATION")
@@ -90,18 +121,15 @@ object EngineInteraction {
         this.uciObserver = observer
     }
 
-    fun initStockfishProcess() : Boolean {
+    fun initStockfishProcessIfNotDoneYet() : Boolean {
         if (copyingThread.isAlive) return false
         val process = ProcessBuilder(localStockfishPath).start()
-        val processInput = Scanner(process.inputStream)
-        processWriter = PrintWriter(process.outputStream)
+        processCommunicator = ProcessCommunicator(process)
+        Thread(processCommunicator).apply {
+            isDaemon = true
+            start()
+        }
 
-        Thread {
-            while(processInput.hasNextLine()) {
-                val line = processInput.nextLine()
-                sendOutput(line)
-            }
-        }.start()
         return true
     }
 
@@ -114,12 +142,11 @@ object EngineInteraction {
     operator fun Regex.contains(text: CharSequence): Boolean = this.matches(text)
 
     private fun sendCommandToStockfishProcess(command: String){
-        processWriter.println(command)
-        processWriter.flush()
+        processCommunicator.sendCommand(command)
     }
 
-    fun closeProcess(){
-        processWriter.close()
+    fun closeStockfishProcess(){
+        processCommunicator.stop()
     }
 
 
