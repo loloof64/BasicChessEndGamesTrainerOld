@@ -1,6 +1,7 @@
 package com.loloof64.android.basicchessendgamestrainer.playing_activity
 
 import android.content.Context
+import android.graphics.Typeface
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -31,6 +32,8 @@ class MovesListAdapter(private val weakRefContext: WeakReference<Context>, priva
         val layout = LayoutInflater.from(parent?.context).inflate(
                 R.layout.playing_activity_moves_list_single_item, parent, false) as LinearLayout
         val txtView = layout.findViewById<TextView>(R.id.moves_list_view_item)
+        val font = Typeface.createFromAsset(MyApplication.appContext.assets, "FreeSerif.ttf")
+        txtView.typeface = font
 
         layout.removeView(txtView)
         return ViewHolder(txtView)
