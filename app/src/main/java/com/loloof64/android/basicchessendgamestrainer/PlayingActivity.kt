@@ -14,7 +14,7 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import com.github.bhlangonijr.chesslib.PieceType
+import com.github.bhlangonijr.chesslib.Piece
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerator
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
@@ -61,7 +61,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
 
-    override fun reactToPromotionPieceSelection(piece: PieceType) {
+    override fun reactToPromotionPieceSelection(piece: Piece) {
         playingBoard.validatePromotionMove(piece)
         playingBoard.checkIfGameFinished()
         if (!playingBoard.gameFinished()) playingBoard.makeComputerPlay()

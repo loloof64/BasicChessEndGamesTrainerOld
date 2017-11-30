@@ -3,7 +3,10 @@ package com.loloof64.android.basicchessendgamestrainer.playing_activity
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
-import com.github.bhlangonijr.chesslib.*
+import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.Piece
+import com.github.bhlangonijr.chesslib.Side
+import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import com.github.bhlangonijr.chesslib.move.MoveGenerator
 import com.github.bhlangonijr.chesslib.move.MoveList
@@ -30,7 +33,7 @@ data class PromotionInfo(val startFile: Int, val startRank: Int,
 
 class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSet?,
                              defStyleAttr: Int) : BoardComponent(context, attrs, defStyleAttr),
-                                                    SimpleUciObserver {
+                                                    SimpleUciObserver{
 
     fun isDrawByRepetitions():Boolean {
         val historySize = _relatedPosition.history.size
@@ -382,7 +385,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
         _startedToWriteMoves = true
     }
 
-    fun validatePromotionMove(promotedPieceType: PieceType) {
+    fun validatePromotionMove(givenPromotionPiece: Piece) {
         when(_pendingPromotionInfo) {
             null -> {}
             else -> {
@@ -395,12 +398,11 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                 val matchingMoves = legalMovesList.filter { currentMove ->
                     val currentMoveStartSquare = currentMove.from
                     val currentMoveEndSquare = currentMove.to
-                    val promotionPiece = currentMove.promotion
+                    val matchingMovePromotionPiece = currentMove.promotion
 
                     currentMoveStartSquare == startSquare
                     && currentMoveEndSquare == endSquare
-                    && promotionPiece != Piece.NONE
-                    && promotionPiece == promotedPieceType
+                    && matchingMovePromotionPiece == givenPromotionPiece
                 }
                 if (matchingMoves.isEmpty()) Logger.getLogger("BasicChessEndgamesTrainer").severe("Illegal move ! (When validating promotion)")
                 else {

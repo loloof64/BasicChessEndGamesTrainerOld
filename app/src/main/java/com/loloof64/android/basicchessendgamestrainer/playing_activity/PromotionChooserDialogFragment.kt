@@ -8,7 +8,7 @@ import android.support.v7.app.AlertDialog.Builder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import com.github.bhlangonijr.chesslib.PieceType
+import com.github.bhlangonijr.chesslib.Piece
 import com.loloof64.android.basicchessendgamestrainer.R
 import java.lang.ref.WeakReference
 
@@ -28,7 +28,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         }
 
         interface Listener {
-            fun reactToPromotionPieceSelection(piece: PieceType)
+            fun reactToPromotionPieceSelection(piece: Piece)
         }
     }
 
@@ -62,6 +62,15 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         promotionChooserBishopButton.setImageResource(if (whiteToPlay) R.drawable.chess_bl else R.drawable.chess_bd)
         promotionChooserKnightButton.setImageResource(if (whiteToPlay) R.drawable.chess_nl else R.drawable.chess_nd)
 
+        queenPromotionListener = PromotionButtonOnClickListener(listener as Listener,
+                if (whiteToPlay) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN)
+        rookPromotionListener = PromotionButtonOnClickListener(listener as Listener,
+                if (whiteToPlay) Piece.WHITE_ROOK else Piece.BLACK_ROOK)
+        bishopPromotionListener = PromotionButtonOnClickListener(listener as Listener,
+                if (whiteToPlay) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP)
+        knightPromotionListener = PromotionButtonOnClickListener(listener as Listener,
+                if (whiteToPlay) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT)
+
         promotionChooserQueenButton.setOnClickListener(queenPromotionListener)
         promotionChooserRookButton.setOnClickListener(rookPromotionListener)
         promotionChooserBishopButton.setOnClickListener(bishopPromotionListener)
@@ -80,10 +89,6 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         when(context) {
             is Listener -> {
                 listener = context
-                queenPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.QUEEN)
-                rookPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.ROOK)
-                bishopPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.BISHOP)
-                knightPromotionListener = PromotionButtonOnClickListener(listener as Listener, PieceType.KNIGHT)
             }
             else -> throw IllegalArgumentException("Context must use PromotionPieceChooseDialogFragment.Listener trait !")
         }
@@ -92,7 +97,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
 }
 
 class PromotionButtonOnClickListener(listener: PromotionPieceChooserDialogFragment.Companion.Listener,
-                                     val promotionPiece: PieceType) : View.OnClickListener {
+                                     val promotionPiece: Piece) : View.OnClickListener {
 
     override fun onClick(relatedView: View?) {
         refListener.get()?.reactToPromotionPieceSelection(promotionPiece)
