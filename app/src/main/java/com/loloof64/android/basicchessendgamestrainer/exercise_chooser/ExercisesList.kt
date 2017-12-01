@@ -4,51 +4,51 @@ import com.loloof64.android.basicchessendgamestrainer.R
 
 val KRRvK = positionGenerator {
     computerKing {
-            location.file in BoardCoordinate.FILE_C..BoardCoordinate.FILE_F
-                    && location.rank in BoardCoordinate.RANK_3..BoardCoordinate.RANK_6
+            file in FileC..FileF
+            && rank in Rank3..Rank6
     }
 
     otherPiecesCount {
-        add(PieceType.rook belongingTo Side.player inCount 2)
+        add(Rook belongingTo Player inCount 2)
     }
 }
 
 val KQvK = positionGenerator {
     computerKing {
-            location.file in BoardCoordinate.FILE_C..BoardCoordinate.FILE_F
-                    && location.rank in BoardCoordinate.RANK_3..BoardCoordinate.RANK_6
+            file in FileC..FileF
+            && rank in Rank3..Rank6
     }
 
     otherPiecesCount {
-        add(PieceType.queen belongingTo Side.player inCount 1)
+        add(Queen belongingTo Player inCount 1)
     }
 }
 
 val KRvK = positionGenerator {
     computerKing {
-            location.file in BoardCoordinate.FILE_C..BoardCoordinate.FILE_F
-                    && location.rank in BoardCoordinate.RANK_3..BoardCoordinate.RANK_6
+            file in FileC..FileF
+            && rank in Rank3..Rank6
     }
 
     otherPiecesCount {
-        add(PieceType.rook belongingTo Side.player inCount 1)
+        add(Rook belongingTo Player inCount 1)
     }
 }
 
 val KBBvK = positionGenerator {
     computerKing {
-            location.file in BoardCoordinate.FILE_C..BoardCoordinate.FILE_F
-                    && location.rank in BoardCoordinate.RANK_3..BoardCoordinate.RANK_6
+            file in FileC..FileF
+            && rank in Rank3..Rank6
     }
 
     otherPiecesCount {
-        add(PieceType.bishop belongingTo Side.player inCount 2)
+        add(Bishop belongingTo Player inCount 2)
     }
 
     otherPiecesMutualConstraint {
-        add(pieceKind = PieceType.bishop belongingTo Side.player) {
-            val firstSquareIsBlack = (firstPieceLocation.file + firstPieceLocation.rank) % 2 > 0
-            val secondSquareIsBlack = (secondPieceLocation.file + secondPieceLocation.rank) % 2 > 0
+        set(Bishop belongingTo Player) {
+            val firstSquareIsBlack = (firstPieceFile + firstPieceRank) % 2 > 0
+            val secondSquareIsBlack = (secondPieceFile + secondPieceRank) % 2 > 0
             firstSquareIsBlack != secondSquareIsBlack
         }
     }
@@ -56,97 +56,97 @@ val KBBvK = positionGenerator {
 
 val KPvK_I = positionGenerator {
         playerKing {
-                location.rank == (if (playerHasWhite) BoardCoordinate.RANK_6 else BoardCoordinate.RANK_3)
-                        && location.file in BoardCoordinate.FILE_B..BoardCoordinate.FILE_G
+                rank == (if (playerHasWhite) Rank6 else Rank3)
+                && file in FileB..FileG
         }
 
         computerKing {
-                location.rank == if (playerHasWhite) BoardCoordinate.RANK_8 else BoardCoordinate.RANK_1
+                rank == if (playerHasWhite) Rank8 else Rank1
         }
 
         kingsMutualConstraint {
-            playerKingCoordinate.file == computerKingCoordinate.file
+            playerKingFile == computerKingFile
         }
 
         otherPiecesCount {
-            add(PieceType.pawn belongingTo Side.player inCount 1)
+            add(Pawn belongingTo Player inCount 1)
         }
 
         otherPiecesGlobalConstraint {
-            add(pieceKind = PieceType.pawn belongingTo Side.player) {
-                (location.rank == if (playerHasWhite) BoardCoordinate.RANK_5 else BoardCoordinate.RANK_4)
-                && (location.file == playerKingLocation.file)
+            set(Pawn belongingTo Player) {
+                (rank == if (playerHasWhite) Rank5 else Rank4)
+                && (file == playerKingFile)
             }
         }
 }
 
 val KPvK_II = positionGenerator {
     playerKing {
-            location.rank == if (playerHasWhite) BoardCoordinate.RANK_1 else BoardCoordinate.RANK_8
+            rank == if (playerHasWhite) Rank1 else Rank8
     }
 
     computerKing {
-            location.rank == if (playerHasWhite) BoardCoordinate.RANK_4 else BoardCoordinate.RANK_5
+            rank == if (playerHasWhite) Rank4 else Rank5
     }
 
     kingsMutualConstraint {
-        Math.abs(playerKingCoordinate.file - computerKingCoordinate.file) <= 1
+        Math.abs(playerKingFile - computerKingFile) <= 1
     }
 
     otherPiecesCount {
-        add(PieceType.pawn belongingTo Side.computer inCount 1)
+        add(Pawn belongingTo Computer inCount 1)
     }
 
     otherPiecesGlobalConstraint {
-        add(pieceKind = PieceType.pawn belongingTo Side.computer) {
-            (location.rank in if (playerHasWhite) BoardCoordinate.RANK_3..BoardCoordinate.RANK_5 else BoardCoordinate.RANK_4..BoardCoordinate.RANK_6)
-            && (location.file == playerKingLocation.file)
+        set(Pawn belongingTo Computer) {
+            (rank in if (playerHasWhite) Rank3..Rank5 else Rank4..Rank6)
+            && (file == playerKingFile)
         }
     }
 }
 
 val KPPPvKPPP = positionGenerator {
     playerKing {
-            location.rank == (if (playerHasWhite) BoardCoordinate.RANK_1 else BoardCoordinate.RANK_8)
+            rank == (if (playerHasWhite) Rank1 else Rank8)
     }
 
     computerKing {
-            location.rank == (if (playerHasWhite) BoardCoordinate.RANK_1 else BoardCoordinate.RANK_8)
+            rank == (if (playerHasWhite) Rank1 else Rank8)
     }
 
     otherPiecesCount {
-        add(PieceType.pawn belongingTo Side.player inCount 3)
-        add(PieceType.pawn belongingTo Side.computer inCount 3)
+        add(Pawn belongingTo Player inCount 3)
+        add(Pawn belongingTo Computer inCount 3)
     }
 
     otherPiecesGlobalConstraint {
-        add(pieceKind = PieceType.pawn belongingTo Side.player){
-            location.rank == if (playerHasWhite) BoardCoordinate.RANK_5 else BoardCoordinate.RANK_4
+        set(Pawn belongingTo Player){
+            rank == if (playerHasWhite) Rank5 else Rank4
         }
-        add(pieceKind = PieceType.pawn belongingTo Side.computer){
-            location.rank == if (playerHasWhite) BoardCoordinate.RANK_7 else BoardCoordinate.RANK_2
+        set(Pawn belongingTo Computer){
+            rank == if (playerHasWhite) Rank7 else Rank2
         }
     }
 
     otherPiecesIndexedConstraint {
-        add(pieceKind = PieceType.pawn belongingTo Side.player){
-            location.file == apparitionIndex
+        set(Pawn belongingTo Player){
+            file == apparitionIndex
         }
-        add(pieceKind = PieceType.pawn belongingTo Side.computer){
-            location.file == apparitionIndex
+        set(Pawn belongingTo Computer){
+            file == apparitionIndex
         }
     }
 }
 
 val KNBvK = positionGenerator {
     computerKing {
-        location.file in (BoardCoordinate.FILE_C .. BoardCoordinate.FILE_F)
-        && location.rank in (BoardCoordinate.RANK_3 .. BoardCoordinate.RANK_6)
+        file in FileC..FileF
+        && rank in Rank3..Rank6
     }
 
     otherPiecesCount {
-        add(PieceType.knight belongingTo Side.player inCount 1)
-        add(PieceType.bishop belongingTo Side.player inCount 1)
+        add(Knight belongingTo Player inCount 1)
+        add(Bishop belongingTo Player inCount 1)
     }
 }
 

@@ -45,12 +45,16 @@ class PositionGenerator(private val constraints : PositionConstraints) {
         return _position.fen
     }
 
-    private var playerKingCoords = BoardCoordinate(-1,-1)
-    private var oppositeKingCoords = BoardCoordinate(-1,-1)
+    private var playerKingFile = -1
+    private var playerKingRank = -1
+    private var oppositeKingFile = -1
+    private var oppositeKingRank = -1
 
     private fun placeKings(playerHasWhite: Boolean){
-        playerKingCoords = BoardCoordinate(-1,-1)
-        oppositeKingCoords = BoardCoordinate(-1,-1)
+        playerKingFile = -1
+        playerKingRank = -1
+        oppositeKingFile = -1
+        oppositeKingRank = -1
         var loopSuccess = false
         for (iters in 0..maxLoopsIterations){ // setting up player king
             val kingFile = _random.nextInt(8)
@@ -61,9 +65,10 @@ class PositionGenerator(private val constraints : PositionConstraints) {
             tempPosition.setPiece(if (playerHasWhite) Piece.WHITE_KING else Piece.BLACK_KING,
                     Square.encode(Rank.values()[kingRank], File.values()[kingFile]))
 
-            if (constraints.checkPlayerKingConstraint(BoardCoordinate(kingFile, kingRank), playerHasWhite)) {
+            if (constraints.checkPlayerKingConstraint(kingFile, kingRank, playerHasWhite)) {
                 _position.loadFromFEN(tempPosition.fen)
-                playerKingCoords = BoardCoordinate(file = kingFile, rank = kingRank)
+                playerKingFile = kingFile
+                playerKingRank = kingRank
                 loopSuccess = true
                 break
             }
@@ -86,13 +91,14 @@ class PositionGenerator(private val constraints : PositionConstraints) {
             tempPosition.sideToMove = if (playerHasWhite) LibSide.WHITE else LibSide.BLACK
             if (enemyKingInChess) continue
 
-            if (constraints.checkComputerKingConstraint(BoardCoordinate(kingFile, kingRank), playerHasWhite)
+            if (constraints.checkComputerKingConstraint(kingFile, kingRank, playerHasWhite)
                     && constraints.checkKingsMutualConstraint(
-                    playerKingCoords,
-                    BoardCoordinate(file = kingFile, rank = kingRank),
+                    playerKingFile, playerKingRank,
+                    kingFile, kingRank,
                     playerHasWhite
             )) {
-                oppositeKingCoords = BoardCoordinate(kingFile, kingRank)
+                oppositeKingFile = kingFile
+                oppositeKingRank = kingRank
                 _position.loadFromFEN(tempPosition.fen)
                 loopSuccess = true
                 break
@@ -104,13 +110,13 @@ class PositionGenerator(private val constraints : PositionConstraints) {
     private fun placeOtherPieces(playerHasWhite: Boolean){
         constraints.otherPiecesCountsConstraint.forEach { (kind, count) ->
 
-            val savedCoordinates = arrayListOf<BoardCoordinate>()
+            val savedCoordinates = arrayListOf<Pair<Int, Int>>()
             count.loops { index ->
                 var loopSuccess = false
                 for (loopIter in 0..maxLoopsIterations) {
                     val pieceFile = _random.nextInt(8)
                     val pieceRank = _random.nextInt(8)
-                    val currentPieceCoordinate = BoardCoordinate(pieceFile, pieceRank)
+                    val currentPieceCoordinate = pieceFile to pieceRank
 
                     val tempPosition = Board()
                     tempPosition.loadFromFEN(_position.fen)
@@ -127,15 +133,18 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                     if (enemyKingInChess) continue
 
                     // If for any previous piece of same kind, mutual constraint is not respected, will go into another try
-                    if (savedCoordinates.any { !constraints.checkOtherPieceMutualConstraint(kind, it, currentPieceCoordinate, playerHasWhite) }) continue
+                    if (savedCoordinates.any { !constraints.checkOtherPieceMutualConstraint(kind, it.first, it.second,
+                            currentPieceCoordinate.first, currentPieceCoordinate.second, playerHasWhite) }) continue
 
                     if (!constraints.checkOtherPieceIndexedConstraint(kind, index,
-                            BoardCoordinate(pieceFile, pieceRank),
+                            pieceFile, pieceRank,
                             playerHasWhite)) continue
 
-                    if (constraints.checkOtherPieceGlobalConstraint(kind, currentPieceCoordinate, playerHasWhite, playerKingCoords, oppositeKingCoords)){
+                    if (constraints.checkOtherPieceGlobalConstraint(kind, currentPieceCoordinate.first,
+                            currentPieceCoordinate.second, playerHasWhite, playerKingFile, playerKingRank,
+                            oppositeKingFile, oppositeKingRank)){
                         _position.loadFromFEN(tempPosition.fen)
-                        savedCoordinates += BoardCoordinate(pieceFile, pieceRank)
+                        savedCoordinates += pieceFile to pieceRank
                         loopSuccess = true
                         break
                     }

@@ -13,41 +13,70 @@ class PositionConstraints {
     private var otherPiecesMutualConstraintInstance = OtherPiecesMutualConstraint()
     private var otherPiecesIndexedConstraintInstance = OtherPiecesIndexedConstraint()
 
-    fun checkPlayerKingConstraint(kingLocation: BoardCoordinate, playerHasWhite: Boolean): Boolean {
-        return SingleKingConstraint(kingLocation, playerHasWhite).playerKingIndividualConstraintInstance()
+    val FileA = 0
+    val FileB = 1
+    val FileC = 2
+    val FileD = 3
+    val FileE = 4
+    val FileF = 5
+    val FileG = 6
+    val FileH = 7
+
+    val Rank1 = 0
+    val Rank2 = 1
+    val Rank3 = 2
+    val Rank4 = 3
+    val Rank5 = 4
+    val Rank6 = 5
+    val Rank7 = 6
+    val Rank8 = 7
+
+    val Pawn = PieceType.pawn
+    val Knight = PieceType.knight
+    val Bishop = PieceType.bishop
+    val Rook = PieceType.rook
+    val Queen = PieceType.queen
+    val King = PieceType.king
+
+    val Player = Side.player
+    val Computer = Side.computer
+
+    fun checkPlayerKingConstraint(file: Int, rank: Int, playerHasWhite: Boolean): Boolean {
+        return SingleKingConstraint(file, rank, playerHasWhite).playerKingIndividualConstraintInstance()
     }
 
-    fun checkComputerKingConstraint(kingLocation: BoardCoordinate, playerHasWhite: Boolean) : Boolean {
-        return SingleKingConstraint(kingLocation, playerHasWhite).computerKingIndividualConstraintInstance()
+    fun checkComputerKingConstraint(file: Int, rank: Int, playerHasWhite: Boolean) : Boolean {
+        return SingleKingConstraint(file, rank, playerHasWhite).computerKingIndividualConstraintInstance()
     }
 
-    fun checkKingsMutualConstraint(playerKingLocation: BoardCoordinate, computerKingLocation: BoardCoordinate, playerHasWhite: Boolean) : Boolean {
-        return KingsMutualConstraint(playerKingLocation, computerKingLocation, playerHasWhite).kingsMutualConstraintInstance()
+    fun checkKingsMutualConstraint(playerKingFile: Int, playerKingRank: Int,
+                                   computerKingFile: Int, computerKingRank: Int, playerHasWhite: Boolean) : Boolean {
+        return KingsMutualConstraint(playerKingFile, playerKingRank, computerKingFile, computerKingRank, playerHasWhite).kingsMutualConstraintInstance()
     }
 
     val otherPiecesCountsConstraint : Iterator<PieceKindCount>
         get() = otherPiecesCountConstraintInstance.iterator()
 
     fun checkOtherPieceGlobalConstraint(pieceKind: PieceKind,
-                                        location: BoardCoordinate,
+                                        file: Int, rank: Int,
                                         playerHasWhite: Boolean,
-                                        playerKingLocation : BoardCoordinate,
-                                        computerKingLocation: BoardCoordinate) : Boolean {
-        return otherPiecesGlobalConstraintInstance(location, playerHasWhite, playerKingLocation, computerKingLocation).checkConstraint(pieceKind)
+                                        playerKingFile : Int, playerKingRank: Int,
+                                        computerKingFile: Int, computerKingRank: Int) : Boolean {
+        return otherPiecesGlobalConstraintInstance(file, rank, playerHasWhite, playerKingFile, playerKingRank, computerKingFile, computerKingRank).checkConstraint(pieceKind)
     }
 
     fun checkOtherPieceMutualConstraint(pieceKind: PieceKind,
-                                        firstPieceLocation: BoardCoordinate,
-                                        secondPieceLocation: BoardCoordinate,
+                                        firstPieceFile: Int, firstPieceRank: Int,
+                                        secondPieceFile: Int, secondPieceRank: Int,
                                         playerHasWhite: Boolean) : Boolean {
-        return otherPiecesMutualConstraintInstance(firstPieceLocation, secondPieceLocation, playerHasWhite).checkConstraint(pieceKind)
+        return otherPiecesMutualConstraintInstance(firstPieceFile, firstPieceRank, secondPieceFile, secondPieceRank, playerHasWhite).checkConstraint(pieceKind)
     }
 
     fun checkOtherPieceIndexedConstraint(pieceKind: PieceKind,
                                          apparitionIndex: Int,
-                                         location: BoardCoordinate,
+                                         file: Int, rank: Int,
                                          playerHasWhite: Boolean) : Boolean {
-        return otherPiecesIndexedConstraintInstance(apparitionIndex, location, playerHasWhite).checkConstraint(pieceKind)
+        return otherPiecesIndexedConstraintInstance(apparitionIndex, file, rank, playerHasWhite).checkConstraint(pieceKind)
     }
 
     fun playerKing(constraint: SingleKingConstraint.() -> Boolean) {
@@ -85,8 +114,8 @@ class PositionConstraints {
  * Constraint between both kings
  */
 @Suppress("UNUSED")
-class KingsMutualConstraint(val playerKingCoordinate: BoardCoordinate,
-                            val computerKingCoordinate: BoardCoordinate,
+class KingsMutualConstraint(val playerKingFile: Int, val playerKingRank: Int,
+                            val computerKingFile: Int, val computerKingRank: Int,
                             val playerHasWhite: Boolean)
 
 /**
@@ -109,30 +138,43 @@ class OtherPiecesCountConstraints {
 class OtherPiecesGlobalConstraint {
     private var allConstraints: MutableMap<PieceKind, OtherPiecesGlobalConstraint.() -> Boolean> = mutableMapOf()
 
-    var location: BoardCoordinate = BoardCoordinate(file = 0, rank = 0)
+    var file:Int = 0
+        private set
+
+    var rank:Int = 0
         private set
 
     var playerHasWhite: Boolean = true
         private set
 
-    var playerKingLocation: BoardCoordinate = BoardCoordinate(file = 0, rank = 0)
+    var playerKingFile: Int = 0
         private set
 
-    var computerKingLocation : BoardCoordinate = BoardCoordinate(file = 0, rank = 0)
+    var playerKingRank: Int = 0
+        private set
 
-    operator fun invoke(location: BoardCoordinate,
+    var computerKingFile : Int = 0
+        private set
+
+    var computerKingRank : Int = 0
+        private set
+
+    operator fun invoke(file: Int, rank: Int,
                         playerHasWhite: Boolean,
-                        playerKingLocation : BoardCoordinate,
-                        computerKingLocation: BoardCoordinate) : OtherPiecesGlobalConstraint {
-        this.location = location
+                        playerKingFile: Int, playerKingRank: Int,
+                        computerKingFile: Int, computerKingRank: Int) : OtherPiecesGlobalConstraint {
+        this.file = file
+        this.rank = rank
         this.playerHasWhite = playerHasWhite
-        this.playerKingLocation = playerKingLocation
-        this.computerKingLocation = computerKingLocation
+        this.playerKingFile = playerKingFile
+        this.playerKingRank = playerKingRank
+        this.computerKingFile = computerKingFile
+        this.computerKingRank = computerKingRank
 
         return this
     }
 
-    fun add(pieceKind: PieceKind, constraint: OtherPiecesGlobalConstraint.() -> Boolean){
+    fun set(pieceKind: PieceKind, constraint: OtherPiecesGlobalConstraint.() -> Boolean){
         allConstraints.put(pieceKind, constraint)
     }
 
@@ -149,24 +191,32 @@ class OtherPiecesGlobalConstraint {
 class OtherPiecesMutualConstraint {
     private var allConstraints: MutableMap<PieceKind, OtherPiecesMutualConstraint.() -> Boolean> = mutableMapOf()
 
-    var firstPieceLocation: BoardCoordinate = BoardCoordinate(file = 0, rank = 0)
+    var firstPieceFile: Int = 0
         private set
 
-    var secondPieceLocation: BoardCoordinate = BoardCoordinate(file = 0, rank = 0)
+    var firstPieceRank: Int = 0
+        private set
+
+    var secondPieceFile: Int = 0
+        private set
+
+    var secondPieceRank: Int = 0
         private set
 
     var playerHasWhite : Boolean = true
         private set
 
-    fun add(pieceKind: PieceKind, constraint: OtherPiecesMutualConstraint.() -> Boolean){
+    fun set(pieceKind: PieceKind, constraint: OtherPiecesMutualConstraint.() -> Boolean){
         allConstraints.put(pieceKind, constraint)
     }
 
-    operator fun invoke(firstPieceLocation: BoardCoordinate,
-               secondPieceLocation: BoardCoordinate,
+    operator fun invoke(firstPieceFile: Int, firstPieceRank: Int,
+               secondPieceFile: Int, secondPieceRank: Int,
                playerHasWhite: Boolean) : OtherPiecesMutualConstraint {
-        this.firstPieceLocation = firstPieceLocation
-        this.secondPieceLocation = secondPieceLocation
+        this.firstPieceFile = firstPieceFile
+        this.firstPieceRank = firstPieceRank
+        this.secondPieceFile = secondPieceFile
+        this.secondPieceRank = secondPieceRank
         this.playerHasWhite = playerHasWhite
         return this
     }
@@ -187,21 +237,25 @@ class OtherPiecesIndexedConstraint {
     var apparitionIndex:Int = 0
         private set
 
-    var location: BoardCoordinate = BoardCoordinate(file = 0, rank = 0)
+    var file:Int = 0
+        private set
+
+    var rank:Int = 0
         private set
 
     var playerHasWhite: Boolean = true
         private set
 
-    fun add(pieceKind: PieceKind, constraint: OtherPiecesIndexedConstraint.() -> Boolean){
+    fun set(pieceKind: PieceKind, constraint: OtherPiecesIndexedConstraint.() -> Boolean){
         allConstraints.put(pieceKind, constraint)
     }
 
     operator fun invoke(apparitionIndex: Int,
-                        location: BoardCoordinate,
+                        file: Int, rank: Int,
                         playerHasWhite: Boolean) : OtherPiecesIndexedConstraint {
         this.apparitionIndex = apparitionIndex
-        this.location = location
+        this.file = file
+        this.rank = rank
         this.playerHasWhite = playerHasWhite
         return this
     }
@@ -215,18 +269,18 @@ class OtherPiecesIndexedConstraint {
 
 @Suppress("UNUSED")
 class IndexedConstraint(val apparitionIndex: Int,
-                        val location: BoardCoordinate,
+                        val file: Int, val rank: Int,
                         val playerHasWhite: Boolean)
 
 /*
  Individual king global constraint
  */
-data class SingleKingConstraint(val location: BoardCoordinate,
+data class SingleKingConstraint(val file: Int, val rank: Int,
                                 val playerHasWhite: Boolean)
 
 @Suppress("UNUSED")
-class MutualConstraint(val firstPieceLocation: BoardCoordinate,
-                       val secondPieceLocation: BoardCoordinate,
+class MutualConstraint(val firstPieceFile: Int, firstPieceRank: Int,
+                       val secondPieceFile: Int, val secondPieceRank: Int,
                        val playerHasWhite: Boolean)
 
 enum class PieceType {
@@ -240,28 +294,6 @@ enum class Side {
 data class PieceKind(val pieceType: PieceType, val side: Side)
 data class PieceKindCount(val pieceKind: PieceKind, val count: Int)
 
-@Suppress("UNUSED")
-data class BoardCoordinate(val file: Int, val rank: Int) {
-    companion object {
-        val FILE_A = 0
-        val FILE_B = 1
-        val FILE_C = 2
-        val FILE_D = 3
-        val FILE_E = 4
-        val FILE_F = 5
-        val FILE_G = 6
-        val FILE_H = 7
-
-        val RANK_1 = 0
-        val RANK_2 = 1
-        val RANK_3 = 2
-        val RANK_4 = 3
-        val RANK_5 = 4
-        val RANK_6 = 5
-        val RANK_7 = 6
-        val RANK_8 = 7
-    }
-}
 
 @Suppress("UNUSED")
 infix fun PieceType.belongingTo(owner: Side) = PieceKind(pieceType = this, side = owner)

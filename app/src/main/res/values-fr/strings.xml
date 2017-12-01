@@ -60,7 +60,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
 [TAB]Les fichiers du projet sont disponibles à l\'adresse https://goo.gl/KDKig0.[CR][CR]
 
 
-[TAB]Developpée par Laurent Bernabé en 2017. Ce projet utilise le moteur d\'échecs stockfish 8,
+[TAB]Developpée par Laurent Bernabé en 2017. Ce projet utilise une version adaptée moteur d\'échecs stockfish 8(https://goo.gl/ABv2wS),
         une version forkée par Laurent Bernabé de chessLib (https://github.com/loloof64/chesslib),
         la fonte FreeSerif ttf (https://fr.fonts2u.com/free-serif.police)
         et des images provenant du site Wikimedia Commons (https://goo.gl/DPdkMw).
