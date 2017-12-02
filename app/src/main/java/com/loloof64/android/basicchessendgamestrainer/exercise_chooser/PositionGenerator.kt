@@ -28,6 +28,35 @@ fun pieceKindToPiece(kind: PieceKind, whitePiece: Boolean): Piece =
 
 class PositionGenerator(private val constraints : PositionConstraints) {
 
+    private data class BoardCoordinate(val file: Int, val rank : Int){
+        init {
+            require(file in (0 until 8))
+            require(rank in (0 until 8))
+        }
+    }
+
+    private fun generateCell() = BoardCoordinate(
+            file = _random.nextInt(8),
+            rank = _random.nextInt(8)
+    )
+
+    private fun buildPositionOrNullIfCellAlreadyOccupied(startFen: String, pieceToAdd: Piece, pieceCell: Square): Board? {
+        val builtPosition = Board()
+        builtPosition.loadFromFEN(startFen)
+
+        val wantedCellOccupied = builtPosition.getPiece(pieceCell) != Piece.NONE
+        if (wantedCellOccupied) return null
+
+        builtPosition.setPiece(pieceToAdd, pieceCell)
+        return builtPosition
+    }
+
+    private fun enemyKingInChessFor(position: Board, playerHasWhite: Boolean) : Boolean =
+        Board().apply {
+            loadFromFEN(position.fen)
+            sideToMove = if (playerHasWhite) LibSide.BLACK else LibSide.WHITE
+        }.isKingAttacked
+
     fun generatePosition(playerHasWhite: Boolean = true): String {
         _position.loadFromFEN( "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1")
         _position.halfMoveCounter = 0
@@ -45,30 +74,27 @@ class PositionGenerator(private val constraints : PositionConstraints) {
         return _position.fen
     }
 
-    private var playerKingFile = -1
-    private var playerKingRank = -1
-    private var oppositeKingFile = -1
-    private var oppositeKingRank = -1
+    private var playerKingCell = BoardCoordinate(file = 0, rank = 0)
+    private var oppositeKingCell = BoardCoordinate(file = 0, rank = 0)
 
     private fun placeKings(playerHasWhite: Boolean){
-        playerKingFile = -1
-        playerKingRank = -1
-        oppositeKingFile = -1
-        oppositeKingRank = -1
         var loopSuccess = false
         for (iters in 0..maxLoopsIterations){ // setting up player king
-            val kingFile = _random.nextInt(8)
-            val kingRank = _random.nextInt(8)
 
-            val tempPosition = Board()
-            tempPosition.loadFromFEN(_position.fen)
-            tempPosition.setPiece(if (playerHasWhite) Piece.WHITE_KING else Piece.BLACK_KING,
-                    Square.encode(Rank.values()[kingRank], File.values()[kingFile]))
+            val kingCell = generateCell()
+            val tempPosition = buildPositionOrNullIfCellAlreadyOccupied(
+                    startFen = _position.fen,
+                    pieceToAdd = if (playerHasWhite) Piece.WHITE_KING else Piece.BLACK_KING,
+                    pieceCell = buildSquare(rank = kingCell.rank, file = kingCell.file)
+            )
+            if (tempPosition == null) continue
 
-            if (constraints.checkPlayerKingConstraint(kingFile, kingRank, playerHasWhite)) {
+
+            if (constraints.checkPlayerKingConstraint(
+                    file = kingCell.file, rank = kingCell.rank,
+                    playerHasWhite = playerHasWhite)) {
                 _position.loadFromFEN(tempPosition.fen)
-                playerKingFile = kingFile
-                playerKingRank = kingRank
+                playerKingCell = kingCell
                 loopSuccess = true
                 break
             }
@@ -77,28 +103,28 @@ class PositionGenerator(private val constraints : PositionConstraints) {
 
         loopSuccess = false
         for (iters in 0..maxLoopsIterations){  // setting up enemy king
-            val kingFile = _random.nextInt(8)
-            val kingRank = _random.nextInt(8)
 
-            val tempPosition = Board()
-            tempPosition.loadFromFEN(_position.fen)
-            val cellNotEmpty = tempPosition.getPiece(buildSquare(kingRank, kingFile)) != Piece.NONE
-            if (cellNotEmpty) continue
-            tempPosition.setPiece(if (playerHasWhite) Piece.BLACK_KING else Piece.WHITE_KING, buildSquare(kingRank, kingFile))
+            val kingCell = generateCell()
 
-            tempPosition.sideToMove = if (playerHasWhite) LibSide.BLACK else LibSide.WHITE
-            val enemyKingInChess = tempPosition.isKingAttacked()
-            tempPosition.sideToMove = if (playerHasWhite) LibSide.WHITE else LibSide.BLACK
-            if (enemyKingInChess) continue
+            val tempPosition = buildPositionOrNullIfCellAlreadyOccupied(
+                    startFen = _position.fen,
+                    pieceToAdd = if (playerHasWhite) Piece.BLACK_KING else Piece.WHITE_KING,
+                    pieceCell = buildSquare(
+                            rank = kingCell.rank, file = kingCell.file
+                    )
+            )
 
-            if (constraints.checkComputerKingConstraint(kingFile, kingRank, playerHasWhite)
+            if (tempPosition == null) continue
+            if (enemyKingInChessFor(tempPosition, playerHasWhite)) continue
+
+            // validate position if enemy king constraint and kings mutual constraint are respected
+            if (constraints.checkComputerKingConstraint(file = kingCell.file, rank = kingCell.rank, playerHasWhite = playerHasWhite)
                     && constraints.checkKingsMutualConstraint(
-                    playerKingFile, playerKingRank,
-                    kingFile, kingRank,
-                    playerHasWhite
+                    playerKingFile = playerKingCell.file, playerKingRank = playerKingCell.rank,
+                    computerKingFile = kingCell.file, computerKingRank = kingCell.rank,
+                    playerHasWhite = playerHasWhite
             )) {
-                oppositeKingFile = kingFile
-                oppositeKingRank = kingRank
+                oppositeKingCell = kingCell
                 _position.loadFromFEN(tempPosition.fen)
                 loopSuccess = true
                 break
@@ -110,41 +136,44 @@ class PositionGenerator(private val constraints : PositionConstraints) {
     private fun placeOtherPieces(playerHasWhite: Boolean){
         constraints.otherPiecesCountsConstraint.forEach { (kind, count) ->
 
-            val savedCoordinates = arrayListOf<Pair<Int, Int>>()
+            val savedCoordinates = arrayListOf<BoardCoordinate>()
             count.loops { index ->
                 var loopSuccess = false
                 for (loopIter in 0..maxLoopsIterations) {
-                    val pieceFile = _random.nextInt(8)
-                    val pieceRank = _random.nextInt(8)
-                    val currentPieceCoordinate = pieceFile to pieceRank
-
-                    val tempPosition = Board()
-                    tempPosition.loadFromFEN(_position.fen)
-                    val cellNotEmpty = tempPosition.getPiece(buildSquare(pieceRank, pieceFile)) != Piece.NONE
-                    if (cellNotEmpty) continue
                     val isAPieceOfPlayer = kind.side == Side.player
                     val isWhitePiece = (isAPieceOfPlayer && playerHasWhite)
-                        || (!isAPieceOfPlayer && !playerHasWhite)
-                    tempPosition.setPiece(pieceKindToPiece(kind, isWhitePiece), buildSquare(pieceRank, pieceFile))
-                    
-                    tempPosition.sideToMove = if (playerHasWhite) LibSide.BLACK else LibSide.WHITE
-                    val enemyKingInChess = tempPosition.isKingAttacked()
-                    tempPosition.sideToMove = if (playerHasWhite) LibSide.WHITE else LibSide.BLACK
-                    if (enemyKingInChess) continue
+                            || (!isAPieceOfPlayer && !playerHasWhite)
 
-                    // If for any previous piece of same kind, mutual constraint is not respected, will go into another try
-                    if (savedCoordinates.any { !constraints.checkOtherPieceMutualConstraint(kind, it.first, it.second,
-                            currentPieceCoordinate.first, currentPieceCoordinate.second, playerHasWhite) }) continue
+                    val pieceCell = generateCell()
+                    val tempPosition = buildPositionOrNullIfCellAlreadyOccupied(
+                            startFen = _position.fen,
+                            pieceToAdd = pieceKindToPiece(kind, isWhitePiece),
+                            pieceCell = buildSquare(
+                                    rank = pieceCell.rank, file = pieceCell.file
+                            )
+                    )
+                    if (tempPosition == null) continue
+                    if (enemyKingInChessFor(tempPosition, playerHasWhite)) continue
 
-                    if (!constraints.checkOtherPieceIndexedConstraint(kind, index,
-                            pieceFile, pieceRank,
-                            playerHasWhite)) continue
+                    // If for any previous piece of same kind, mutual constraint is not respected, will loop another time
+                    if (savedCoordinates.any { !constraints.checkOtherPieceMutualConstraint(
+                            pieceKind = kind, firstPieceFile = it.file, firstPieceRank = it.rank,
+                            secondPieceFile = pieceCell.file, secondPieceRank = pieceCell.rank,
+                            playerHasWhite = playerHasWhite) }) continue
 
-                    if (constraints.checkOtherPieceGlobalConstraint(kind, currentPieceCoordinate.first,
-                            currentPieceCoordinate.second, playerHasWhite, playerKingFile, playerKingRank,
-                            oppositeKingFile, oppositeKingRank)){
+                    if (!constraints.checkOtherPieceIndexedConstraint(pieceKind = kind, apparitionIndex = index,
+                            file = pieceCell.file, rank = pieceCell.rank,
+                            playerHasWhite = playerHasWhite)) continue
+
+                    if (constraints.checkOtherPieceGlobalConstraint(
+                            pieceKind = kind,
+                            file = pieceCell.file,
+                            rank = pieceCell.rank,
+                            playerHasWhite = playerHasWhite,
+                            playerKingFile = playerKingCell.file, playerKingRank = playerKingCell.rank,
+                            computerKingFile = oppositeKingCell.file, computerKingRank = playerKingCell.rank)){
                         _position.loadFromFEN(tempPosition.fen)
-                        savedCoordinates += pieceFile to pieceRank
+                        savedCoordinates += pieceCell
                         loopSuccess = true
                         break
                     }

@@ -7,7 +7,7 @@ android {
     buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "com.loloof64.android.basicchessendgamestrainer"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 26
         versionCode 5
         versionName "1.0.6"
