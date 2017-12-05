@@ -78,4 +78,10 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="black_play_for_win">Les Noirs jouent pour le gain.</string>
     <string name="exercise_kppp_kppp">Roi+3Pions/Roi+3Pions</string>
     <string name="loading_stockfish">Chargement du moteur Stockfish</string>
+    <string name="title_activity_position_generator_editor">Editeur pour générateur de position</string>
+    <string name="action_settings">Paramètres</string>
+    <string name="kings_constraints">Rois</string>
+    <string name="other_pieces_count_constraints">Compte autres pièces</string>
+    <string name="other_pieces_mutual_constraints">Contraintes mutuelles pour les autres pièces</string>
+    <string name="section_format">Bonjour de la section: %1$d</string>
 </resources>
