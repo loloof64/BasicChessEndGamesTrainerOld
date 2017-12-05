@@ -57,7 +57,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     }
 
     override fun consumeMove(move: Move) {
-        if (!_waitingForPlayerGoal){
+        if (!_waitingForPlayerGoal && !_gameFinished){
             val isComputerToMove = _playerHasWhite != isWhiteToPlay()
             if (isComputerToMove){
                 handler.post {
@@ -159,6 +159,7 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
     private var _highlightedStartCell:SquareCoordinates? = null
     private var _pendingPromotionInfo:PromotionInfo? = null
 
+    @SuppressWarnings("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val whiteTurn = _relatedPosition.sideToMove == Side.WHITE
         val notPlayerTurn = _playerHasWhite != whiteTurn

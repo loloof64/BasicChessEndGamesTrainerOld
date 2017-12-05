@@ -18,7 +18,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".PlayingActivity" />
+        <activity android:name=".PlayingActivity"
+            android:parentActivityName=".ExerciseChooserActivity"/>
         <activity android:name=".HelpActivity" />
         <activity
             android:name=".PositionGeneratorEditorActivity"
