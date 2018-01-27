@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
+import android.support.v4.app.FragmentActivity
 import android.support.v7.app.AlertDialog.Builder
 import android.view.View
 import android.view.ViewGroup
@@ -45,17 +46,17 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
     private lateinit var knightPromotionListener: PromotionButtonOnClickListener
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val title = arguments.getString(PromotionPieceChooserDialogFragment.TitleKey)
+        val title = arguments!!.getString(PromotionPieceChooserDialogFragment.TitleKey)
 
-        val whiteToPlay = arguments.getBoolean(WhiteToPlayKey)
+        val whiteToPlay = arguments!!.getBoolean(WhiteToPlayKey)
 
         val nullParent: ViewGroup? = null
-        val rootView = activity.layoutInflater.inflate(R.layout.promotion_chooser_dialog, nullParent)
+        val rootView = activity!!.layoutInflater.inflate(R.layout.promotion_chooser_dialog, nullParent)
 
-        promotionChooserQueenButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_queen_button)
-        promotionChooserRookButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_rook_button)
-        promotionChooserBishopButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_bishop_button)
-        promotionChooserKnightButton = rootView.findViewById<ImageButton>(R.id.promotion_chooser_knight_button)
+        promotionChooserQueenButton = rootView.findViewById(R.id.promotion_chooser_queen_button)
+        promotionChooserRookButton = rootView.findViewById(R.id.promotion_chooser_rook_button)
+        promotionChooserBishopButton = rootView.findViewById(R.id.promotion_chooser_bishop_button)
+        promotionChooserKnightButton = rootView.findViewById(R.id.promotion_chooser_knight_button)
 
         promotionChooserQueenButton.setImageResource(if (whiteToPlay) R.drawable.chess_ql else R.drawable.chess_qd)
         promotionChooserRookButton.setImageResource(if (whiteToPlay) R.drawable.chess_rl else R.drawable.chess_rd)
@@ -76,7 +77,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         promotionChooserBishopButton.setOnClickListener(bishopPromotionListener)
         promotionChooserKnightButton.setOnClickListener(knightPromotionListener)
 
-        val dialog = Builder(activity).setTitle(title).setView(rootView).create()
+        val dialog = Builder(activity as FragmentActivity).setTitle(title).setView(rootView).create()
         queenPromotionListener.setDialog(dialog)
         rookPromotionListener.setDialog(dialog)
         bishopPromotionListener.setDialog(dialog)

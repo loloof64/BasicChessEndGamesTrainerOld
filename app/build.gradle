@@ -35,6 +35,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     implementation 'com.github.loloof64:chesslib:990e16d500'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:0.19.3'
+    implementation ('org.antlr:antlr4:4.7.1') {
+        exclude group: 'org.antlr', module:'ST4'
+    }
 }
 
 repositories {

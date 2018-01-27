@@ -295,7 +295,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                         with(weakRefContext.get() as PlayingActivity){
                             playingBoard.setFromFen(positionFen)
                             if (moveToHighlight != null) {
-                                playingBoard.setHighlightedMove(moveToHighlight.startFile,
+                                playingBoard.setHighlightedMove(
+                                        moveToHighlight.startFile,
                                         moveToHighlight.startRank,
                                         moveToHighlight.endFile,
                                         moveToHighlight.endRank)
