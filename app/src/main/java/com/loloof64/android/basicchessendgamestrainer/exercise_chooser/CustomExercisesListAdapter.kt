@@ -9,13 +9,15 @@ import android.widget.TextView
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
 
-interface ItemClickListener {
-    fun onClick(position: Int)
+interface ItemLongClickListener {
+    fun onLongClick(position: Int)
 }
 
-class ExercisesListAdapter(private val exercisesList: List<ExerciseInfo>,
-                           private val itemClickListener: ItemClickListener) :
-        RecyclerView.Adapter<ExercisesListAdapter.Companion.ViewHolder>(){
+class CustomExercisesListAdapter(private val itemClickListener: ItemClickListener,
+                                 private val itemLongClickListener: ItemLongClickListener)
+    : RecyclerView.Adapter<CustomExercisesListAdapter.Companion.ViewHolder>(){
+
+    private var exercisesList: List<ExerciseInfo> = listOf()
 
     companion object {
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
@@ -25,7 +27,7 @@ class ExercisesListAdapter(private val exercisesList: List<ExerciseInfo>,
         val layout = LayoutInflater.from(parent?.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
         val textView = layout.findViewById<TextView>(R.id.exercise_list_row_value)
         layout.removeView(textView)
-        return ViewHolder(textView)
+        return CustomExercisesListAdapter.Companion.ViewHolder(textView)
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
@@ -36,6 +38,7 @@ class ExercisesListAdapter(private val exercisesList: List<ExerciseInfo>,
 
         holder?.textView?.text = MyApplication.getApplicationContext().getString(exercisesList[position].textId)
         holder?.textView?.setOnClickListener{ itemClickListener.onClick(position) }
+        holder?.textView?.setOnLongClickListener { itemLongClickListener.onLongClick(position); true }
         holder?.textView?.setBackgroundColor(
                 if (exercisesList[position].mustWin) getColor(R.color.exercise_chooser_winning_color)
                 else getColor(R.color.exercise_chooser_nullifying_color)
@@ -45,4 +48,5 @@ class ExercisesListAdapter(private val exercisesList: List<ExerciseInfo>,
     override fun getItemCount(): Int {
         return exercisesList.size
     }
+
 }

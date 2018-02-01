@@ -1,51 +1,74 @@
 package com.loloof64.android.basicchessendgamestrainer
 
 import android.content.Intent
-import android.os.Bundle
+import android.support.design.widget.TabLayout
+import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
+
+import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.app.FragmentPagerAdapter
+import android.support.v4.view.ViewPager
+import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ExercisesListAdapter
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
-import com.loloof64.android.basicchessendgamestrainer.playing_activity.EngineInteraction
+import android.view.View
+import android.view.ViewGroup
+
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
+import kotlinx.android.synthetic.main.fragment_exercise_chooser.view.*
 
 class ExerciseChooserActivity : AppCompatActivity() {
+
+    private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_chooser)
 
-        EngineInteraction.copyStockfishIntoInternalMemoryIfNecessary()
+        setSupportActionBar(toolbar)
+        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
-        exercisesListView.layoutManager = LinearLayoutManager(this)
-        exercisesListView.adapter = ExercisesListAdapter(availableGenerators, object : ItemClickListener {
-            override fun onClick(position: Int) {
-                val intent = Intent(this@ExerciseChooserActivity, PlayingActivity::class.java)
-                val bundle = Bundle()
-                bundle.putInt(PlayingActivity.generatorIndexKey, position)
-                intent.putExtras(bundle)
-                startActivity(intent)
-            }
-        })
+        container.adapter = mSectionsPagerAdapter
+
+        container.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
+        tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu_exercise_chooser, menu)
         return true
     }
 
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when(item?.itemId) {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val id = item.itemId
+
+        when (id) {
             R.id.action_help -> {
                 val intent = Intent(this, HelpActivity::class.java)
                 startActivity(intent)
-                return true
             }
-            else -> super.onOptionsItemSelected(item)
+        }
+
+        return super.onOptionsItemSelected(item)
+    }
+
+
+    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+
+        override fun getItem(position: Int): Fragment {
+            return when(position){
+                0 -> PredefinedExerciseChooserFragment.newInstance()
+                1 -> CustomExerciseChooserFragment.newInstance()
+                else -> throw IllegalArgumentException("No fragment for position $position !")
+            }
+        }
+
+        override fun getCount(): Int {
+            return 2
         }
     }
 

@@ -10,16 +10,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
         <activity
-            android:name=".ExerciseChooserActivity"
-            android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".PlayingActivity"
-            android:parentActivityName=".ExerciseChooserActivity"/>
+            android:name=".PlayingActivity"
+            android:parentActivityName=".ExerciseChooserActivity" />
         <activity android:name=".HelpActivity" />
         <activity
             android:name=".PositionGeneratorEditorActivity"
@@ -29,6 +21,16 @@
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.loloof64.android.basicchessendgamestrainer.ExerciseChooserActivity" />
+        </activity>
+        <activity
+            android:name=".ExerciseChooserActivity"
+            android:label="@string/title_activity_exercise_chooser"
+            android:theme="@style/NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

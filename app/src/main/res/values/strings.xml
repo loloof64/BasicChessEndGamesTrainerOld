@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Basic Chess Endgames</string>
-    <string name="main_menu_select_exercise">Select your exercise</string>
     <string name="exercise_kq_k">King+Queen/King</string>
     <string name="exercise_krr_k">King+2Rooks/King</string>
     <string name="exercise_kbb_k">King+2Bishops/King</string>
@@ -80,4 +79,7 @@ of endgame.[CR][CR]
     <string name="kings_constraints">Kings</string>
     <string name="other_pieces_count_constraints">Other pieces count</string>
     <string name="other_pieces_mutual_constraints">Other pieces mutual constraints</string>
+    <string name="title_activity_exercise_chooser">Manage your exercises</string>
+    <string name="tab_title_predefined_exercise">Predefined</string>
+    <string name="tab_title_custom_exercise">Custom</string>
 </resources>
