@@ -10,8 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
         <activity
-            android:name=".PlayingActivity"
-            android:parentActivityName=".ExerciseChooserActivity" />
+            android:name=".PlayingActivity" />
         <activity android:name=".HelpActivity" />
         <activity
             android:name=".PositionGeneratorEditorActivity"
