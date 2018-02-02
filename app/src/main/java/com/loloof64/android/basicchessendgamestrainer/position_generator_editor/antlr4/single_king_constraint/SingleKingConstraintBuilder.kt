@@ -16,27 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
+package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.antlr4.single_king_constraint
 
-import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import com.loloof64.android.basicchessendgamestrainer.R
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.antlr4.single_king_constraint.generated.SingleKingConstraintBaseVisitor
 
-class PlayerKingConstraintEditorFragment : Fragment() {
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        return inflater.inflate(R.layout.fragment_editing_player_king_constraint, container, false)
-    }
-
-    fun scriptIsValid(): Boolean {
-        return false // TODO change
-    }
-
-    companion object {
-        fun newInstance(): PlayerKingConstraintEditorFragment {
-            return PlayerKingConstraintEditorFragment()
-        }
-    }
+class SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingConstraintBooleanExpr>() {
 }
