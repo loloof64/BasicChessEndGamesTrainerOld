@@ -41,8 +41,10 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     <com.robertlevonyan.views.customfloatingactionbutton.FloatingLayout
-        android:layout_width="wrap_content"
+        android:layout_width="200dp"
         android:layout_height="wrap_content"
+        app:fabMenuStyle="popLeft"
+        app:fabMenuGravity="end"
         android:layout_gravity="end|bottom">
         <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
             app:fabColor="#26dcbb"

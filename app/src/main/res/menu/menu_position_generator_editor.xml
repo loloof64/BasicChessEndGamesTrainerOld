@@ -6,10 +6,10 @@
         android:id="@+id/action_save"
         android:title="@string/action_save_generator"
         android:icon="@mipmap/ic_action_save"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
     <item
         android:id="@+id/action_cancel"
         android:title="@string/action_cancel_generator"
         android:icon="@mipmap/ic_action_cancel"
-        app:showAsAction="ifRoom" />
+        app:showAsAction="never" />
 </menu>
