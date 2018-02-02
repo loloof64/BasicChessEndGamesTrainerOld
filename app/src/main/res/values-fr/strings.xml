@@ -89,4 +89,6 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="tab_title_custom_exercise">Personnelles</string>
     <string name="action_save_generator">Sauvegarder</string>
     <string name="action_cancel_generator">Annuler</string>
+    <string name="constraint_script">Script de contrainte</string>
+    <string name="check_constraint">Vérifier</string>
 </resources>

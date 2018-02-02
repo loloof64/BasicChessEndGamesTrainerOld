@@ -85,4 +85,6 @@ of endgame.[CR][CR]
     <string name="tab_title_custom_exercise">Custom</string>
     <string name="action_save_generator">Save</string>
     <string name="action_cancel_generator">Cancel</string>
+    <string name="constraint_script">Constraint script</string>
+    <string name="check_constraint">Check</string>
 </resources>
