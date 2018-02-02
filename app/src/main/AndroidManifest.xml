@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.loloof64.android.basicchessendgamestrainer">
+    package="com.loloof64.android.basicchessendgamestrainer"
+    xmlns:tools="http://schemas.android.com/tools">
 
     <application
         android:name=".MyApplication"
@@ -8,9 +9,10 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.DarkActionBar">
-        <activity
-            android:name=".PlayingActivity" />
+        android:theme="@style/Theme.AppCompat.Light.DarkActionBar"
+        tools:replace="android:theme"
+        >
+        <activity android:name=".PlayingActivity" />
         <activity android:name=".HelpActivity" />
         <activity
             android:name=".PositionGeneratorEditorActivity"
@@ -23,7 +25,7 @@
         </activity>
         <activity
             android:name=".ExerciseChooserActivity"
-            android:label="@string/title_activity_exercise_chooser"
+            android:label="@string/app_name"
             android:theme="@style/NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

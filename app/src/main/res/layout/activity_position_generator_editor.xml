@@ -25,46 +25,43 @@
             app:popupTheme="@style/PopupOverlay"
             app:title="@string/app_name">
 
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:popupTheme="@style/PopupOverlay" />
         </android.support.v7.widget.Toolbar>
 
-        <android.support.design.widget.TabLayout
-            android:id="@+id/tabs"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-            <android.support.design.widget.TabItem
-                android:id="@+id/tabItem"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/kings_constraints" />
-
-            <android.support.design.widget.TabItem
-                android:id="@+id/tabItem2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/other_pieces_count_constraints" />
-
-            <android.support.design.widget.TabItem
-                android:id="@+id/tabItem3"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/other_pieces_mutual_constraints" />
-
-        </android.support.design.widget.TabLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <android.support.v4.view.ViewPager
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+    <com.robertlevonyan.views.customfloatingactionbutton.FloatingLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="end|bottom"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+        android:layout_gravity="end|bottom">
+        <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
+            app:fabColor="#26dcbb"
+            app:fabIcon="@mipmap/ic_action_menu"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_save_generator"
+            app:fabColor="#338f2c"
+            app:fabIcon="@mipmap/ic_action_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_cancel_generator"
+            app:fabColor="#da6d29"
+            app:fabIcon="@mipmap/ic_action_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        
+    </com.robertlevonyan.views.customfloatingactionbutton.FloatingLayout>
 
 </android.support.design.widget.CoordinatorLayout>

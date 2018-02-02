@@ -16,19 +16,25 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.loloof64.android.basicchessendgamestrainer
+package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_help.*
+import android.support.v4.app.Fragment
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import com.loloof64.android.basicchessendgamestrainer.R
 
-class HelpActivity : AppCompatActivity() {
+class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_help)
-        help_text_view.text = resources.getString(R.string.help)
-                .replace("[CR]", System.getProperty("line.separator"))
-                .replace("[TAB]", "    ")
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        return inflater.inflate(R.layout.fragment_editing_other_pieces_global_constraint, container, false)
     }
+
+    companion object {
+        fun newInstance(): OtherPiecesGlobalConstraintEditorFragment {
+            return OtherPiecesGlobalConstraintEditorFragment()
+        }
+    }
+
 }

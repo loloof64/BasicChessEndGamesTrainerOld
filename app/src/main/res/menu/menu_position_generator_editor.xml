@@ -3,8 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.loloof64.android.basicchessendgamestrainer.PositionGeneratorEditorActivity">
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_save"
+        android:title="@string/action_save_generator"
+        android:icon="@mipmap/ic_action_save"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_cancel"
+        android:title="@string/action_cancel_generator"
+        android:icon="@mipmap/ic_action_cancel"
+        app:showAsAction="ifRoom" />
 </menu>

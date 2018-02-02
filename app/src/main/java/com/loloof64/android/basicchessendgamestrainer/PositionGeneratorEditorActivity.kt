@@ -1,120 +1,137 @@
+/*
+ * Basic Chess Endgames : generates a position of the endgame you want, then play it against computer.
+    Copyright (C) 2017-2018  Laurent Bernabe <laurent.bernabe@gmail.com>
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.loloof64.android.basicchessendgamestrainer
 
-import android.os.Bundle
 import android.support.design.widget.Snackbar
-import android.support.design.widget.TabLayout
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
-import android.support.v4.app.FragmentPagerAdapter
 import android.support.v7.app.AppCompatActivity
-import android.view.*
+
+import android.support.v4.app.Fragment
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.OnItemSelectedListener
+import android.widget.ArrayAdapter
+import android.content.Context
+import android.support.v7.widget.ThemedSpinnerAdapter
+import android.content.res.Resources.Theme
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
+
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.fragment_position_generator_editor.view.*
+import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 
 class PositionGeneratorEditorActivity : AppCompatActivity() {
-
-    /**
-     * The [android.support.v4.view.PagerAdapter] that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * [android.support.v4.app.FragmentStatePagerAdapter].
-     */
-    private var mSectionsPagerAdapter: SectionsPagerAdapter? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_position_generator_editor)
 
         setSupportActionBar(toolbar)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
-        mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        // Set up the ViewPager with the sections adapter.
-        container.adapter = mSectionsPagerAdapter
+        spinner.adapter = MyAdapter(
+                toolbar.context,
+                arrayOf(R.string.player_king_constraints,
+                        R.string.computer_king_constraints,
+                        R.string.kings_mutual_constraints,
+                        R.string.other_pieces_count_constraints,
+                        R.string.other_pieces_global_constraints,
+                        R.string.other_pieces_mutual_constraints,
+                        R.string.other_pieces_indexed_constraints).map {
+                    resources.getString(it)
+                }.toTypedArray()
+        )
 
-        container.addOnPageChangeListener(TabLayout.TabLayoutOnPageChangeListener(tabs))
-        tabs.addOnTabSelectedListener(TabLayout.ViewPagerOnTabSelectedListener(container))
+        spinner.onItemSelectedListener = object : OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                val fragment:Fragment = when (position) {
+                    0 -> PlayerKingConstraintEditorFragment.newInstance()
+                    1 -> ComputerKingConstraintEditorFragment.newInstance()
+                    2 -> KingsMutualConstraintEditorFragment.newInstance()
+                    3 -> OtherPiecesCountConstraintEditorFragment.newInstance()
+                    4 -> OtherPiecesGlobalConstraintEditorFragment.newInstance()
+                    5 -> OtherPiecesMutualConstraintEditorFragment.newInstance()
+                    6 -> OtherPiecesIndexedConstraintEditorFragment.newInstance()
+                    else -> throw IllegalArgumentException("No fragment defined for position $position !")
+                }
+                supportFragmentManager.beginTransaction()
+                        .replace(R.id.container, fragment)
+                        .commit()
+            }
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+            override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
     }
 
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_position_generator_editor, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         val id = item.itemId
 
-        if (id == R.id.action_settings) {
-            return true
+        when(id) {
+            R.id.action_save -> {
+                //TODO
+                return true
+            }
+            R.id.action_cancel -> {
+                //TODO
+                return true
+            }
         }
 
         return super.onOptionsItemSelected(item)
     }
 
+    private class MyAdapter(context: Context, objects: Array<String>) : ArrayAdapter<String>(context, R.layout.position_generator_editor_list_item, objects), ThemedSpinnerAdapter {
+        private val mDropDownHelper: ThemedSpinnerAdapter.Helper = ThemedSpinnerAdapter.Helper(context)
 
-    /**
-     * A [FragmentPagerAdapter] that returns a fragment corresponding to
-     * one of the sections/tabs/pages.
-     */
-    inner class SectionsPagerAdapter(fm: FragmentManager) : FragmentPagerAdapter(fm) {
+        override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup): View {
+            val view: View
 
-        override fun getItem(position: Int): Fragment {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1)
-        }
-
-        override fun getCount(): Int {
-            // Show 3 total pages.
-            return 3
-        }
-    }
-
-    /**
-     * A placeholder fragment containing a simple view.
-     */
-    class PlaceholderFragment : Fragment() {
-
-        override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                                  savedInstanceState: Bundle?): View? {
-            val rootView = inflater.inflate(R.layout.fragment_position_generator_editor, container, false)
-            rootView.section_label.text = getString(R.string.section_format, arguments?.getInt(ARG_SECTION_NUMBER))
-            return rootView
-        }
-
-        companion object {
-            /**
-             * The fragment argument representing the section number for this
-             * fragment.
-             */
-            private val ARG_SECTION_NUMBER = "section_number"
-
-            /**
-             * Returns a new instance of this fragment for the given section
-             * number.
-             */
-            fun newInstance(sectionNumber: Int): PlaceholderFragment {
-                val fragment = PlaceholderFragment()
-                val args = Bundle()
-                args.putInt(ARG_SECTION_NUMBER, sectionNumber)
-                fragment.arguments = args
-                return fragment
+            if (convertView == null) {
+                // Inflate the drop down using the helper's LayoutInflater
+                val inflater = mDropDownHelper.dropDownViewInflater
+                view = inflater.inflate(R.layout.position_generator_editor_list_item, parent, false)
+            } else {
+                view = convertView
             }
+
+            view.text1.text = getItem(position)
+
+            return view
+        }
+
+        override fun getDropDownViewTheme(): Theme? {
+            return mDropDownHelper.dropDownViewTheme
+        }
+
+        override fun setDropDownViewTheme(theme: Theme?) {
+            mDropDownHelper.dropDownViewTheme = theme
         }
     }
 }

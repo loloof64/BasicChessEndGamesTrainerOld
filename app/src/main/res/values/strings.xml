@@ -74,12 +74,15 @@ of endgame.[CR][CR]
     <string name="loading_stockfish">Loading Stockfish engine</string>
     <string name="exercise_knb_k">King+Knight+Bishop/King</string>
     <string name="title_activity_position_generator_editor">Position Generator Editor</string>
-    <string name="action_settings">Settings</string>
-    <string name="section_format">Hello World from section: %1$d</string>
-    <string name="kings_constraints">Kings</string>
+    <string name="player_king_constraints">Player king</string>
+    <string name="computer_king_constraints">Computer king</string>
     <string name="other_pieces_count_constraints">Other pieces count</string>
     <string name="other_pieces_mutual_constraints">Other pieces mutual constraints</string>
-    <string name="title_activity_exercise_chooser">Manage your exercises</string>
+    <string name="other_pieces_indexed_constraints">Other pieces indexed constraints</string>
+    <string name="other_pieces_global_constraints">Other pieces global constraints</string>
+    <string name="kings_mutual_constraints">Kings mutual constraints</string>
     <string name="tab_title_predefined_exercise">Predefined</string>
     <string name="tab_title_custom_exercise">Custom</string>
+    <string name="action_save_generator">Save</string>
+    <string name="action_cancel_generator">Cancel</string>
 </resources>
