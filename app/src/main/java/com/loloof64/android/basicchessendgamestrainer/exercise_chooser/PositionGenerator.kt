@@ -23,7 +23,7 @@ import java.util.*
 import java.util.logging.Logger
 import com.github.bhlangonijr.chesslib.Side as LibSide
 
-class PositionGenerationLoopException : Exception()
+class PositionGenerationLoopException(message: String = "") : Exception(message)
 
 private val maxLoopsIterations = 250
 

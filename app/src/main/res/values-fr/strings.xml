@@ -91,4 +91,6 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="action_cancel_generator">Annuler</string>
     <string name="constraint_script">Script de contrainte</string>
     <string name="check_constraint">Vérifier</string>
+    <string name="script_valid">Le script est correct.</string>
+    <string name="invalid_script">Script erroné !</string>
 </resources>

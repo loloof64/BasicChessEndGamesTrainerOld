@@ -31,33 +31,35 @@ class PositionConstraints {
     private var otherPiecesMutualConstraintInstance = OtherPiecesMutualConstraint()
     private var otherPiecesIndexedConstraintInstance = OtherPiecesIndexedConstraint()
 
-    val FileA = 0
-    val FileB = 1
-    val FileC = 2
-    val FileD = 3
-    val FileE = 4
-    val FileF = 5
-    val FileG = 6
-    val FileH = 7
+    companion object {
+        val FileA = 0
+        val FileB = 1
+        val FileC = 2
+        val FileD = 3
+        val FileE = 4
+        val FileF = 5
+        val FileG = 6
+        val FileH = 7
 
-    val Rank1 = 0
-    val Rank2 = 1
-    val Rank3 = 2
-    val Rank4 = 3
-    val Rank5 = 4
-    val Rank6 = 5
-    val Rank7 = 6
-    val Rank8 = 7
+        val Rank1 = 0
+        val Rank2 = 1
+        val Rank3 = 2
+        val Rank4 = 3
+        val Rank5 = 4
+        val Rank6 = 5
+        val Rank7 = 6
+        val Rank8 = 7
 
-    val Pawn = PieceType.pawn
-    val Knight = PieceType.knight
-    val Bishop = PieceType.bishop
-    val Rook = PieceType.rook
-    val Queen = PieceType.queen
-    val King = PieceType.king
+        val Pawn = PieceType.pawn
+        val Knight = PieceType.knight
+        val Bishop = PieceType.bishop
+        val Rook = PieceType.rook
+        val Queen = PieceType.queen
+        val King = PieceType.king
 
-    val Player = Side.player
-    val Computer = Side.computer
+        val Player = Side.player
+        val Computer = Side.computer
+    }
 
     fun checkPlayerKingConstraint(file: Int, rank: Int, playerHasWhite: Boolean): Boolean {
         return SingleKingConstraint(file, rank, playerHasWhite).playerKingIndividualConstraintInstance()

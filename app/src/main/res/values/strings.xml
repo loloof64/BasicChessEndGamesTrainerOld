@@ -87,4 +87,6 @@ of endgame.[CR][CR]
     <string name="action_cancel_generator">Cancel</string>
     <string name="constraint_script">Constraint script</string>
     <string name="check_constraint">Check</string>
+    <string name="script_valid">Script is valid.</string>
+    <string name="invalid_script">Invalid script !</string>
 </resources>

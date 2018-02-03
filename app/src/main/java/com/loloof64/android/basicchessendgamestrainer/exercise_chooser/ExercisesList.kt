@@ -19,6 +19,25 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
 import com.loloof64.android.basicchessendgamestrainer.R
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.FileB
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.FileC
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.FileF
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.FileG
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank1
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank2
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank3
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank4
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank5
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank6
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank7
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rank8
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Queen
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Rook
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Bishop
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Knight
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Pawn
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Player
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints.Companion.Computer
 
 val KRRvK = positionGenerator {
     computerKing {

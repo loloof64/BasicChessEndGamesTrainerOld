@@ -23,15 +23,44 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.R
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBuilder
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintGenericExpr
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintBaseVisitor
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintLexer
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintParser
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintVisitor
+import org.antlr.v4.runtime.CharStreams
+import kotlinx.android.synthetic.main.fragment_editing_player_king_constraint.*
+import org.antlr.v4.runtime.CommonTokenStream
 
 class PlayerKingConstraintEditorFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_editing_player_king_constraint, container, false)
     }
 
-    fun scriptIsValid(): Boolean {
-        return false // TODO change
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        button_check_player_king_constraint.setOnClickListener {
+            if (scriptIsValid()) Toast.makeText(activity, R.string.script_valid, Toast.LENGTH_SHORT).show()
+            else Toast.makeText(activity, R.string.invalid_script, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun scriptIsValid(): Boolean {
+       return try {
+           val inputStream = CharStreams.fromString(generator_editor_field_player_king_constraint.text.toString())
+           val lexer = SingleKingConstraintLexer(inputStream)
+           val tokens = CommonTokenStream(lexer)
+           val parser = SingleKingConstraintParser(tokens)
+           val tree = parser.singleKingConstraint()
+           SingleKingConstraintBuilder.clearVariables()
+           SingleKingConstraintBuilder.visit(tree)
+           true
+       }
+       catch (ex: Exception){
+           false
+       }
     }
 
     companion object {
