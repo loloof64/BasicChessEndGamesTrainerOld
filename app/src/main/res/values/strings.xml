@@ -91,6 +91,8 @@ of endgame.[CR][CR]
     <string name="invalid_script">Invalid script !</string>
     <string name="no_viable_alt_exception">Entry %s does not follow any rule (line %s: character number %s).</string>
     <string name="input_mismatch_exception">Input mismatch at line %s: character number %s. Expected %s but got %s .</string>
+    <string name="parser_unrecognized_symbol">Unrecognized element : \'%s\' .</string>
+    <string name="misc_parse_error">Miscellaneous script error.</string>
     <string name="no_antlr4_token">[no_token]</string>
     <string name="antlr4_eof">EndOfFile</string>
     <string name="antlr4_unknown_input">Unknown input</string>

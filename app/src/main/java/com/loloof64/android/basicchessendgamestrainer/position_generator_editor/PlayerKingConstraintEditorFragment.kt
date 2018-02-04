@@ -31,6 +31,7 @@ import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.
 import org.antlr.v4.runtime.CharStreams
 import kotlinx.android.synthetic.main.fragment_editing_player_king_constraint.*
 import org.antlr.v4.runtime.CommonTokenStream
+import org.antlr.v4.runtime.misc.ParseCancellationException
 
 class PlayerKingConstraintEditorFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -53,7 +54,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
            parser.singleKingConstraint()
            true
        }
-       catch (ex: Exception){
+       catch (ex: ParseCancellationException){
            val dialog = AlertDialog.Builder(activity!!).create()
            dialog.setTitle(R.string.parse_error_dialog_title)
            dialog.setMessage(ex.message)

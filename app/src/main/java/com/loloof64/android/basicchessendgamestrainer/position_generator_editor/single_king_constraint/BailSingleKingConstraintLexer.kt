@@ -17,17 +17,20 @@
  */
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint
 
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
+import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintLexer
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.LexerNoViableAltException
-import org.antlr.v4.runtime.RecognitionException
+import org.antlr.v4.runtime.misc.Interval
+import org.antlr.v4.runtime.misc.ParseCancellationException
 
-class BailSingleKingConstraintLexer(input: CharStream) : SingleKingConstraintLexer(input) {
-    override fun recover(e: LexerNoViableAltException?) {
-        throw RuntimeException(e)
-    }
-
-    override fun recover(re: RecognitionException?) {
-        throw RuntimeException(re)
+class BailSingleKingConstraintLexer(val input: CharStream) : SingleKingConstraintLexer(input) {
+    override fun recover(error: LexerNoViableAltException?) {
+        val lowerBound = error?.startIndex!!
+        val offendingText = input.getText(Interval(lowerBound, lowerBound))
+        val messageFormat = MyApplication.appContext.resources.getString(R.string.parser_unrecognized_symbol)
+        val message = String.format(messageFormat, offendingText)
+        throw ParseCancellationException(message)
     }
 }

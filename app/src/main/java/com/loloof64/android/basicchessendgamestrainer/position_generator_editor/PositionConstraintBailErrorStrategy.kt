@@ -40,13 +40,19 @@ class PositionConstraintBailErrorStrategy : DefaultErrorStrategy() {
 
     override fun reportError(recognizer: Parser?, error: RecognitionException?) {
         when (error){
-            is NoViableAltException -> throw ParseCancellationException(
-                    buildNoViableAltExceptionMessage(recognizer, error), error
-            )
             is InputMismatchException -> throw ParseCancellationException(
                     buildInputMismatchExceptionMessage(recognizer, error), error
             )
-            else -> recognizer?.notifyErrorListeners(error?.offendingToken, error?.message, error)
+            // This one should not happen
+            is FailedPredicateException -> throw ParseCancellationException(
+                    "Unexpected semantic predicate error", error
+            )
+            is NoViableAltException -> throw ParseCancellationException(
+                    buildRecognitionExceptionMessage(error), error
+            )
+            else -> throw ParseCancellationException(
+                    MyApplication.appContext.resources.getString(R.string.misc_parse_error), error
+            )
         }
     }
 
@@ -72,11 +78,10 @@ class PositionConstraintBailErrorStrategy : DefaultErrorStrategy() {
         return symbol
     }
 
-    private fun buildNoViableAltExceptionMessage(recognizer: Parser?, error: RecognitionException?) : String {
-        val tokens = recognizer?.inputStream
-        val inputToken = escapeWSAndQuote(getInputToken(error as NoViableAltException, tokens))
-        val line = error.offendingToken.line
-        val positionInLine = error.offendingToken.charPositionInLine
+    private fun buildRecognitionExceptionMessage(error: NoViableAltException?) : String {
+        val inputToken = escapeWSAndQuote(error?.offendingToken?.text)
+        val line = error?.offendingToken?.line
+        val positionInLine = error?.offendingToken?.charPositionInLine
 
         val messageString = MyApplication.appContext.resources.getString(R.string.no_viable_alt_exception)
 
@@ -94,17 +99,6 @@ class PositionConstraintBailErrorStrategy : DefaultErrorStrategy() {
 
         return String.format(messageString,
                 line, positionInLine, expectedToken, tokenErrorDisplay)
-    }
-
-    private fun getInputToken(e: NoViableAltException, tokens: TokenStream?): String {
-        if (tokens != null) {
-            return if (tokenIsEOF(e.startToken)) {
-                MyApplication.appContext.resources.getString(R.string.antlr4_eof)
-            } else {
-                tokens.getText(e.startToken, e.offendingToken)
-            }
-        }
-        return MyApplication.appContext.resources.getString(R.string.antlr4_unknown_input)
     }
 
     private fun tokenIsEOF(token: Token) : Boolean {
