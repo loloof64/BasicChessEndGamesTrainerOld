@@ -34,6 +34,7 @@ import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.misc.ParseCancellationException
 
 class PlayerKingConstraintEditorFragment : Fragment() {
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_editing_player_king_constraint, container, false)
     }
@@ -41,6 +42,19 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         button_check_player_king_constraint.setOnClickListener {
             if (checkIsScriptIsValidAndShowEventualError()) Toast.makeText(activity, R.string.script_valid, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(SCRIPT_KEY, generator_editor_field_player_king_constraint.text.toString())
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        if (savedInstanceState != null) {
+            generator_editor_field_player_king_constraint.text.clear()
+            generator_editor_field_player_king_constraint.text.append(savedInstanceState.getString(SCRIPT_KEY))
         }
     }
 
@@ -70,5 +84,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         fun newInstance(): PlayerKingConstraintEditorFragment {
             return PlayerKingConstraintEditorFragment()
         }
+
+        const val SCRIPT_KEY = "Script"
     }
 }

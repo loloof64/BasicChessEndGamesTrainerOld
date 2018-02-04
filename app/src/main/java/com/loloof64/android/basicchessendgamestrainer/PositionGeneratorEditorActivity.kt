@@ -18,12 +18,10 @@
 
 package com.loloof64.android.basicchessendgamestrainer
 
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 
 import android.support.v4.app.Fragment
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -37,10 +35,21 @@ import android.content.res.Resources.Theme
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
 
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
-import kotlinx.android.synthetic.main.fragment_position_generator_editor.view.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 
 class PositionGeneratorEditorActivity : AppCompatActivity() {
+
+    companion object {
+        val allFragments = arrayOf(
+                PlayerKingConstraintEditorFragment.newInstance(),
+                ComputerKingConstraintEditorFragment.newInstance(),
+                KingsMutualConstraintEditorFragment.newInstance(),
+                OtherPiecesCountConstraintEditorFragment.newInstance(),
+                OtherPiecesGlobalConstraintEditorFragment.newInstance(),
+                OtherPiecesMutualConstraintEditorFragment.newInstance(),
+                OtherPiecesIndexedConstraintEditorFragment.newInstance()
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -64,16 +73,8 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
         spinner.onItemSelectedListener = object : OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val fragment:Fragment = when (position) {
-                    0 -> PlayerKingConstraintEditorFragment.newInstance()
-                    1 -> ComputerKingConstraintEditorFragment.newInstance()
-                    2 -> KingsMutualConstraintEditorFragment.newInstance()
-                    3 -> OtherPiecesCountConstraintEditorFragment.newInstance()
-                    4 -> OtherPiecesGlobalConstraintEditorFragment.newInstance()
-                    5 -> OtherPiecesMutualConstraintEditorFragment.newInstance()
-                    6 -> OtherPiecesIndexedConstraintEditorFragment.newInstance()
-                    else -> throw IllegalArgumentException("No fragment defined for position $position !")
-                }
+                val fragment: Fragment = if (position < allFragments.size) allFragments[position]
+                    else throw IllegalArgumentException("No fragment defined for position $position !")
                 supportFragmentManager.beginTransaction()
                         .replace(R.id.container, fragment)
                         .commit()
