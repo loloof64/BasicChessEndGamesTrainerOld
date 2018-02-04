@@ -54,7 +54,9 @@ class PlayerKingConstraintEditorFragment : Fragment() {
            true
        }
        catch (ex: Exception){
-           //TODO show error detail in a dialog
+           //////////////////////////////
+           ex.printStackTrace()
+           ///////////////////////////////
            false
        }
     }

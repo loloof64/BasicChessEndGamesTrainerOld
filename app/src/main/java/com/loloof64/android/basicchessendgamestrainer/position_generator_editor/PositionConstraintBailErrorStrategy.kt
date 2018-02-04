@@ -15,20 +15,99 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+/**
+ * Code adapted from this gist :
+ * https://gist.github.com/KetothXupack/bec735ad12016ea2b552a3503f80cd53
+ */
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
+import com.loloof64.android.basicchessendgamestrainer.R
 import org.antlr.v4.runtime.*
+import org.antlr.v4.runtime.misc.ParseCancellationException
 
 class PositionConstraintBailErrorStrategy : DefaultErrorStrategy() {
     override fun recover(recognizer: Parser?, e: RecognitionException?) {
-        throw RuntimeException(e)
+        throw ParseCancellationException(e)
     }
 
     override fun recoverInline(recognizer: Parser?): Token {
-        throw RuntimeException(InputMismatchException(recognizer))
+        val exception = InputMismatchException(recognizer)
+        reportError(recognizer, exception)
+        throw exception
+    }
+
+    override fun reportError(recognizer: Parser?, error: RecognitionException?) {
+        when (error){
+            is NoViableAltException -> throw ParseCancellationException(
+                    buildNoViableAltExceptionMessage(recognizer, error), error
+            )
+            is InputMismatchException -> throw ParseCancellationException(
+                    buildInputMismatchExceptionMessage(recognizer, error), error
+            )
+            else -> recognizer?.notifyErrorListeners(error?.offendingToken, error?.message, error)
+        }
     }
 
     override fun sync(recognizer: Parser?) {
 
+    }
+
+    override fun getTokenErrorDisplay(token: Token?): String {
+        return if (token == null) MyApplication.appContext.resources.getString(R.string.no_antlr4_token)
+        else escapeWSAndQuote(String.format("<%s>", getErrorSymbol(token)))
+    }
+
+    private fun getErrorSymbol(token: Token): String {
+        var symbol = getSymbolText(token)
+
+        if (symbol == null) {
+            symbol = if (tokenIsEOF(token)) {
+                MyApplication.appContext.getString(R.string.antlr4_eof)
+            } else {
+                getSymbolType(token).toString()
+            }
+        }
+        return symbol
+    }
+
+    private fun buildNoViableAltExceptionMessage(recognizer: Parser?, error: RecognitionException?) : String {
+        val tokens = recognizer?.inputStream
+        val inputToken = escapeWSAndQuote(getInputToken(error as NoViableAltException, tokens))
+        val line = error.offendingToken.line
+        val positionInLine = error.offendingToken.charPositionInLine
+
+        val messageString = MyApplication.appContext.resources.getString(R.string.no_viable_alt_exception)
+
+        return String.format(messageString,
+                inputToken, line, positionInLine)
+    }
+
+    private fun buildInputMismatchExceptionMessage(recognizer: Parser?, error: RecognitionException?): String {
+        val line = error?.offendingToken?.line
+        val positionInLine = error?.offendingToken?.charPositionInLine
+        val tokenErrorDisplay = getTokenErrorDisplay(error?.offendingToken)
+        val expectedToken = error?.expectedTokens?.toString(recognizer?.vocabulary)
+
+        val messageString = MyApplication.appContext.resources.getString(R.string.input_mismatch_exception)
+
+        return String.format(messageString,
+                line, positionInLine, expectedToken, tokenErrorDisplay)
+    }
+
+    private fun getInputToken(e: NoViableAltException, tokens: TokenStream?): String {
+        if (tokens != null) {
+            return if (tokenIsEOF(e.startToken)) {
+                MyApplication.appContext.resources.getString(R.string.antlr4_eof)
+            } else {
+                tokens.getText(e.startToken, e.offendingToken)
+            }
+        }
+        return MyApplication.appContext.resources.getString(R.string.antlr4_unknown_input)
+    }
+
+    private fun tokenIsEOF(token: Token) : Boolean {
+        return getSymbolType(token) == Token.EOF
     }
 }
