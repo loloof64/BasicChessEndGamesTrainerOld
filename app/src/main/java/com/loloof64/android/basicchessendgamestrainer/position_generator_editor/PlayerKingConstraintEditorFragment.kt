@@ -39,11 +39,11 @@ class PlayerKingConstraintEditorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         button_check_player_king_constraint.setOnClickListener {
-            if (scriptIsValid()) Toast.makeText(activity, R.string.script_valid, Toast.LENGTH_SHORT).show()
+            if (checkIsScriptIsValidAndShowEventualError()) Toast.makeText(activity, R.string.script_valid, Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun scriptIsValid(): Boolean {
+    private fun checkIsScriptIsValidAndShowEventualError(): Boolean {
        return try {
            val inputStream = CharStreams.fromString(generator_editor_field_player_king_constraint.text.toString())
            val lexer = BailSingleKingConstraintLexer(inputStream)
