@@ -16,8 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Generated from SingleKingConstraint.g4 by ANTLR 4.7.1
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4;
+
+// Generated from SingleKingConstraint.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -41,15 +42,15 @@ public class SingleKingConstraintParser extends Parser {
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
 		T__31=32, NumericLitteral=33, ID=34, WS=35;
 	public static final int
-		RULE_singleKingConstraint = 0, RULE_variableAssign = 1, RULE_booleanExpr = 2, 
-		RULE_fileConstant = 3, RULE_rankConstant = 4, RULE_numericExpr = 5;
+		RULE_singleKingConstraint = 0, RULE_variableAssign = 1, RULE_terminalExpr = 2, 
+		RULE_booleanExpr = 3, RULE_fileConstant = 4, RULE_rankConstant = 5, RULE_numericExpr = 6;
 	public static final String[] ruleNames = {
-		"singleKingConstraint", "variableAssign", "booleanExpr", "fileConstant", 
-		"rankConstant", "numericExpr"
+		"singleKingConstraint", "variableAssign", "terminalExpr", "booleanExpr", 
+		"fileConstant", "rankConstant", "numericExpr"
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "'return'", "';'", "':='", "'('", "')'", "'<'", "'>'", "'<='", "'>='", 
+		null, "':='", "';'", "'return'", "'('", "')'", "'<'", "'>'", "'<='", "'>='", 
 		"'='", "'<>'", "'and'", "'or'", "'FileA'", "'FileB'", "'FileC'", "'FileD'", 
 		"'FileE'", "'FileF'", "'FileG'", "'FileH'", "'Rank1'", "'Rank2'", "'Rank3'", 
 		"'Rank4'", "'Rank5'", "'Rank6'", "'Rank7'", "'Rank8'", "'abs('", "'+'", 
@@ -111,8 +112,8 @@ public class SingleKingConstraintParser extends Parser {
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
 	public static class SingleKingConstraintContext extends ParserRuleContext {
-		public BooleanExprContext booleanExpr() {
-			return getRuleContext(BooleanExprContext.class,0);
+		public TerminalExprContext terminalExpr() {
+			return getRuleContext(TerminalExprContext.class,0);
 		}
 		public List<VariableAssignContext> variableAssign() {
 			return getRuleContexts(VariableAssignContext.class);
@@ -138,26 +139,22 @@ public class SingleKingConstraintParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(15);
+			setState(17);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
 			while (_la==ID) {
 				{
 				{
-				setState(12);
+				setState(14);
 				variableAssign();
 				}
 				}
-				setState(17);
+				setState(19);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
 			}
-			setState(18);
-			match(T__0);
-			setState(19);
-			booleanExpr(0);
 			setState(20);
-			match(T__1);
+			terminalExpr();
 			}
 		}
 		catch (RecognitionException re) {
@@ -221,7 +218,7 @@ public class SingleKingConstraintParser extends Parser {
 				setState(22);
 				match(ID);
 				setState(23);
-				match(T__2);
+				match(T__0);
 				setState(24);
 				numericExpr(0);
 				setState(25);
@@ -235,13 +232,53 @@ public class SingleKingConstraintParser extends Parser {
 				setState(27);
 				match(ID);
 				setState(28);
-				match(T__2);
+				match(T__0);
 				setState(29);
 				booleanExpr(0);
 				setState(30);
 				match(T__1);
 				}
 				break;
+			}
+		}
+		catch (RecognitionException re) {
+			_localctx.exception = re;
+			_errHandler.reportError(this, re);
+			_errHandler.recover(this, re);
+		}
+		finally {
+			exitRule();
+		}
+		return _localctx;
+	}
+
+	public static class TerminalExprContext extends ParserRuleContext {
+		public BooleanExprContext booleanExpr() {
+			return getRuleContext(BooleanExprContext.class,0);
+		}
+		public TerminalExprContext(ParserRuleContext parent, int invokingState) {
+			super(parent, invokingState);
+		}
+		@Override public int getRuleIndex() { return RULE_terminalExpr; }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof SingleKingConstraintVisitor ) return ((SingleKingConstraintVisitor<? extends T>)visitor).visitTerminalExpr(this);
+			else return visitor.visitChildren(this);
+		}
+	}
+
+	public final TerminalExprContext terminalExpr() throws RecognitionException {
+		TerminalExprContext _localctx = new TerminalExprContext(_ctx, getState());
+		enterRule(_localctx, 4, RULE_terminalExpr);
+		try {
+			enterOuterAlt(_localctx, 1);
+			{
+			setState(34);
+			match(T__2);
+			setState(35);
+			booleanExpr(0);
+			setState(36);
+			match(T__1);
 			}
 		}
 		catch (RecognitionException re) {
@@ -354,14 +391,14 @@ public class SingleKingConstraintParser extends Parser {
 		int _parentState = getState();
 		BooleanExprContext _localctx = new BooleanExprContext(_ctx, _parentState);
 		BooleanExprContext _prevctx = _localctx;
-		int _startState = 4;
-		enterRecursionRule(_localctx, 4, RULE_booleanExpr, _p);
+		int _startState = 6;
+		enterRecursionRule(_localctx, 6, RULE_booleanExpr, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(48);
+			setState(52);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
 			case 1:
@@ -370,11 +407,11 @@ public class SingleKingConstraintParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(35);
+				setState(39);
 				match(T__3);
-				setState(36);
+				setState(40);
 				booleanExpr(0);
-				setState(37);
+				setState(41);
 				match(T__4);
 				}
 				break;
@@ -383,7 +420,7 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new BooleanVariableContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(39);
+				setState(43);
 				match(ID);
 				}
 				break;
@@ -392,9 +429,9 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new NumericRelationalContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(40);
+				setState(44);
 				numericExpr(0);
-				setState(41);
+				setState(45);
 				((NumericRelationalContext)_localctx).op = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__5) | (1L << T__6) | (1L << T__7) | (1L << T__8))) != 0)) ) {
@@ -405,7 +442,7 @@ public class SingleKingConstraintParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(42);
+				setState(46);
 				numericExpr(0);
 				}
 				break;
@@ -414,9 +451,9 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new NumericEqualityContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(44);
+				setState(48);
 				numericExpr(0);
-				setState(45);
+				setState(49);
 				((NumericEqualityContext)_localctx).op = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(_la==T__9 || _la==T__10) ) {
@@ -427,13 +464,13 @@ public class SingleKingConstraintParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(46);
+				setState(50);
 				numericExpr(0);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(58);
+			setState(62);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -441,18 +478,18 @@ public class SingleKingConstraintParser extends Parser {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(56);
+					setState(60);
 					_errHandler.sync(this);
 					switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 					case 1:
 						{
 						_localctx = new AndComparisonContext(new BooleanExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_booleanExpr);
-						setState(50);
+						setState(54);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(51);
+						setState(55);
 						match(T__11);
-						setState(52);
+						setState(56);
 						booleanExpr(3);
 						}
 						break;
@@ -460,18 +497,18 @@ public class SingleKingConstraintParser extends Parser {
 						{
 						_localctx = new OrComparisonContext(new BooleanExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_booleanExpr);
-						setState(53);
+						setState(57);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(54);
+						setState(58);
 						match(T__12);
-						setState(55);
+						setState(59);
 						booleanExpr(2);
 						}
 						break;
 					}
 					} 
 				}
-				setState(60);
+				setState(64);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			}
@@ -502,12 +539,12 @@ public class SingleKingConstraintParser extends Parser {
 
 	public final FileConstantContext fileConstant() throws RecognitionException {
 		FileConstantContext _localctx = new FileConstantContext(_ctx, getState());
-		enterRule(_localctx, 6, RULE_fileConstant);
+		enterRule(_localctx, 8, RULE_fileConstant);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(61);
+			setState(65);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__13) | (1L << T__14) | (1L << T__15) | (1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -544,12 +581,12 @@ public class SingleKingConstraintParser extends Parser {
 
 	public final RankConstantContext rankConstant() throws RecognitionException {
 		RankConstantContext _localctx = new RankConstantContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_rankConstant);
+		enterRule(_localctx, 10, RULE_rankConstant);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(63);
+			setState(67);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__21) | (1L << T__22) | (1L << T__23) | (1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -670,14 +707,14 @@ public class SingleKingConstraintParser extends Parser {
 		int _parentState = getState();
 		NumericExprContext _localctx = new NumericExprContext(_ctx, _parentState);
 		NumericExprContext _prevctx = _localctx;
-		int _startState = 10;
-		enterRecursionRule(_localctx, 10, RULE_numericExpr, _p);
+		int _startState = 12;
+		enterRecursionRule(_localctx, 12, RULE_numericExpr, _p);
 		int _la;
 		try {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(78);
+			setState(82);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__3:
@@ -686,11 +723,11 @@ public class SingleKingConstraintParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(66);
+				setState(70);
 				match(T__3);
-				setState(67);
+				setState(71);
 				numericExpr(0);
-				setState(68);
+				setState(72);
 				match(T__4);
 				}
 				break;
@@ -699,11 +736,11 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new AbsoluteNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(70);
+				setState(74);
 				match(T__29);
-				setState(71);
+				setState(75);
 				numericExpr(0);
-				setState(72);
+				setState(76);
 				match(T__4);
 				}
 				break;
@@ -712,7 +749,7 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new LitteralNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(74);
+				setState(78);
 				match(NumericLitteral);
 				}
 				break;
@@ -721,7 +758,7 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new NumericVariableContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(75);
+				setState(79);
 				match(ID);
 				}
 				break;
@@ -737,7 +774,7 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new FileConstantNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(76);
+				setState(80);
 				fileConstant();
 				}
 				break;
@@ -753,7 +790,7 @@ public class SingleKingConstraintParser extends Parser {
 				_localctx = new RankConstantNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(77);
+				setState(81);
 				rankConstant();
 				}
 				break;
@@ -761,7 +798,7 @@ public class SingleKingConstraintParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(85);
+			setState(89);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -772,9 +809,9 @@ public class SingleKingConstraintParser extends Parser {
 					{
 					_localctx = new PlusMinusNumericExprContext(new NumericExprContext(_parentctx, _parentState));
 					pushNewRecursionContext(_localctx, _startState, RULE_numericExpr);
-					setState(80);
+					setState(84);
 					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-					setState(81);
+					setState(85);
 					((PlusMinusNumericExprContext)_localctx).op = _input.LT(1);
 					_la = _input.LA(1);
 					if ( !(_la==T__30 || _la==T__31) ) {
@@ -785,12 +822,12 @@ public class SingleKingConstraintParser extends Parser {
 						_errHandler.reportMatch(this);
 						consume();
 					}
-					setState(82);
+					setState(86);
 					numericExpr(2);
 					}
 					} 
 				}
-				setState(87);
+				setState(91);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
 			}
@@ -809,9 +846,9 @@ public class SingleKingConstraintParser extends Parser {
 
 	public boolean sempred(RuleContext _localctx, int ruleIndex, int predIndex) {
 		switch (ruleIndex) {
-		case 2:
+		case 3:
 			return booleanExpr_sempred((BooleanExprContext)_localctx, predIndex);
-		case 5:
+		case 6:
 			return numericExpr_sempred((NumericExprContext)_localctx, predIndex);
 		}
 		return true;
@@ -834,30 +871,30 @@ public class SingleKingConstraintParser extends Parser {
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3%[\4\2\t\2\4\3\t\3"+
-		"\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\3\2\7\2\20\n\2\f\2\16\2\23\13\2\3\2\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3%_\4\2\t\2\4\3\t\3"+
+		"\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\3\2\7\2\22\n\2\f\2\16\2\25\13"+
 		"\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3#\n\3\3\4\3\4\3"+
-		"\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\3\4\5\4\63\n\4\3\4\3\4\3\4"+
-		"\3\4\3\4\3\4\7\4;\n\4\f\4\16\4>\13\4\3\5\3\5\3\6\3\6\3\7\3\7\3\7\3\7\3"+
-		"\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\3\7\5\7Q\n\7\3\7\3\7\3\7\7\7V\n\7\f\7\16"+
-		"\7Y\13\7\3\7\2\4\6\f\b\2\4\6\b\n\f\2\7\3\2\b\13\3\2\f\r\3\2\20\27\3\2"+
-		"\30\37\3\2!\"\2a\2\21\3\2\2\2\4\"\3\2\2\2\6\62\3\2\2\2\b?\3\2\2\2\nA\3"+
-		"\2\2\2\fP\3\2\2\2\16\20\5\4\3\2\17\16\3\2\2\2\20\23\3\2\2\2\21\17\3\2"+
-		"\2\2\21\22\3\2\2\2\22\24\3\2\2\2\23\21\3\2\2\2\24\25\7\3\2\2\25\26\5\6"+
-		"\4\2\26\27\7\4\2\2\27\3\3\2\2\2\30\31\7$\2\2\31\32\7\5\2\2\32\33\5\f\7"+
-		"\2\33\34\7\4\2\2\34#\3\2\2\2\35\36\7$\2\2\36\37\7\5\2\2\37 \5\6\4\2 !"+
-		"\7\4\2\2!#\3\2\2\2\"\30\3\2\2\2\"\35\3\2\2\2#\5\3\2\2\2$%\b\4\1\2%&\7"+
-		"\6\2\2&\'\5\6\4\2\'(\7\7\2\2(\63\3\2\2\2)\63\7$\2\2*+\5\f\7\2+,\t\2\2"+
-		"\2,-\5\f\7\2-\63\3\2\2\2./\5\f\7\2/\60\t\3\2\2\60\61\5\f\7\2\61\63\3\2"+
-		"\2\2\62$\3\2\2\2\62)\3\2\2\2\62*\3\2\2\2\62.\3\2\2\2\63<\3\2\2\2\64\65"+
-		"\f\4\2\2\65\66\7\16\2\2\66;\5\6\4\5\678\f\3\2\289\7\17\2\29;\5\6\4\4:"+
-		"\64\3\2\2\2:\67\3\2\2\2;>\3\2\2\2<:\3\2\2\2<=\3\2\2\2=\7\3\2\2\2><\3\2"+
-		"\2\2?@\t\4\2\2@\t\3\2\2\2AB\t\5\2\2B\13\3\2\2\2CD\b\7\1\2DE\7\6\2\2EF"+
-		"\5\f\7\2FG\7\7\2\2GQ\3\2\2\2HI\7 \2\2IJ\5\f\7\2JK\7\7\2\2KQ\3\2\2\2LQ"+
-		"\7#\2\2MQ\7$\2\2NQ\5\b\5\2OQ\5\n\6\2PC\3\2\2\2PH\3\2\2\2PL\3\2\2\2PM\3"+
-		"\2\2\2PN\3\2\2\2PO\3\2\2\2QW\3\2\2\2RS\f\3\2\2ST\t\6\2\2TV\5\f\7\4UR\3"+
-		"\2\2\2VY\3\2\2\2WU\3\2\2\2WX\3\2\2\2X\r\3\2\2\2YW\3\2\2\2\t\21\"\62:<"+
-		"PW";
+		"\4\3\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5\67"+
+		"\n\5\3\5\3\5\3\5\3\5\3\5\3\5\7\5?\n\5\f\5\16\5B\13\5\3\6\3\6\3\7\3\7\3"+
+		"\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\5\bU\n\b\3\b\3\b\3"+
+		"\b\7\bZ\n\b\f\b\16\b]\13\b\3\b\2\4\b\16\t\2\4\6\b\n\f\16\2\7\3\2\b\13"+
+		"\3\2\f\r\3\2\20\27\3\2\30\37\3\2!\"\2d\2\23\3\2\2\2\4\"\3\2\2\2\6$\3\2"+
+		"\2\2\b\66\3\2\2\2\nC\3\2\2\2\fE\3\2\2\2\16T\3\2\2\2\20\22\5\4\3\2\21\20"+
+		"\3\2\2\2\22\25\3\2\2\2\23\21\3\2\2\2\23\24\3\2\2\2\24\26\3\2\2\2\25\23"+
+		"\3\2\2\2\26\27\5\6\4\2\27\3\3\2\2\2\30\31\7$\2\2\31\32\7\3\2\2\32\33\5"+
+		"\16\b\2\33\34\7\4\2\2\34#\3\2\2\2\35\36\7$\2\2\36\37\7\3\2\2\37 \5\b\5"+
+		"\2 !\7\4\2\2!#\3\2\2\2\"\30\3\2\2\2\"\35\3\2\2\2#\5\3\2\2\2$%\7\5\2\2"+
+		"%&\5\b\5\2&\'\7\4\2\2\'\7\3\2\2\2()\b\5\1\2)*\7\6\2\2*+\5\b\5\2+,\7\7"+
+		"\2\2,\67\3\2\2\2-\67\7$\2\2./\5\16\b\2/\60\t\2\2\2\60\61\5\16\b\2\61\67"+
+		"\3\2\2\2\62\63\5\16\b\2\63\64\t\3\2\2\64\65\5\16\b\2\65\67\3\2\2\2\66"+
+		"(\3\2\2\2\66-\3\2\2\2\66.\3\2\2\2\66\62\3\2\2\2\67@\3\2\2\289\f\4\2\2"+
+		"9:\7\16\2\2:?\5\b\5\5;<\f\3\2\2<=\7\17\2\2=?\5\b\5\4>8\3\2\2\2>;\3\2\2"+
+		"\2?B\3\2\2\2@>\3\2\2\2@A\3\2\2\2A\t\3\2\2\2B@\3\2\2\2CD\t\4\2\2D\13\3"+
+		"\2\2\2EF\t\5\2\2F\r\3\2\2\2GH\b\b\1\2HI\7\6\2\2IJ\5\16\b\2JK\7\7\2\2K"+
+		"U\3\2\2\2LM\7 \2\2MN\5\16\b\2NO\7\7\2\2OU\3\2\2\2PU\7#\2\2QU\7$\2\2RU"+
+		"\5\n\6\2SU\5\f\7\2TG\3\2\2\2TL\3\2\2\2TP\3\2\2\2TQ\3\2\2\2TR\3\2\2\2T"+
+		"S\3\2\2\2U[\3\2\2\2VW\f\3\2\2WX\t\6\2\2XZ\5\16\b\4YV\3\2\2\2Z]\3\2\2\2"+
+		"[Y\3\2\2\2[\\\3\2\2\2\\\17\3\2\2\2][\3\2\2\2\t\23\"\66>@T[";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

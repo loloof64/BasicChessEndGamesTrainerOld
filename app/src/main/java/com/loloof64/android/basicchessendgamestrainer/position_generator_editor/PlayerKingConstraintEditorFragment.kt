@@ -25,12 +25,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBuilder
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintGenericExpr
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintBaseVisitor
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintLexer
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.BailSingleKingConstraintLexer
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintParser
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintVisitor
 import org.antlr.v4.runtime.CharStreams
 import kotlinx.android.synthetic.main.fragment_editing_player_king_constraint.*
 import org.antlr.v4.runtime.CommonTokenStream
@@ -50,15 +46,15 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     private fun scriptIsValid(): Boolean {
        return try {
            val inputStream = CharStreams.fromString(generator_editor_field_player_king_constraint.text.toString())
-           val lexer = SingleKingConstraintLexer(inputStream)
+           val lexer = BailSingleKingConstraintLexer(inputStream)
            val tokens = CommonTokenStream(lexer)
            val parser = SingleKingConstraintParser(tokens)
-           val tree = parser.singleKingConstraint()
-           SingleKingConstraintBuilder.clearVariables()
-           SingleKingConstraintBuilder.visit(tree)
+           parser.errorHandler = PositionConstraintBailErrorStrategy()
+           parser.singleKingConstraint()
            true
        }
        catch (ex: Exception){
+           //TODO show error detail in a dialog
            false
        }
     }

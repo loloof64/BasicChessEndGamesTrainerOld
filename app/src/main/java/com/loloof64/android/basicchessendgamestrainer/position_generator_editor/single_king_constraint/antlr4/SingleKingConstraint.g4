@@ -18,11 +18,13 @@
 
 grammar SingleKingConstraint;
 
-singleKingConstraint: variableAssign* 'return' booleanExpr ';';
+singleKingConstraint: variableAssign* terminalExpr;
 
 variableAssign:   ID ':=' numericExpr ';' #numericAssign
                 | ID ':=' booleanExpr ';' #booleanAssign
                 ;
+
+terminalExpr : 'return' booleanExpr ';';
 
 booleanExpr: '(' booleanExpr ')'                                #parenthesisBooleanExpr
             | ID                                                #booleanVariable

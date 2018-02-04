@@ -32,8 +32,8 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
         booleanExprVariables.clear()
     }
 
-    override fun visitSingleKingConstraint(ctx: SingleKingConstraintParser.SingleKingConstraintContext?): SingleKingConstraintGenericExpr {
-        return visit(ctx?.booleanExpr()) as SingleKingConstraintBooleanExpr
+    override fun visitTerminalExpr(ctx: SingleKingConstraintParser.TerminalExprContext?): SingleKingConstraintGenericExpr {
+        return visit(ctx?.booleanExpr())
     }
 
     override fun visitNumericAssign(ctx: SingleKingConstraintParser.NumericAssignContext?): SingleKingConstraintGenericExpr {

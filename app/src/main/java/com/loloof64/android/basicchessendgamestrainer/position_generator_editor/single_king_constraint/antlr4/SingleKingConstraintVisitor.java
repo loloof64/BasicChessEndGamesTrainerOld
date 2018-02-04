@@ -15,9 +15,10 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-// Generated from SingleKingConstraint.g4 by ANTLR 4.7.1
+
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4;
 
+// Generated from SingleKingConstraint.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -48,6 +49,12 @@ public interface SingleKingConstraintVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBooleanAssign(SingleKingConstraintParser.BooleanAssignContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link SingleKingConstraintParser#terminalExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTerminalExpr(SingleKingConstraintParser.TerminalExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code numericEquality}
 	 * labeled alternative in {@link SingleKingConstraintParser#booleanExpr}.

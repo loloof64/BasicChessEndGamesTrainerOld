@@ -16,8 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-// Generated from SingleKingConstraint.g4 by ANTLR 4.7.1
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4;
+
+// Generated from SingleKingConstraint.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**
@@ -50,6 +51,13 @@ public class SingleKingConstraintBaseVisitor<T> extends AbstractParseTreeVisitor
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
 	@Override public T visitBooleanAssign(SingleKingConstraintParser.BooleanAssignContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
+	@Override public T visitTerminalExpr(SingleKingConstraintParser.TerminalExprContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
