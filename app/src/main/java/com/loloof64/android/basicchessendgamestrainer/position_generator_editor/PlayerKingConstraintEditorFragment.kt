@@ -20,6 +20,7 @@ package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,7 +40,6 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         button_check_player_king_constraint.setOnClickListener {
             if (scriptIsValid()) Toast.makeText(activity, R.string.script_valid, Toast.LENGTH_SHORT).show()
-            else Toast.makeText(activity, R.string.invalid_script, Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -54,9 +54,13 @@ class PlayerKingConstraintEditorFragment : Fragment() {
            true
        }
        catch (ex: Exception){
-           //////////////////////////////
-           ex.printStackTrace()
-           ///////////////////////////////
+           val dialog = AlertDialog.Builder(activity!!).create()
+           dialog.setTitle(R.string.parse_error_dialog_title)
+           dialog.setMessage(ex.message)
+           val buttonText = activity?.resources?.getString(R.string.OK)
+           dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }
+
+           dialog.show()
            false
        }
     }

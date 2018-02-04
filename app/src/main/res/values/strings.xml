@@ -94,4 +94,6 @@ of endgame.[CR][CR]
     <string name="no_antlr4_token">[no_token]</string>
     <string name="antlr4_eof">EndOfFile</string>
     <string name="antlr4_unknown_input">Unknown input</string>
+    <string name="OK">OK</string>
+    <string name="parse_error_dialog_title">Script error</string>
 </resources>
