@@ -20,6 +20,7 @@ package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 import com.github.bhlangonijr.chesslib.*
 import com.github.bhlangonijr.chesslib.Side
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBooleanExpr
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintNumericExpr
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.eval
 import java.util.*
 
@@ -101,9 +102,12 @@ object PositionGeneratorFromANTLR {
 
             if (builtPosition != null) {
                 if (allConstraints.playerKingConstraint != null){
-                    val intVariables = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
-                    val booleanVariables = mapOf("playerHasWhite" to playerHasWhite)
-                    val buildSuccess = eval(allConstraints.playerKingConstraint!!, intVariables, booleanVariables)
+                    val intValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
+                    val booleanValues = mapOf("playerHasWhite" to playerHasWhite)
+                    val buildSuccess = eval(expr = allConstraints.playerKingConstraint!!,
+                            intValues = intValues, booleanValues = booleanValues,
+                            numericVariables = mapOf(), booleanVariables = mapOf()
+                    )
                     if (buildSuccess) return builtPosition
                 }
                 else {
@@ -133,9 +137,11 @@ object PositionGeneratorFromANTLR {
 
             if (builtPositionIsLegal) {
                 if (allConstraints.playerKingConstraint != null){
-                    val intVariables = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
-                    val booleanVariables = mapOf("playerHasWhite" to playerHasWhite)
-                    val buildSuccess = eval(allConstraints.playerKingConstraint!!, intVariables, booleanVariables)
+                    val intValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
+                    val booleanValues = mapOf("playerHasWhite" to playerHasWhite)
+                    val buildSuccess = eval(expr = allConstraints.playerKingConstraint!!,
+                            intValues = intValues, booleanValues = booleanValues,
+                            numericVariables = mapOf(), booleanVariables = mapOf())
                     if (buildSuccess) return builtPosition!!
                 }
                 else {

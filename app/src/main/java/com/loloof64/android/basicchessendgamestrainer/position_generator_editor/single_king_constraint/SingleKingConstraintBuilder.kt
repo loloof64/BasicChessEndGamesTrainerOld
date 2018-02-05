@@ -32,6 +32,10 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
         booleanExprVariables.clear()
     }
 
+    fun getIntVariables() = intExprVariables.toMap()
+
+    fun getBooleanVariables() = booleanExprVariables.toMap()
+
     override fun visitTerminalExpr(ctx: SingleKingConstraintParser.TerminalExprContext?): SingleKingConstraintGenericExpr {
         return visit(ctx?.booleanExpr())
     }

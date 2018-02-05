@@ -26,7 +26,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.BailSingleKingConstraintLexer
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.*
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintParser
 import org.antlr.v4.runtime.CharStreams
 import kotlinx.android.synthetic.main.fragment_editing_player_king_constraint.*
@@ -60,24 +61,58 @@ class PlayerKingConstraintEditorFragment : Fragment() {
 
     private fun checkIsScriptIsValidAndShowEventualError(): Boolean {
        return try {
-           val inputStream = CharStreams.fromString(generator_editor_field_player_king_constraint.text.toString())
-           val lexer = BailSingleKingConstraintLexer(inputStream)
-           val tokens = CommonTokenStream(lexer)
-           val parser = SingleKingConstraintParser(tokens)
-           parser.errorHandler = PositionConstraintBailErrorStrategy()
-           parser.singleKingConstraint()
-           true
+           val resultExpr = buildExprObjectFromScript()
+           return testCanEvaluateExpressionWithDefaultVariablesSetAndShowEventualError(resultExpr)
        }
        catch (ex: ParseCancellationException){
-           val dialog = AlertDialog.Builder(activity!!).create()
-           dialog.setTitle(R.string.parse_error_dialog_title)
-           dialog.setMessage(ex.message)
-           val buttonText = activity?.resources?.getString(R.string.OK)
-           dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }
-
-           dialog.show()
+           showErrorDialog(ex.message ?: "<Internal error : could not get ParseCancellationException message !>")
            false
        }
+    }
+
+    private fun buildExprObjectFromScript() : SingleKingConstraintBooleanExpr {
+        val inputStream = CharStreams.fromString(generator_editor_field_player_king_constraint.text.toString())
+        val lexer = BailSingleKingConstraintLexer(inputStream)
+        val tokens = CommonTokenStream(lexer)
+        val parser = SingleKingConstraintParser(tokens)
+        parser.errorHandler = PositionConstraintBailErrorStrategy()
+        val tree = parser.singleKingConstraint()
+        SingleKingConstraintBuilder.clearVariables()
+        return SingleKingConstraintBuilder.visit(tree) as SingleKingConstraintBooleanExpr
+    }
+
+    private fun testCanEvaluateExpressionWithDefaultVariablesSetAndShowEventualError(expr: SingleKingConstraintBooleanExpr): Boolean {
+        val samplesIntValues = mapOf(
+                "file" to PositionConstraints.FileA,
+                "rank" to PositionConstraints.Rank7
+        )
+        val samplesBooleanValues = mapOf("playerHasWhite" to true)
+
+        val numericVariables = SingleKingConstraintBuilder.getIntVariables()
+        val booleanVariables = SingleKingConstraintBuilder.getBooleanVariables()
+
+        return try {
+            eval(expr = expr, intValues = samplesIntValues, booleanValues = samplesBooleanValues,
+                    numericVariables = numericVariables, booleanVariables = booleanVariables)
+            true
+        }
+        catch (ex: VariableIsNotAffectedException) {
+            val messageFormat = activity?.resources?.getString(R.string.parser_variable_not_affected)
+            val message = String.format(messageFormat ?: "<Internal error could not open format string !>", ex.name)
+            showErrorDialog(message)
+
+            false
+        }
+    }
+
+    private fun showErrorDialog(message: String) {
+        val dialog = AlertDialog.Builder(activity!!).create()
+        dialog.setTitle(R.string.parse_error_dialog_title)
+        dialog.setMessage(message)
+        val buttonText = activity?.resources?.getString(R.string.OK)
+        dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }
+
+        dialog.show()
     }
 
     companion object {

@@ -96,11 +96,17 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
         when(id) {
             R.id.action_save -> {
-                //TODO
+                /*
+                TODO check all scripts and
+                create file and exit if success
+                or inform user of errors
+                 */
                 return true
             }
             R.id.action_cancel -> {
-                //TODO
+                /*
+                TODO ask for confirmation and proceed/stay accordingly
+                 */
                 return true
             }
         }
