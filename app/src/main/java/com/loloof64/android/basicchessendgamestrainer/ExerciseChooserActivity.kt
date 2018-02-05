@@ -45,7 +45,7 @@ class ExerciseChooserActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_chooser)
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(exercise_chooser_activity_toolbar)
         mSectionsPagerAdapter = SectionsPagerAdapter(supportFragmentManager)
 
         container.adapter = mSectionsPagerAdapter

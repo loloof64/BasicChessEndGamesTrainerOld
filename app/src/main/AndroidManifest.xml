@@ -13,7 +13,10 @@
         tools:replace="android:theme"
         >
         <activity android:name=".PlayingActivity" />
-        <activity android:name=".HelpActivity" />
+        <activity
+            android:name=".HelpActivity"
+            android:theme="@style/NoActionBar"
+            />
         <activity
             android:name=".PositionGeneratorEditorActivity"
             android:label="@string/title_activity_position_generator_editor"

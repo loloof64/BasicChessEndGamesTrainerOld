@@ -27,6 +27,9 @@ class HelpActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_help)
+
+        setSupportActionBar(help_activity_toolbar)
+
         help_text_view.text = resources.getString(R.string.help)
                 .replace("[CR]", System.getProperty("line.separator"))
                 .replace("[TAB]", "    ")
