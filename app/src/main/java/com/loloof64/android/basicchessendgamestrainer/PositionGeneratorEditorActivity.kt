@@ -33,9 +33,13 @@ import android.content.Context
 import android.support.v7.widget.ThemedSpinnerAdapter
 import android.content.res.Resources.Theme
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
+import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
 
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
+
+
+data class BoomButtonParameters(val textId: Int, val iconId: Int)
 
 class PositionGeneratorEditorActivity : AppCompatActivity() {
 
@@ -57,6 +61,26 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        val boomMenuButtonPiecesNumber = position_generator_activity_boom_menu_button.piecePlaceEnum.pieceNumber()
+        (0 until boomMenuButtonPiecesNumber).forEach {pieceIndex ->
+            val buttonParameters = when(pieceIndex) {
+                0 -> BoomButtonParameters(
+                        textId = R.string.action_save_generator,
+                        iconId = R.mipmap.ic_action_save
+                )
+                1 -> BoomButtonParameters(
+                        textId = R.string.action_cancel_generator,
+                        iconId = R.mipmap.ic_action_cancel
+                )
+                else -> throw RuntimeException("Unexpected pieceIndex value $pieceIndex")
+            }
+            val builder = TextInsideCircleButton.Builder().
+                    normalImageRes(buttonParameters.iconId).
+                    normalTextRes(buttonParameters.textId).
+                    textSize(20)
+            position_generator_activity_boom_menu_button.addBuilder(builder)
+        }
 
         spinner.adapter = MyAdapter(
                 toolbar.context,

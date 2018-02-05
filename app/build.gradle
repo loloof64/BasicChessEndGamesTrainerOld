@@ -38,7 +38,7 @@ dependencies {
     implementation ('org.antlr:antlr4:4.7.1') {
         exclude group: 'org.antlr', module:'ST4'
     }
-    implementation 'com.robertlevonyan.view:CustomFloatingActionButton:2.0.4'
+    implementation 'com.nightonke:boommenu:2.1.1'
 }
 
 repositories {

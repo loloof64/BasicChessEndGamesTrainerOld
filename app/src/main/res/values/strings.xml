@@ -99,4 +99,5 @@ of endgame.[CR][CR]
     <string name="antlr4_unknown_input">Unknown input</string>
     <string name="OK">OK</string>
     <string name="parse_error_dialog_title">Script error</string>
+    <string name="menu_actions">Actions</string>
 </resources>

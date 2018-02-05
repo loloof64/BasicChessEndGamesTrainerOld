@@ -20,10 +20,28 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:layout_weight="1"
-            android:background="?attr/colorPrimary"
+            android:background="@android:color/holo_blue_dark"
             app:layout_scrollFlags="scroll|enterAlways"
             app:popupTheme="@style/PopupOverlay"
             app:title="@string/app_name">
+
+            <com.nightonke.boommenu.BoomMenuButton
+                android:id="@+id/position_generator_activity_boom_menu_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:bmb_buttonEnum="textInsideCircle"
+                app:bmb_piecePlaceEnum="piecePlace_dot_2_1"
+                app:bmb_buttonPlaceEnum="buttonPlace_sc_2_1"
+                app:bmb_backgroundEffect="false"
+                />
+
+            <TextView
+                android:id="@+id/position_generator_activity_title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:textColor="#fff"
+                />
 
             <Spinner
                 android:id="@+id/spinner"
@@ -40,30 +58,5 @@
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
-    <com.robertlevonyan.views.customfloatingactionbutton.FloatingLayout
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        app:fabMenuStyle="popLeft"
-        app:fabMenuGravity="end"
-        android:layout_gravity="end|bottom">
-        <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
-            app:fabColor="#26dcbb"
-            app:fabIcon="@mipmap/ic_action_menu"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_save_generator"
-            app:fabColor="#338f2c"
-            app:fabIcon="@mipmap/ic_action_save"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        <com.robertlevonyan.views.customfloatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_cancel_generator"
-            app:fabColor="#da6d29"
-            app:fabIcon="@mipmap/ic_action_cancel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-        
-    </com.robertlevonyan.views.customfloatingactionbutton.FloatingLayout>
 
 </android.support.design.widget.CoordinatorLayout>

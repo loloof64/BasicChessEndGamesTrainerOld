@@ -103,4 +103,5 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="antlr4_unknown_input">Entrée inconnue</string>
     <string name="OK">OK</string>
     <string name="parse_error_dialog_title">Erreur de script</string>
+    <string name="menu_actions">Actions</string>
 </resources>
