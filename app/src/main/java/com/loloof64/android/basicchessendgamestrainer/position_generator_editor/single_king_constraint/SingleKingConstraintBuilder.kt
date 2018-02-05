@@ -59,6 +59,14 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
         return ParenthesisSingleKingConstraintBooleanExpr(expr = internalExpr)
     }
 
+    override fun visitConditionalBooleanExpr(ctx: SingleKingConstraintParser.ConditionalBooleanExprContext?): SingleKingConstraintGenericExpr {
+        val conditionalExpr = visit(ctx?.booleanExpr(0)) as SingleKingConstraintBooleanExpr
+        val successExpr = visit(ctx?.booleanExpr(1)) as SingleKingConstraintBooleanExpr
+        val failureExpr = visit(ctx?.booleanExpr(2)) as SingleKingConstraintBooleanExpr
+
+        return ConditionalSingleKingConstraintBooleanExpr(condition = conditionalExpr, successExpr = successExpr, failureExpr = failureExpr)
+    }
+
     override fun visitBooleanVariable(ctx: SingleKingConstraintParser.BooleanVariableContext?): SingleKingConstraintGenericExpr {
         val variableName = ctx?.ID()?.text.toString()
         return if (booleanExprVariables.containsKey(variableName)) booleanExprVariables[variableName]!!
@@ -108,6 +116,14 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
     override fun visitParenthesisNumericExpr(ctx: SingleKingConstraintParser.ParenthesisNumericExprContext?): SingleKingConstraintGenericExpr {
         val internalExpr = visit(ctx?.numericExpr()) as SingleKingConstraintNumericExpr
         return ParenthesisSingleKingConstraintNumericExpr(expr = internalExpr)
+    }
+
+    override fun visitConditionalNumericExpr(ctx: SingleKingConstraintParser.ConditionalNumericExprContext?): SingleKingConstraintGenericExpr {
+        val conditionalExpr = visit(ctx?.booleanExpr()) as SingleKingConstraintBooleanExpr
+        val successExpr = visit(ctx?.numericExpr(0)) as SingleKingConstraintNumericExpr
+        val failureExpr = visit(ctx?.numericExpr(1)) as SingleKingConstraintNumericExpr
+
+        return ConditionalSingleKingConstraintNumericExpr(condition = conditionalExpr, successExpr = successExpr, failureExpr = failureExpr)
     }
 
     override fun visitAbsoluteNumericExpr(ctx: SingleKingConstraintParser.AbsoluteNumericExprContext?): SingleKingConstraintGenericExpr {

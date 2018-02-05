@@ -26,12 +26,13 @@ variableAssign:   ID ':=' numericExpr ';' #numericAssign
 
 terminalExpr : 'return' booleanExpr ';';
 
-booleanExpr: '(' booleanExpr ')'                                #parenthesisBooleanExpr
-            | ID                                                #booleanVariable
-            | numericExpr op=('<'|'>'|'<='|'>=') numericExpr    #numericRelational
-            | numericExpr op=('='|'<>') numericExpr             #numericEquality
-            | booleanExpr 'and' booleanExpr                     #andComparison
-            | booleanExpr 'or' booleanExpr                      #orComparison
+booleanExpr: '(' booleanExpr ')'                                                              #parenthesisBooleanExpr
+            | 'if' '(' booleanExpr ')' 'then' '(' booleanExpr ')' 'else' '(' booleanExpr ')'  #conditionalBooleanExpr
+            | ID                                                                              #booleanVariable
+            | numericExpr op=('<'|'>'|'<='|'>=') numericExpr                                  #numericRelational
+            | numericExpr op=('='|'<>') numericExpr                                           #numericEquality
+            | booleanExpr 'and' booleanExpr                                                   #andComparison
+            | booleanExpr 'or' booleanExpr                                                    #orComparison
             ;
 
 fileConstant: 'FileA' | 'FileB' | 'FileC' | 'FileD' |
@@ -39,13 +40,14 @@ fileConstant: 'FileA' | 'FileB' | 'FileC' | 'FileD' |
 rankConstant: 'Rank1' | 'Rank2' | 'Rank3' | 'Rank4' |
               'Rank5' | 'Rank6' | 'Rank7' | 'Rank8';
 
-numericExpr: '(' numericExpr ')'                      #parenthesisNumericExpr
-              | 'abs(' numericExpr ')'                #absoluteNumericExpr
-              | NumericLitteral                       #litteralNumericExpr
-              | ID                                    #numericVariable
-              | fileConstant                          #fileConstantNumericExpr
-              | rankConstant                          #rankConstantNumericExpr
-              | numericExpr op=('+'|'-') numericExpr  #plusMinusNumericExpr
+numericExpr: '(' numericExpr ')'                                                                #parenthesisNumericExpr
+              | 'if' '(' booleanExpr ')' 'then' '(' numericExpr ')' 'else' '(' numericExpr ')'  #conditionalNumericExpr
+              | 'abs(' numericExpr ')'                                                          #absoluteNumericExpr
+              | NumericLitteral                                                                 #litteralNumericExpr
+              | ID                                                                              #numericVariable
+              | fileConstant                                                                    #fileConstantNumericExpr
+              | rankConstant                                                                    #rankConstantNumericExpr
+              | numericExpr op=('+'|'-') numericExpr                                            #plusMinusNumericExpr
               ;
 
 NumericLitteral: [1-9][0-9]*;

@@ -70,6 +70,13 @@ public interface SingleKingConstraintVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitOrComparison(SingleKingConstraintParser.OrComparisonContext ctx);
 	/**
+	 * Visit a parse tree produced by the {@code conditionalBooleanExpr}
+	 * labeled alternative in {@link SingleKingConstraintParser#booleanExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditionalBooleanExpr(SingleKingConstraintParser.ConditionalBooleanExprContext ctx);
+	/**
 	 * Visit a parse tree produced by the {@code booleanVariable}
 	 * labeled alternative in {@link SingleKingConstraintParser#booleanExpr}.
 	 * @param ctx the parse tree
@@ -123,6 +130,13 @@ public interface SingleKingConstraintVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParenthesisNumericExpr(SingleKingConstraintParser.ParenthesisNumericExprContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code conditionalNumericExpr}
+	 * labeled alternative in {@link SingleKingConstraintParser#numericExpr}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConditionalNumericExpr(SingleKingConstraintParser.ConditionalNumericExprContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code numericVariable}
 	 * labeled alternative in {@link SingleKingConstraintParser#numericExpr}.
