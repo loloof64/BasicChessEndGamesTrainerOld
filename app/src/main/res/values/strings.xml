@@ -83,8 +83,8 @@ of endgame.[CR][CR]
     <string name="kings_mutual_constraints">Kings mutual constraints</string>
     <string name="tab_title_predefined_exercise">Predefined</string>
     <string name="tab_title_custom_exercise">Custom</string>
-    <string name="action_save_generator">Save</string>
-    <string name="action_cancel_generator">Cancel</string>
+    <string name="action_save_generator">Save all scripts</string>
+    <string name="action_cancel_generator">Cancel all scripts</string>
     <string name="constraint_script">Constraint script</string>
     <string name="check_constraint">Check</string>
     <string name="script_valid">Script is valid.</string>

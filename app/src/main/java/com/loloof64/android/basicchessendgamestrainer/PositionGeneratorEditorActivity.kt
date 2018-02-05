@@ -22,8 +22,6 @@ import android.support.v7.app.AppCompatActivity
 
 import android.support.v4.app.Fragment
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
@@ -33,13 +31,14 @@ import android.content.Context
 import android.support.v7.widget.ThemedSpinnerAdapter
 import android.content.res.Resources.Theme
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
+import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
 
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 
 
-data class BoomButtonParameters(val textId: Int, val iconId: Int)
+data class BoomButtonParameters(val textId: Int, val iconId: Int, val colorId: Int, val listener: OnBMClickListener)
 
 class PositionGeneratorEditorActivity : AppCompatActivity() {
 
@@ -67,17 +66,33 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
             val buttonParameters = when(pieceIndex) {
                 0 -> BoomButtonParameters(
                         textId = R.string.action_save_generator,
-                        iconId = R.mipmap.ic_action_save
+                        iconId = R.mipmap.ic_action_save,
+                        colorId = R.color.position_generator_activity_boom_menu_action_save,
+                        listener = OnBMClickListener {
+                            /*
+                                                TODO check all scripts and
+                                                create file and exit if success
+                                                or inform user of errors
+                                                */
+                        }
                 )
                 1 -> BoomButtonParameters(
                         textId = R.string.action_cancel_generator,
-                        iconId = R.mipmap.ic_action_cancel
+                        iconId = R.mipmap.ic_action_cancel,
+                        colorId = R.color.position_generator_activity_boom_menu_action_cancel,
+                        listener = OnBMClickListener {
+                            /*
+                                                TODO ask for confirmation and proceed/stay accordingly
+                                                 */
+                        }
                 )
                 else -> throw RuntimeException("Unexpected pieceIndex value $pieceIndex")
             }
             val builder = TextInsideCircleButton.Builder().
+                    listener(buttonParameters.listener).
                     normalImageRes(buttonParameters.iconId).
                     normalTextRes(buttonParameters.textId).
+                    normalColorRes(buttonParameters.colorId).
                     textSize(20)
             position_generator_activity_boom_menu_button.addBuilder(builder)
         }
@@ -107,35 +122,6 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
-    }
-
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_position_generator_editor, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-
-        when(id) {
-            R.id.action_save -> {
-                /*
-                TODO check all scripts and
-                create file and exit if success
-                or inform user of errors
-                 */
-                return true
-            }
-            R.id.action_cancel -> {
-                /*
-                TODO ask for confirmation and proceed/stay accordingly
-                 */
-                return true
-            }
-        }
-
-        return super.onOptionsItemSelected(item)
     }
 
     private class MyAdapter(context: Context, objects: Array<String>) : ArrayAdapter<String>(context, R.layout.position_generator_editor_list_item, objects), ThemedSpinnerAdapter {

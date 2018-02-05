@@ -25,16 +25,6 @@
             app:popupTheme="@style/PopupOverlay"
             app:title="@string/app_name">
 
-            <com.nightonke.boommenu.BoomMenuButton
-                android:id="@+id/position_generator_activity_boom_menu_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:bmb_buttonEnum="textInsideCircle"
-                app:bmb_piecePlaceEnum="piecePlace_dot_2_1"
-                app:bmb_buttonPlaceEnum="buttonPlace_sc_2_1"
-                app:bmb_backgroundEffect="false"
-                />
-
             <TextView
                 android:id="@+id/position_generator_activity_title_text"
                 android:layout_width="wrap_content"
@@ -45,9 +35,21 @@
 
             <Spinner
                 android:id="@+id/spinner"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:popupTheme="@style/PopupOverlay" />
+
+            <com.nightonke.boommenu.BoomMenuButton
+                android:id="@+id/position_generator_activity_boom_menu_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                app:popupTheme="@style/PopupOverlay" />
+                android:layout_gravity="end"
+                app:bmb_buttonEnum="textInsideCircle"
+                app:bmb_piecePlaceEnum="piecePlace_dot_2_1"
+                app:bmb_buttonPlaceEnum="buttonPlace_sc_2_1"
+                app:bmb_backgroundEffect="false"
+                />
+
         </android.support.v7.widget.Toolbar>
 
     </android.support.design.widget.AppBarLayout>
