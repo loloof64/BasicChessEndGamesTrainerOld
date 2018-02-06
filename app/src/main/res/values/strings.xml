@@ -99,7 +99,16 @@ of endgame.[CR][CR]
     <string name="antlr4_eof">EndOfFile</string>
     <string name="antlr4_unknown_input">Unknown input</string>
     <string name="OK">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="parse_error_dialog_title">Script error for %s</string>
     <string name="menu_actions">Actions</string>
     <string name="empty_script_error">Script is empty : will be ignored during positions generation.</string>
+    <string name="script_errors">Script errors</string>
+    <string name="correct_scripts_errors_first">Please, first correct script(s) error(s).</string>
+    <string name="title_output_script_file_name">Output script file name</string>
+    <string name="message_output_script_file_name">Please set output script file name</string>
+    <string name="could_not_save_file">Failed to save file !\nMaybe you should try with another file name.</string>
+    <string name="no_filename_given">Cancelled as no file name given.</string>
+    <string name="overwrite_file_prompt_title">Overwrite file ?</string>
+    <string name="overwrite_file_prompt_message">Overwrite file %s ?</string>
 </resources>

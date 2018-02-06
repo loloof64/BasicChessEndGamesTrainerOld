@@ -59,7 +59,9 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         }
     }
 
-    private fun checkIsScriptIsValidAndShowEventualError(): Boolean {
+    fun getScriptContent(): String = generator_editor_field_player_king_constraint.text.toString()
+
+    fun checkIsScriptIsValidAndShowEventualError(): Boolean {
        val scriptIsEmpty = generator_editor_field_player_king_constraint.text.toString().isEmpty()
         if (scriptIsEmpty){
             val title = activity?.resources?.getString(R.string.player_king_constraints) ?:

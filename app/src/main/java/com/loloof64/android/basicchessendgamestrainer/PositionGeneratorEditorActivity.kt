@@ -28,14 +28,19 @@ import android.widget.AdapterView
 import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.content.Context
+import android.content.DialogInterface
 import android.support.v7.widget.ThemedSpinnerAdapter
 import android.content.res.Resources.Theme
+import android.support.v7.app.AlertDialog
+import android.widget.EditText
+import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
 
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
+import java.io.IOException
 
 
 data class BoomButtonParameters(val textId: Int, val iconId: Int, val colorId: Int, val listener: OnBMClickListener)
@@ -69,11 +74,17 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                         iconId = R.mipmap.ic_action_save,
                         colorId = R.color.position_generator_activity_boom_menu_action_save,
                         listener = OnBMClickListener {
-                            /*
-                                                TODO check all scripts and
-                                                create file and exit if success
-                                                or inform user of errors
-                                                */
+                            val playerKingFragment = allFragments[0] as PlayerKingConstraintEditorFragment
+                            val allScriptsAreGood =
+                                    playerKingFragment.checkIsScriptIsValidAndShowEventualError()
+                            if (allScriptsAreGood){
+                                promptForFileName()
+                            }
+                            else {
+                                val title = resources.getString(R.string.script_errors)
+                                val message = resources.getString(R.string.correct_scripts_errors_first)
+                                showAlertDialog(title, message)
+                            }
                         }
                 )
                 1 -> BoomButtonParameters(
@@ -122,6 +133,80 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
+    }
+
+    private fun buildFileContent(): String {
+        val playerKingFragment = allFragments[0] as PlayerKingConstraintEditorFragment
+
+        val contentBuilder = StringBuilder()
+
+        contentBuilder.append(FilesManager.playerKingHeader)
+        contentBuilder.append(playerKingFragment.getScriptContent())
+        contentBuilder.append(FilesManager.newLine)
+
+        return contentBuilder.toString()
+    }
+
+    private fun promptForFileName() {
+        val inputField = EditText(this)
+        AlertDialog.Builder(this)
+            .setTitle(R.string.title_output_script_file_name)
+            .setMessage(R.string.message_output_script_file_name)
+            .setView(inputField)
+            .setPositiveButton(R.string.OK, { _: DialogInterface?, _: Int ->
+                val fileName = inputField.text.toString()
+                if (fileName.isNotEmpty()){
+                    val fileNameWithExtension = if (fileName.endsWith(".txt")) fileName else "$fileName.txt"
+
+                    if (FilesManager.exists(fileNameWithExtension)) {
+                        askIfFileShouldBeOverwritten(fileNameWithExtension)
+                    }
+                    else {
+                        saveFile(fileNameWithExtension)
+                    }
+                }
+                else {
+                    Toast.makeText(this, R.string.no_filename_given, Toast.LENGTH_SHORT).show()
+                }
+            })
+            .setNegativeButton(R.string.cancel, { dialog: DialogInterface?, _: Int ->
+                dialog?.dismiss()
+            })
+            .show()
+    }
+
+    private fun saveFile(name: String) {
+        val content = buildFileContent()
+        try {
+            FilesManager.saveTextFile(name, content)
+            finish()
+        }
+        catch (ex: IOException) {
+            Toast.makeText(this, R.string.could_not_save_file, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun showAlertDialog(title : String, message: String) {
+        val dialog = AlertDialog.Builder(this).create()
+        dialog.setTitle(title)
+        dialog.setMessage(message)
+        val buttonText = this.resources.getString(R.string.OK)
+        dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }
+
+        dialog.show()
+    }
+
+    private fun askIfFileShouldBeOverwritten(name: String) {
+        AlertDialog.Builder(this)
+                .setTitle(R.string.overwrite_file_prompt_title)
+                .setMessage(String.format(resources.getString(R.string.overwrite_file_prompt_message), name))
+                .setPositiveButton(R.string.OK, {_: DialogInterface?, _: Int ->
+                    saveFile(name)
+                })
+                .setNegativeButton(R.string.cancel, {dialog: DialogInterface?, _: Int ->
+                    dialog?.dismiss()
+                })
+                .show()
     }
 
     private class MyAdapter(context: Context, objects: Array<String>) : ArrayAdapter<String>(context, R.layout.position_generator_editor_list_item, objects), ThemedSpinnerAdapter {
