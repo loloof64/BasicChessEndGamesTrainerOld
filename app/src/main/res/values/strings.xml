@@ -113,4 +113,6 @@ of endgame.[CR][CR]
     <string name="overwrite_file_prompt_message">Overwrite file %s ?</string>
     <string name="confirm_cancel_script_editing_title">Confirm script editing cancellation ?</string>
     <string name="confirm_cancel_script_editing_message">Do you really want to quit script editing ?</string>
+    <string name="result_should_be_draw">Result should be draw</string>
+    <string name="theoretic_result_option">Theoretic result</string>
 </resources>

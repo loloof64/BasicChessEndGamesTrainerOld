@@ -34,6 +34,7 @@ import android.content.res.Resources.Theme
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
 import android.widget.Toast
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PieceKind
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
@@ -41,7 +42,19 @@ import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 import java.io.IOException
+import java.util.logging.Logger
 
+
+object PositionGeneratorValuesHolder {
+    var playerKingConstraintScript = ""
+    var computerKingConstraintScript = ""
+    var kingsMutualConstraintScript = ""
+    val otherPiecesCount = mutableMapOf<PieceKind, Int>()
+    var otherPiecesGlobalConstraintScript = ""
+    var otherPiecesMutualConstraintScript = ""
+    var otherPiecesIndexedConstraintScript = ""
+    var resultShouldBeDraw = false
+}
 
 data class BoomButtonParameters(val textId: Int, val iconId: Int, val colorId: Int, val listener: OnBMClickListener)
 
@@ -55,7 +68,8 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 OtherPiecesCountConstraintEditorFragment.newInstance(),
                 OtherPiecesGlobalConstraintEditorFragment.newInstance(),
                 OtherPiecesMutualConstraintEditorFragment.newInstance(),
-                OtherPiecesIndexedConstraintEditorFragment.newInstance()
+                OtherPiecesIndexedConstraintEditorFragment.newInstance(),
+                SetIfResultShouldBeDrawFragment.newInstance()
         )
     }
 
@@ -114,7 +128,8 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                         R.string.other_pieces_count_constraints,
                         R.string.other_pieces_global_constraints,
                         R.string.other_pieces_mutual_constraints,
-                        R.string.other_pieces_indexed_constraints).map {
+                        R.string.other_pieces_indexed_constraints,
+                        R.string.theoretic_result_option).map {
                     resources.getString(it)
                 }.toTypedArray()
         )
@@ -138,12 +153,15 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
     }
 
     private fun buildFileContent(): String {
-        val playerKingFragment = allFragments[0] as PlayerKingConstraintEditorFragment
-
         val contentBuilder = StringBuilder()
 
+        contentBuilder.append(if (PositionGeneratorValuesHolder.resultShouldBeDraw) "1" else "0")
+        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.newLine)
+
         contentBuilder.append(FilesManager.playerKingHeader)
-        contentBuilder.append(playerKingFragment.getScriptContent())
+        contentBuilder.append(PositionGeneratorValuesHolder.playerKingConstraintScript)
+        contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(FilesManager.newLine)
 
         return contentBuilder.toString()

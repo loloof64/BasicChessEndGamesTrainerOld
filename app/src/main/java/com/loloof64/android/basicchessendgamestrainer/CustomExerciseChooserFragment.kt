@@ -37,18 +37,17 @@ class CustomExerciseChooserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         customExercisesListView.layoutManager = LinearLayoutManager(activity)
-        customExercisesListView.adapter = CustomExercisesListAdapter(object : ItemClickListener {
+        customExercisesListView.adapter = CustomExercisesListAdapter(activity!!, object : ItemClickListener {
             override fun onClick(position: Int) {
                 //TODO launch exercise from the definition
+            }},
+            object : ItemLongClickListener {
+                override fun onLongClick(position: Int) {
+                    //TODO launch item menu
+                }
+
             }
-
-        },
-                object : ItemLongClickListener {
-                    override fun onLongClick(position: Int) {
-                        //TODO launch item menu
-                    }
-
-                })
+        )
 
         fab_add_custom_exercise.setOnClickListener {
             val intent = Intent(activity, PositionGeneratorEditorActivity::class.java)

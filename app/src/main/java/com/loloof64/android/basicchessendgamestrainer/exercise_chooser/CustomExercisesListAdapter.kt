@@ -18,6 +18,7 @@
 
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
+import android.content.Context
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -26,16 +27,21 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
+import java.io.BufferedReader
+import java.io.InputStreamReader
 
 interface ItemLongClickListener {
     fun onLongClick(position: Int)
 }
 
-class CustomExercisesListAdapter(private val itemClickListener: ItemClickListener,
+data class CustomExerciseInfo(val name: String, val mustDraw: Boolean)
+
+class CustomExercisesListAdapter(private val context: Context,
+                                 private val itemClickListener: ItemClickListener,
                                  private val itemLongClickListener: ItemLongClickListener)
     : RecyclerView.Adapter<CustomExercisesListAdapter.Companion.ViewHolder>(){
 
-    private var exercisesList: List<ExerciseInfo> = listOf()
+    private var exercisesList: List<CustomExerciseInfo> = listOf()
 
     companion object {
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
@@ -54,17 +60,33 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
             return ResourcesCompat.getColor(context.resources, colorId, null)
         }
 
-        holder?.textView?.text = MyApplication.getApplicationContext().getString(exercisesList[position].textId)
+        holder?.textView?.text = exercisesList[position].name
         holder?.textView?.setOnClickListener{ itemClickListener.onClick(position) }
         holder?.textView?.setOnLongClickListener { itemLongClickListener.onLongClick(position); true }
         holder?.textView?.setBackgroundColor(
-                if (exercisesList[position].mustWin) getColor(R.color.exercise_chooser_winning_color)
-                else getColor(R.color.exercise_chooser_nullifying_color)
+                if (exercisesList[position].mustDraw) getColor(R.color.exercise_chooser_nullifying_color)
+                else getColor(R.color.exercise_chooser_winning_color)
         )
     }
 
     override fun getItemCount(): Int {
         return exercisesList.size
+    }
+
+    fun loadScriptFilesList() {
+        exercisesList = context.fileList().filter { it.endsWith(".txt") }.map{
+            val mustDraw = readFirstLine(it) == "1"
+            CustomExerciseInfo(it, mustDraw)
+        }.sortedBy { it.name }
+    }
+
+    private fun readFirstLine(fileName: String) : String {
+        val fileStream = MyApplication.appContext.openFileInput(fileName)
+        lateinit var line: String
+        BufferedReader(InputStreamReader(fileStream)).use {
+            line = it.readLine()
+        }
+        return line
     }
 
 }

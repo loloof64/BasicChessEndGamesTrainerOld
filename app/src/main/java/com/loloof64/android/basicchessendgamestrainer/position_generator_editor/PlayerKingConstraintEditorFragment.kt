@@ -21,10 +21,13 @@ package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.*
@@ -44,6 +47,21 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         button_check_player_king_constraint.setOnClickListener {
             if (checkIsScriptIsValidAndShowEventualError()) Toast.makeText(activity, R.string.script_valid, Toast.LENGTH_SHORT).show()
         }
+
+        generator_editor_field_player_king_constraint.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(str: Editable?) {
+                PositionGeneratorValuesHolder.playerKingConstraintScript = str?.toString() ?:
+                        "<Internal error : could not read updated player king constraint field>"
+            }
+
+            override fun beforeTextChanged(str: CharSequence?, start: Int, count: Int, after: Int) {
+
+            }
+
+            override fun onTextChanged(str: CharSequence?, start: Int, before: Int, count: Int) {
+
+            }
+        })
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -59,10 +77,8 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         }
     }
 
-    fun getScriptContent(): String = generator_editor_field_player_king_constraint.text.toString()
-
     fun checkIsScriptIsValidAndShowEventualError(): Boolean {
-       val scriptIsEmpty = generator_editor_field_player_king_constraint.text.toString().isEmpty()
+       val scriptIsEmpty = PositionGeneratorValuesHolder.playerKingConstraintScript.isEmpty()
         if (scriptIsEmpty){
             val title = activity?.resources?.getString(R.string.player_king_constraints) ?:
             "<Internal error : could not get empty script localized constraint type !>"
@@ -88,7 +104,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     }
 
     private fun buildExprObjectFromScript() : SingleKingConstraintBooleanExpr {
-        val inputStream = CharStreams.fromString(generator_editor_field_player_king_constraint.text.toString())
+        val inputStream = CharStreams.fromString(PositionGeneratorValuesHolder.playerKingConstraintScript)
         val lexer = BailSingleKingConstraintLexer(inputStream)
         val tokens = CommonTokenStream(lexer)
         val parser = SingleKingConstraintParser(tokens)
