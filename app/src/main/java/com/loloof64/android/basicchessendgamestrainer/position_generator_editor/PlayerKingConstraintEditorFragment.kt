@@ -60,12 +60,27 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     }
 
     private fun checkIsScriptIsValidAndShowEventualError(): Boolean {
+       val scriptIsEmpty = generator_editor_field_player_king_constraint.text.toString().isEmpty()
+        if (scriptIsEmpty){
+            val title = activity?.resources?.getString(R.string.player_king_constraints) ?:
+            "<Internal error : could not get empty script localized constraint type !>"
+            val errorMessage = activity?.resources?.getString(R.string.empty_script_error) ?:
+                "<Internal error : could not get empty script localized error message !>"
+            showAlertDialog(title, errorMessage)
+            return true
+        }
+
        return try {
            val resultExpr = buildExprObjectFromScript()
            return testCanEvaluateExpressionWithDefaultVariablesSetAndShowEventualError(resultExpr)
        }
        catch (ex: ParseCancellationException){
-           showErrorDialog(ex.message ?: "<Internal error : could not get ParseCancellationException message !>")
+           val message = ex.message ?: "<Internal error : could not get ParseCancellationException message !>"
+           val constraintTypeStr = activity?.resources?.getString(R.string.player_king_constraints) ?:
+           "<Internal error : could not get empty script localized constraint type !>"
+           val titleFormat = activity?.resources?.getString(R.string.parse_error_dialog_title)
+           val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
+           showAlertDialog(title, message)
            false
        }
     }
@@ -120,16 +135,21 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         }
         catch (ex: VariableIsNotAffectedException) {
             val messageFormat = activity?.resources?.getString(R.string.parser_variable_not_affected)
-            val message = String.format(messageFormat ?: "<Internal error could not open format string !>", ex.name)
-            showErrorDialog(message)
+            val message = String.format(messageFormat ?: "<Internal error : could not open format string !>", ex.name)
+
+            val constraintTypeStr = activity?.resources?.getString(R.string.player_king_constraints)
+
+            val titleFormat = activity?.resources?.getString(R.string.parse_error_dialog_title)
+            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
+            showAlertDialog(title, message)
 
             false
         }
     }
 
-    private fun showErrorDialog(message: String) {
+    private fun showAlertDialog(title : String, message: String) {
         val dialog = AlertDialog.Builder(activity!!).create()
-        dialog.setTitle(R.string.parse_error_dialog_title)
+        dialog.setTitle(title)
         dialog.setMessage(message)
         val buttonText = activity?.resources?.getString(R.string.OK)
         dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }

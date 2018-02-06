@@ -78,13 +78,13 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="exercise_kppp_kppp">Roi+3Pions/Roi+3Pions</string>
     <string name="loading_stockfish">Chargement du moteur Stockfish</string>
     <string name="title_activity_position_generator_editor">Editeur pour générateur de position</string>
-    <string name="player_king_constraints">Roi joueur</string>
-    <string name="computer_king_constraints">Roi ordinateur</string>
-    <string name="other_pieces_count_constraints">Compte autres pièces</string>
-    <string name="other_pieces_mutual_constraints">Contraintes mutuelles autres pièces</string>
-    <string name="other_pieces_indexed_constraints">Contraintes indexées autres pièces</string>
-    <string name="other_pieces_global_constraints">Contraintes globales autres pièces</string>
-    <string name="kings_mutual_constraints">Contraintes mutuelles rois</string>
+    <string name="player_king_constraints">contraintes roi joueur</string>
+    <string name="computer_king_constraints">contraintes roi ordinateur</string>
+    <string name="other_pieces_count_constraints">contraintes compte autres pièces</string>
+    <string name="other_pieces_mutual_constraints">contraintes mutuelles autres pièces</string>
+    <string name="other_pieces_indexed_constraints">contraintes indexées autres pièces</string>
+    <string name="other_pieces_global_constraints">contraintes globales autres pièces</string>
+    <string name="kings_mutual_constraints">contraintes mutuelles rois</string>
     <string name="tab_title_predefined_exercise">Prédéfinies</string>
     <string name="tab_title_custom_exercise">Personnelles</string>
     <string name="action_save_generator">Sauvegarder tous les scripts</string>
@@ -103,6 +103,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="antlr4_eof">FinDeFichier</string>
     <string name="antlr4_unknown_input">Entrée inconnue</string>
     <string name="OK">OK</string>
-    <string name="parse_error_dialog_title">Erreur de script</string>
+    <string name="parse_error_dialog_title">Erreur de script pour %s</string>
     <string name="menu_actions">Actions</string>
+    <string name="empty_script_error">Le script est vide : sera donc ignoré lors de la construction des positions.</string>
 </resources>
