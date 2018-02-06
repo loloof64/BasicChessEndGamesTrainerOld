@@ -18,23 +18,37 @@
 
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint
 
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
+import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintBaseVisitor
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintParser
+import org.antlr.v4.runtime.misc.ParseCancellationException
+
+data class GenericExprVariable(val name: String, val value: SingleKingConstraintGenericExpr)
 
 object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingConstraintGenericExpr>() {
 
-    private val intExprVariables = mutableMapOf<String, SingleKingConstraintNumericExpr>()
-    private val booleanExprVariables = mutableMapOf<String, SingleKingConstraintBooleanExpr>()
+    private val builtVariables = mutableListOf<GenericExprVariable>()
 
-    fun clearVariables() {
-        intExprVariables.clear()
-        booleanExprVariables.clear()
+    private fun List<GenericExprVariable>.containsKey(key: String): Boolean {
+        return this.any { it.name == key }
     }
 
-    fun getIntVariables() = intExprVariables.toMap()
+    private operator fun List<GenericExprVariable>.get(key: String) : SingleKingConstraintGenericExpr {
+        val expr = this.find { it.name == key }?.value
+        if (expr == null) {
+            val errorFormat = MyApplication.appContext.resources.getString(R.string.parser_variable_not_affected)
+            throw ParseCancellationException(String.format(errorFormat, key))
+        }
+        return expr
+    }
 
-    fun getBooleanVariables() = booleanExprVariables.toMap()
+    fun clearVariables() {
+        builtVariables.clear()
+    }
+
+    fun getVariables() = builtVariables.toList()
 
     override fun visitTerminalExpr(ctx: SingleKingConstraintParser.TerminalExprContext?): SingleKingConstraintGenericExpr {
         return visit(ctx?.booleanExpr())
@@ -43,14 +57,14 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
     override fun visitNumericAssign(ctx: SingleKingConstraintParser.NumericAssignContext?): SingleKingConstraintGenericExpr {
         val variableName = ctx?.ID()?.text.toString()
         val assignedValue = visit(ctx?.numericExpr()) as SingleKingConstraintNumericExpr
-        intExprVariables[variableName] = assignedValue
+        builtVariables.add(GenericExprVariable(variableName, assignedValue))
         return UnitSingleKingConstraintGenericExpr
     }
 
     override fun visitBooleanAssign(ctx: SingleKingConstraintParser.BooleanAssignContext?): SingleKingConstraintGenericExpr {
         val variableName = ctx?.ID()?.text.toString()
         val assignedValue = visit(ctx?.booleanExpr()) as SingleKingConstraintBooleanExpr
-        booleanExprVariables[variableName] = assignedValue
+        builtVariables.add(GenericExprVariable(variableName, assignedValue))
         return UnitSingleKingConstraintGenericExpr
     }
 
@@ -69,7 +83,7 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
 
     override fun visitBooleanVariable(ctx: SingleKingConstraintParser.BooleanVariableContext?): SingleKingConstraintGenericExpr {
         val variableName = ctx?.ID()?.text.toString()
-        return if (booleanExprVariables.containsKey(variableName)) booleanExprVariables[variableName]!!
+        return if (builtVariables.containsKey(variableName)) builtVariables[variableName]
                             else VariableSingleKingConstraintBooleanExpr(name = variableName)
     }
 
@@ -138,7 +152,7 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
 
     override fun visitNumericVariable(ctx: SingleKingConstraintParser.NumericVariableContext?): SingleKingConstraintGenericExpr {
         val variableName = ctx?.ID()?.text.toString()
-        return if (booleanExprVariables.containsKey(variableName)) booleanExprVariables[variableName]!!
+        return if (builtVariables.containsKey(variableName)) builtVariables[variableName]
         else VariableSingleKingConstraintNumericExpr(name = variableName)
     }
 

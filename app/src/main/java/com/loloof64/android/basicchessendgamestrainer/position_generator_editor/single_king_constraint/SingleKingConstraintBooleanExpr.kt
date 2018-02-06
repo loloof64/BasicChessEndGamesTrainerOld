@@ -51,59 +51,53 @@ data class VariableSingleKingConstraintNumericExpr(val name: String): SingleKing
 data class Plus_SingleKingConstraintNumericExpr(val expr1: SingleKingConstraintNumericExpr, val expr2: SingleKingConstraintNumericExpr) : SingleKingConstraintNumericExpr()
 data class Minus_SingleKingConstraintNumericExpr(val expr1: SingleKingConstraintNumericExpr, val expr2: SingleKingConstraintNumericExpr) : SingleKingConstraintNumericExpr()
 
-fun eval(expr: SingleKingConstraintNumericExpr, intValues: Map<String, Int>, booleanValues: Map<String, Boolean>,
-         numericVariables: Map<String, SingleKingConstraintNumericExpr>,
-         booleanVariables: Map<String, SingleKingConstraintBooleanExpr>) : Int {
+fun eval(expr: SingleKingConstraintNumericExpr, intValues: Map<String, Int>, booleanValues: Map<String, Boolean>) : Int {
     return when (expr) {
-        is ParenthesisSingleKingConstraintNumericExpr -> eval(expr.expr, intValues, booleanValues, numericVariables, booleanVariables)
+        is ParenthesisSingleKingConstraintNumericExpr -> eval(expr.expr, intValues, booleanValues)
         is ConditionalSingleKingConstraintNumericExpr ->
-            if (eval(expr.condition, intValues, booleanValues, numericVariables, booleanVariables))
-                eval(expr.successExpr, intValues, booleanValues, numericVariables, booleanVariables)
-                else eval(expr.failureExpr, intValues, booleanValues, numericVariables, booleanVariables)
-        is AbsoluteSingleKingConstraintNumericExpr -> Math.abs(eval(expr.expr, intValues, booleanValues, numericVariables, booleanVariables))
+            if (eval(expr.condition, intValues, booleanValues))
+                eval(expr.successExpr, intValues, booleanValues)
+            else eval(expr.failureExpr, intValues, booleanValues)
+        is AbsoluteSingleKingConstraintNumericExpr -> Math.abs(eval(expr.expr, intValues, booleanValues))
         is LiteralSingleKingConstraintNumericExpr -> expr.value
         is VariableSingleKingConstraintNumericExpr -> {
             if (intValues.containsKey(expr.name)) intValues[expr.name]!!
-            else if (numericVariables.containsKey(expr.name)) eval(numericVariables[expr.name]!!, intValues, booleanValues, numericVariables, booleanVariables)
             else throw VariableIsNotAffectedException(expr.name)
         }
-        is Plus_SingleKingConstraintNumericExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) +
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is Minus_SingleKingConstraintNumericExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) -
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
+        is Plus_SingleKingConstraintNumericExpr -> eval(expr.expr1, intValues, booleanValues) +
+                eval(expr.expr2, intValues, booleanValues)
+        is Minus_SingleKingConstraintNumericExpr -> eval(expr.expr1, intValues, booleanValues) -
+                eval(expr.expr2, intValues, booleanValues)
     }
 }
 
-fun eval(expr: SingleKingConstraintBooleanExpr, intValues: Map<String, Int>, booleanValues: Map<String, Boolean>,
-         numericVariables: Map<String, SingleKingConstraintNumericExpr>,
-         booleanVariables: Map<String, SingleKingConstraintBooleanExpr>) : Boolean {
+fun eval(expr: SingleKingConstraintBooleanExpr, intValues: Map<String, Int>, booleanValues: Map<String, Boolean>) : Boolean {
     return when (expr) {
-        is ParenthesisSingleKingConstraintBooleanExpr -> eval(expr.expr, intValues, booleanValues, numericVariables, booleanVariables)
+        is ParenthesisSingleKingConstraintBooleanExpr -> eval(expr.expr, intValues, booleanValues)
         is ConditionalSingleKingConstraintBooleanExpr ->
-            if (eval(expr.condition, intValues, booleanValues, numericVariables, booleanVariables))
-                eval(expr.successExpr, intValues, booleanValues, numericVariables, booleanVariables)
-            else eval(expr.failureExpr, intValues, booleanValues, numericVariables, booleanVariables)
+            if (eval(expr.condition, intValues, booleanValues))
+                eval(expr.successExpr, intValues, booleanValues)
+            else eval(expr.failureExpr, intValues, booleanValues)
         is VariableSingleKingConstraintBooleanExpr -> {
             if (booleanValues.containsKey(expr.name)) booleanValues[expr.name]!!
-            else if (booleanVariables.containsKey(expr.name)) eval(booleanVariables[expr.name]!!, intValues, booleanValues, numericVariables, booleanVariables)
             else throw VariableIsNotAffectedException(expr.name)
         }
-        is LT_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) <
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is GT_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) >
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is LEQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) <=
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is GEQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) >=
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is EQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) ==
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is NEQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) !=
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is AndComparisonSingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) &&
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
-        is OrComparisonSingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues, numericVariables, booleanVariables) ||
-                eval(expr.expr2, intValues, booleanValues, numericVariables, booleanVariables)
+        is LT_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) <
+                eval(expr.expr2, intValues, booleanValues)
+        is GT_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) >
+                eval(expr.expr2, intValues, booleanValues)
+        is LEQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) <=
+                eval(expr.expr2, intValues, booleanValues)
+        is GEQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) >=
+                eval(expr.expr2, intValues, booleanValues)
+        is EQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) ==
+                eval(expr.expr2, intValues, booleanValues)
+        is NEQ_SingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) !=
+                eval(expr.expr2, intValues, booleanValues)
+        is AndComparisonSingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) &&
+                eval(expr.expr2, intValues, booleanValues)
+        is OrComparisonSingleKingConstraintBooleanExpr -> eval(expr.expr1, intValues, booleanValues) ||
+                eval(expr.expr2, intValues, booleanValues)
         is LiteralSingleKingConstraintBooleanExpr -> expr.value
     }
 }

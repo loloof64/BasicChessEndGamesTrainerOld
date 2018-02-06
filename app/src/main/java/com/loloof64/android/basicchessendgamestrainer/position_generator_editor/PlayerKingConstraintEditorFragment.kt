@@ -82,18 +82,40 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     }
 
     private fun testCanEvaluateExpressionWithDefaultVariablesSetAndShowEventualError(expr: SingleKingConstraintBooleanExpr): Boolean {
-        val samplesIntValues = mapOf(
-                "file" to PositionConstraints.FileA,
-                "rank" to PositionConstraints.Rank7
-        )
-        val samplesBooleanValues = mapOf("playerHasWhite" to true)
-
-        val numericVariables = SingleKingConstraintBuilder.getIntVariables()
-        val booleanVariables = SingleKingConstraintBuilder.getBooleanVariables()
-
         return try {
-            eval(expr = expr, intValues = samplesIntValues, booleanValues = samplesBooleanValues,
-                    numericVariables = numericVariables, booleanVariables = booleanVariables)
+            val samplesIntValues = mapOf(
+                    "file" to PositionConstraints.FileA,
+                    "rank" to PositionConstraints.Rank7
+            )
+            val sampleBooleanValues = mapOf("playerHasWhite" to true)
+
+            val intValues = samplesIntValues.toMutableMap()
+            val booleanValues = sampleBooleanValues.toMutableMap()
+
+            val variables = SingleKingConstraintBuilder.getVariables()
+            // We must evaluate all variables before evaluating the final script expression
+            variables.forEach {
+                when (it.value) {
+                    is SingleKingConstraintNumericExpr -> {
+                        if (samplesIntValues.containsKey(it.name)) {
+                            val errorFormat = resources.getString(R.string.parser_overriding_predefined_variable)
+                            throw ParseCancellationException(String.format(errorFormat, it.name))
+                        }
+                        else intValues[it.name] = eval(expr = it.value, intValues = intValues, booleanValues = booleanValues)
+                    }
+                    is SingleKingConstraintBooleanExpr -> {
+                        if (sampleBooleanValues.containsKey(it.name)) {
+                            val errorFormat = resources.getString(R.string.parser_overriding_predefined_variable)
+                            throw ParseCancellationException(String.format(errorFormat, it.name))
+                        }
+                        else booleanValues[it.name] = eval(expr = it.value, intValues = intValues, booleanValues = booleanValues)
+                    }
+                }
+
+            }
+
+
+            eval(expr = expr, intValues = intValues, booleanValues = booleanValues)
             true
         }
         catch (ex: VariableIsNotAffectedException) {

@@ -96,7 +96,8 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="no_viable_alt_exception">L\'entrée %s ne correspond aucune règle (ligne %s: caractère numéro %s).</string>
     <string name="input_mismatch_exception">Mauvaise entrée à la ligne %s: caractère numéro %s. Il fallait mettre %s mais j\'ai reçu %s .</string>
     <string name="parser_unrecognized_symbol">Elément inconnu : \'%s\' .</string>
-    <string name="parser_variable_not_affected">La variable \'%s\' n\'a pas été affectée dans le script !</string>
+    <string name="parser_variable_not_affected">La variable \'%s\' est utilisée avant-même d\'avoir été définie !</string>
+    <string name="parser_overriding_predefined_variable">Vous changez la variable prédéfinie %s !</string>
     <string name="misc_parse_error">Erreur de script diverse.</string>
     <string name="no_antlr4_token">[pas_d_occurence]</string>
     <string name="antlr4_eof">FinDeFichier</string>

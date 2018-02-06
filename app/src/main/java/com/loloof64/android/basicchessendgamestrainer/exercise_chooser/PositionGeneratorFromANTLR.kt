@@ -105,8 +105,7 @@ object PositionGeneratorFromANTLR {
                     val intValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
                     val booleanValues = mapOf("playerHasWhite" to playerHasWhite)
                     val buildSuccess = eval(expr = allConstraints.playerKingConstraint!!,
-                            intValues = intValues, booleanValues = booleanValues,
-                            numericVariables = mapOf(), booleanVariables = mapOf()
+                            intValues = intValues, booleanValues = booleanValues
                     )
                     if (buildSuccess) return builtPosition
                 }
@@ -140,8 +139,8 @@ object PositionGeneratorFromANTLR {
                     val intValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
                     val booleanValues = mapOf("playerHasWhite" to playerHasWhite)
                     val buildSuccess = eval(expr = allConstraints.playerKingConstraint!!,
-                            intValues = intValues, booleanValues = booleanValues,
-                            numericVariables = mapOf(), booleanVariables = mapOf())
+                            intValues = intValues, booleanValues = booleanValues
+                    )
                     if (buildSuccess) return builtPosition!!
                 }
                 else {
