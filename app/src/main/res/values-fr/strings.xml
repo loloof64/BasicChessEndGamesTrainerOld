@@ -115,4 +115,6 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="no_filename_given">Annulation car aucun nom de fichier fourni.</string>
     <string name="overwrite_file_prompt_title">Ecraser le fichier ?</string>
     <string name="overwrite_file_prompt_message">Ecraser le fichier %s ?</string>
+    <string name="confirm_cancel_script_editing_title">Confirmer l\'annulation de l\'édition de script ?</string>
+    <string name="confirm_cancel_script_editing_message">Voulez-vous vraiment quitter l\'édition de script ?</string>
 </resources>

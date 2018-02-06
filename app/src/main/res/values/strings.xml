@@ -111,4 +111,6 @@ of endgame.[CR][CR]
     <string name="no_filename_given">Cancelled as no file name given.</string>
     <string name="overwrite_file_prompt_title">Overwrite file ?</string>
     <string name="overwrite_file_prompt_message">Overwrite file %s ?</string>
+    <string name="confirm_cancel_script_editing_title">Confirm script editing cancellation ?</string>
+    <string name="confirm_cancel_script_editing_message">Do you really want to quit script editing ?</string>
 </resources>

@@ -92,9 +92,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                         iconId = R.mipmap.ic_action_cancel,
                         colorId = R.color.position_generator_activity_boom_menu_action_cancel,
                         listener = OnBMClickListener {
-                            /*
-                                                TODO ask for confirmation and proceed/stay accordingly
-                                                 */
+                            askForCancelConfirmation()
                         }
                 )
                 else -> throw RuntimeException("Unexpected pieceIndex value $pieceIndex")
@@ -133,6 +131,10 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
             override fun onNothingSelected(parent: AdapterView<*>) {}
         }
 
+    }
+
+    override fun onBackPressed() {
+        askForCancelConfirmation()
     }
 
     private fun buildFileContent(): String {
@@ -202,6 +204,20 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 .setMessage(String.format(resources.getString(R.string.overwrite_file_prompt_message), name))
                 .setPositiveButton(R.string.OK, {_: DialogInterface?, _: Int ->
                     saveFile(name)
+                })
+                .setNegativeButton(R.string.cancel, {dialog: DialogInterface?, _: Int ->
+                    dialog?.dismiss()
+                })
+                .show()
+    }
+
+    private fun askForCancelConfirmation() {
+        AlertDialog.Builder(this)
+                .setTitle(R.string.confirm_cancel_script_editing_title)
+                .setMessage(R.string.confirm_cancel_script_editing_message)
+                .setPositiveButton(R.string.OK, {dialog: DialogInterface?, _: Int ->
+                    dialog?.dismiss()
+                    finish()
                 })
                 .setNegativeButton(R.string.cancel, {dialog: DialogInterface?, _: Int ->
                     dialog?.dismiss()
