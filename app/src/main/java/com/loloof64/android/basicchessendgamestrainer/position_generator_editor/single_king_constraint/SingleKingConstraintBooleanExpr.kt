@@ -54,10 +54,13 @@ data class Minus_SingleKingConstraintNumericExpr(val expr1: SingleKingConstraint
 fun eval(expr: SingleKingConstraintNumericExpr, intValues: Map<String, Int>, booleanValues: Map<String, Boolean>) : Int {
     return when (expr) {
         is ParenthesisSingleKingConstraintNumericExpr -> eval(expr.expr, intValues, booleanValues)
-        is ConditionalSingleKingConstraintNumericExpr ->
-            if (eval(expr.condition, intValues, booleanValues))
-                eval(expr.successExpr, intValues, booleanValues)
-            else eval(expr.failureExpr, intValues, booleanValues)
+        is ConditionalSingleKingConstraintNumericExpr -> {
+            val condition = eval(expr.condition, intValues, booleanValues)
+            val successBranch = eval(expr.successExpr, intValues, booleanValues)
+            val failureBranch = eval(expr.failureExpr, intValues, booleanValues)
+
+            if (condition) successBranch else failureBranch
+        }
         is AbsoluteSingleKingConstraintNumericExpr -> Math.abs(eval(expr.expr, intValues, booleanValues))
         is LiteralSingleKingConstraintNumericExpr -> expr.value
         is VariableSingleKingConstraintNumericExpr -> {
@@ -74,10 +77,13 @@ fun eval(expr: SingleKingConstraintNumericExpr, intValues: Map<String, Int>, boo
 fun eval(expr: SingleKingConstraintBooleanExpr, intValues: Map<String, Int>, booleanValues: Map<String, Boolean>) : Boolean {
     return when (expr) {
         is ParenthesisSingleKingConstraintBooleanExpr -> eval(expr.expr, intValues, booleanValues)
-        is ConditionalSingleKingConstraintBooleanExpr ->
-            if (eval(expr.condition, intValues, booleanValues))
-                eval(expr.successExpr, intValues, booleanValues)
-            else eval(expr.failureExpr, intValues, booleanValues)
+        is ConditionalSingleKingConstraintBooleanExpr -> {
+            val condition = eval(expr.condition, intValues, booleanValues)
+            val successBranch = eval(expr.successExpr, intValues, booleanValues)
+            val failureBranch = eval(expr.failureExpr, intValues, booleanValues)
+
+            if (condition) successBranch else failureBranch
+        }
         is VariableSingleKingConstraintBooleanExpr -> {
             if (booleanValues.containsKey(expr.name)) booleanValues[expr.name]!!
             else throw VariableIsNotAffectedException(expr.name)
