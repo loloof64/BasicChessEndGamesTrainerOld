@@ -22,12 +22,24 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
+import kotlinx.android.synthetic.main.fragment_set_if_result_should_be_draw.*
 
 class SetIfResultShouldBeDrawFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_set_if_result_should_be_draw, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        result_should_be_draw_button.setOnClickListener {
+            PositionGeneratorValuesHolder.resultShouldBeDraw = true
+        }
+
+        result_should_not_be_draw_button.setOnClickListener {
+            PositionGeneratorValuesHolder.resultShouldBeDraw = false
+        }
     }
 
     companion object {
