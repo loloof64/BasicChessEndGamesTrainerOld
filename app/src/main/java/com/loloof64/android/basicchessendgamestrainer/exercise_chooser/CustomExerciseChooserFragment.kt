@@ -16,7 +16,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.loloof64.android.basicchessendgamestrainer
+package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
 import android.content.Intent
 import android.os.Bundle
@@ -25,29 +25,22 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.CustomExercisesListAdapter
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemLongClickListener
+import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorEditorActivity
+import com.loloof64.android.basicchessendgamestrainer.R
 import kotlinx.android.synthetic.main.fragment_custom_exercise_chooser.*
 
 class CustomExerciseChooserFragment : Fragment() {
+    private lateinit var adapter: CustomExercisesListAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_custom_exercise_chooser, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         customExercisesListView.layoutManager = LinearLayoutManager(activity)
-        customExercisesListView.adapter = CustomExercisesListAdapter(activity!!, object : ItemClickListener {
-            override fun onClick(position: Int) {
-                //TODO launch exercise from the definition
-            }},
-            object : ItemLongClickListener {
-                override fun onLongClick(position: Int) {
-                    //TODO launch item menu
-                }
-
-            }
-        )
+        adapter = CustomExercisesListAdapter(CustomExerciseChooserFragmentItemClickListener(),
+                CustomExerciseChooserFragmentItemLongClickListener())
+        customExercisesListView.adapter = adapter
 
         fab_add_custom_exercise.setOnClickListener {
             val intent = Intent(activity, PositionGeneratorEditorActivity::class.java)
@@ -55,9 +48,26 @@ class CustomExerciseChooserFragment : Fragment() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        adapter.loadScriptFilesList()
+    }
+
     companion object {
         fun newInstance(): CustomExerciseChooserFragment {
             return CustomExerciseChooserFragment()
         }
+    }
+}
+
+class CustomExerciseChooserFragmentItemClickListener : ItemClickListener {
+    override fun onClick(position: Int) {
+        //TODO launch exercise from the definition
+    }
+}
+
+class CustomExerciseChooserFragmentItemLongClickListener: ItemLongClickListener {
+    override fun onLongClick(position: Int) {
+        //TODO launch item menu
     }
 }

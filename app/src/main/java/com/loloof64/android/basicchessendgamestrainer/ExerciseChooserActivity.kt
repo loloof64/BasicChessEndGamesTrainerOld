@@ -20,22 +20,18 @@ package com.loloof64.android.basicchessendgamestrainer
 
 import android.content.Intent
 import android.support.design.widget.TabLayout
-import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentPagerAdapter
-import android.support.v4.view.ViewPager
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.CustomExerciseChooserFragment
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PredefinedExerciseChooserFragment
 
 import kotlinx.android.synthetic.main.activity_exercise_chooser.*
-import kotlinx.android.synthetic.main.fragment_exercise_chooser.view.*
 
 class ExerciseChooserActivity : AppCompatActivity() {
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.loloof64.android.basicchessendgamestrainer.PredefinedExerciseChooserFragment"
+    tools:context="com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PredefinedExerciseChooserFragment"
 >
 
     <android.support.v7.widget.RecyclerView

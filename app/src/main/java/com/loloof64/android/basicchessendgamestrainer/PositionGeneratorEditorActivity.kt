@@ -42,7 +42,6 @@ import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 import java.io.IOException
-import java.util.logging.Logger
 
 
 object PositionGeneratorValuesHolder {
@@ -178,7 +177,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 if (fileName.isNotEmpty()){
                     val fileNameWithExtension = if (fileName.endsWith(".txt")) fileName else "$fileName.txt"
 
-                    if (FilesManager.exists(fileNameWithExtension)) {
+                    if (FilesManager.existsInCurrentDirectory(fileNameWithExtension)) {
                         askIfFileShouldBeOverwritten(fileNameWithExtension)
                     }
                     else {

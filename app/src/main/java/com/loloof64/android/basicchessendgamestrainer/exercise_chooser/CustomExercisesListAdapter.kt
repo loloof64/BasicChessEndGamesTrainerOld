@@ -18,17 +18,18 @@
 
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
-import android.content.Context
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
+import com.loloof64.android.basicchessendgamestrainer.FilesManager
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
 import java.io.BufferedReader
-import java.io.InputStreamReader
+import java.io.File
+import java.io.FileReader
 
 interface ItemLongClickListener {
     fun onLongClick(position: Int)
@@ -36,12 +37,15 @@ interface ItemLongClickListener {
 
 data class CustomExerciseInfo(val name: String, val mustDraw: Boolean)
 
-class CustomExercisesListAdapter(private val context: Context,
-                                 private val itemClickListener: ItemClickListener,
+class CustomExercisesListAdapter(private val itemClickListener: ItemClickListener,
                                  private val itemLongClickListener: ItemLongClickListener)
     : RecyclerView.Adapter<CustomExercisesListAdapter.Companion.ViewHolder>(){
 
     private var exercisesList: List<CustomExerciseInfo> = listOf()
+
+    init {
+        loadScriptFilesList()
+    }
 
     companion object {
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
@@ -74,16 +78,19 @@ class CustomExercisesListAdapter(private val context: Context,
     }
 
     fun loadScriptFilesList() {
-        exercisesList = context.fileList().filter { it.endsWith(".txt") }.map{
+        exercisesList = FilesManager.getCurrentDirectoryFiles().filter { /* it.endsWith(".txt") */ true }.map{
             val mustDraw = readFirstLine(it) == "1"
-            CustomExerciseInfo(it, mustDraw)
+            CustomExerciseInfo(it.nameWithoutExtension, mustDraw)
         }.sortedBy { it.name }
+        /////////////////////////////
+        println(exercisesList)
+        //////////////////////////////
+        notifyDataSetChanged()
     }
 
-    private fun readFirstLine(fileName: String) : String {
-        val fileStream = MyApplication.appContext.openFileInput(fileName)
+    private fun readFirstLine(file: File) : String {
         lateinit var line: String
-        BufferedReader(InputStreamReader(fileStream)).use {
+        BufferedReader(FileReader(file)).use {
             line = it.readLine()
         }
         return line

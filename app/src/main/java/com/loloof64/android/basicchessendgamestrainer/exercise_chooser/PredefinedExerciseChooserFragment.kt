@@ -16,16 +16,15 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.loloof64.android.basicchessendgamestrainer
+package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.LinearLayoutManager
 import android.view.*
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PredefinedExercisesListAdapter
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.ItemClickListener
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
+import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
+import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.EngineInteraction
 import kotlinx.android.synthetic.main.fragment_predefined_exercise_chooser.*
 

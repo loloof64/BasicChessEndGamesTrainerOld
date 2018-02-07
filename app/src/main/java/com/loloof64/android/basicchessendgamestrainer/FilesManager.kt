@@ -18,14 +18,20 @@
 
 package com.loloof64.android.basicchessendgamestrainer
 
-import android.content.Context
 import java.io.*
 
 object FilesManager {
     const val newLine = "\n"
     const val playerKingHeader = "# player king"
 
-    fun exists(name: String): Boolean = MyApplication.appContext.fileList().contains(name)
+    private val topDirectory = File(MyApplication.appContext.filesDir, "script")
+    private var currentDirectory = topDirectory
+
+    init {
+        topDirectory.mkdir()
+    }
+
+    fun existsInCurrentDirectory(name: String): Boolean = currentDirectory.listFiles().any { it.name == name }
 
     /*
     Save and overwrite text file.
@@ -33,12 +39,14 @@ object FilesManager {
     fun saveTextFile(name: String, content: String) {
         val contentLines = content.split("""\n+""".toRegex())
 
-        val fileStream = MyApplication.appContext.openFileOutput(name, Context.MODE_PRIVATE)
-        BufferedWriter(OutputStreamWriter(fileStream)).use { reader ->
+        val file = File(currentDirectory, name)
+        BufferedWriter(FileWriter(file)).use { reader ->
             contentLines.forEach { line ->
                 reader.append(line)
                 reader.newLine()
             }
         }
     }
+
+    fun getCurrentDirectoryFiles() : Array<File> = currentDirectory.listFiles()
 }
