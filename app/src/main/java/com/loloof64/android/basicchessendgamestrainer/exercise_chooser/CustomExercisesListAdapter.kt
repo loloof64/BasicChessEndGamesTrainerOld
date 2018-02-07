@@ -78,16 +78,10 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
     }
 
     fun loadScriptFilesList() {
-        exercisesList = FilesManager.getCurrentDirectoryFiles().filter { /* it.endsWith(".txt") */ true }.map{
-            ///////////////////////////////////////
-            println("First line is ${readFirstLine(it)}")
-            ///////////////////////////////////////////
+        exercisesList = FilesManager.getCurrentDirectoryFiles().filter { it.name.endsWith(".txt") }.map{
             val mustDraw = readFirstLine(it) == "1"
             CustomExerciseInfo(it.nameWithoutExtension, mustDraw)
         }.sortedBy { it.name }
-        /////////////////////////////
-        println("exercises list is $exercisesList")
-        //////////////////////////////
         notifyDataSetChanged()
     }
 
