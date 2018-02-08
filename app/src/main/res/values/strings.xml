@@ -122,4 +122,5 @@ of endgame.[CR][CR]
     <string name="empty_folder_name">Empty folder name : cancellation !</string>
     <string name="folder_creation_error">Folder creation error</string>
     <string name="faced_folder_creation_restriction">Faced restrictions when trying to create folder !</string>
+    <string name="description_element_type">Element type (file/folder)</string>
 </resources>

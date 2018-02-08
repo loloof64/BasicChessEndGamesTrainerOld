@@ -126,4 +126,5 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="empty_folder_name">Nom de dossier vide : annulation !</string>
     <string name="folder_creation_error">Erreur de création de dossier</string>
     <string name="faced_folder_creation_restriction">Restrictions rencontrées lors de l\'éssai de création du dossier !</string>
+    <string name="description_element_type">Type d\élément (fichier/dossier)</string>
 </resources>

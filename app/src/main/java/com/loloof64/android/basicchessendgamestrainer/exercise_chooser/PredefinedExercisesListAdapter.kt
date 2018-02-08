@@ -41,7 +41,7 @@ class PredefinedExercisesListAdapter(private val exercisesList: List<ExerciseInf
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val layout = LayoutInflater.from(parent?.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
-        val textView = layout.findViewById<TextView>(R.id.exercise_list_row_value)
+        val textView = layout.findViewById<TextView>(R.id.custom_exercise_fragment_file_name)
         layout.removeView(textView)
         return ViewHolder(textView)
     }

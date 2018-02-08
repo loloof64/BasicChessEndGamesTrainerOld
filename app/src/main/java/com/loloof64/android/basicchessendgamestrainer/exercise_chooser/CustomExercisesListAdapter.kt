@@ -22,6 +22,8 @@ import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
@@ -48,32 +50,35 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
     }
 
     companion object {
-        class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
+        class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
+            val nameView: TextView = view.findViewById(R.id.custom_exercise_fragment_file_name)
+            val imageView: ImageView = view.findViewById(R.id.custom_exercise_fragment_file_type)
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
         val layout = LayoutInflater.from(parent?.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
-        val textView = layout.findViewById<TextView>(R.id.exercise_list_row_value)
-        layout.removeView(textView)
-        return CustomExercisesListAdapter.Companion.ViewHolder(textView)
+        return CustomExercisesListAdapter.Companion.ViewHolder(layout)
     }
 
     override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        fun getColor(colorId: Int) : Int {
+        fun getColorFromId(colorId: Int) : Int {
             val context = MyApplication.getApplicationContext()
             return ResourcesCompat.getColor(context.resources, colorId, null)
         }
 
-        holder?.textView?.text = exercisesList[position].name
-        holder?.textView?.setOnClickListener{ itemClickListener.onClick(position) }
-        holder?.textView?.setOnLongClickListener { itemLongClickListener.onLongClick(position); true }
-        holder?.textView?.setBackgroundColor(
+        holder?.nameView?.text = exercisesList[position].name
+        holder?.nameView?.setOnClickListener{ itemClickListener.onClick(position) }
+        holder?.nameView?.setOnLongClickListener { itemLongClickListener.onLongClick(position); true }
+        holder?.nameView?.setBackgroundColor(
                 when {
-                    exercisesList[position].isFolder -> getColor(R.color.exercise_chooser_folder_color)
-                    exercisesList[position].mustDraw -> getColor(R.color.exercise_chooser_nullifying_color)
-                    else -> getColor(R.color.exercise_chooser_winning_color)
+                    exercisesList[position].isFolder -> getColorFromId(R.color.exercise_chooser_folder_color)
+                    exercisesList[position].mustDraw -> getColorFromId(R.color.exercise_chooser_nullifying_color)
+                    else -> getColorFromId(R.color.exercise_chooser_winning_color)
                 }
         )
+
+        holder?.imageView?.setImageResource(if (exercisesList[position].isFolder) R.mipmap.ic_folder_type else R.mipmap.ic_file_type)
     }
 
     override fun getItemCount(): Int {
