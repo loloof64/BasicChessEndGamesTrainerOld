@@ -16,8 +16,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package com.loloof64.android.basicchessendgamestrainer
+package com.loloof64.android.basicchessendgamestrainer.utils
 
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import java.io.*
 
 object FilesManager {

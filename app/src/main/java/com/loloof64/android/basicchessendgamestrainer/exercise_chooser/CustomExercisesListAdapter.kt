@@ -24,7 +24,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.TextView
-import com.loloof64.android.basicchessendgamestrainer.FilesManager
+import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
 import java.io.BufferedReader

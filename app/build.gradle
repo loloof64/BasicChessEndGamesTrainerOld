@@ -39,6 +39,7 @@ dependencies {
         exclude group: 'org.antlr', module:'ST4'
     }
     implementation 'com.nightonke:boommenu:2.1.1'
+    implementation 'org.greenrobot:eventbus:3.1.1'
 }
 
 repositories {

@@ -36,11 +36,14 @@ import android.widget.EditText
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PieceKind
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
+import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
 
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import java.io.IOException
 
 
@@ -54,6 +57,8 @@ object PositionGeneratorValuesHolder {
     var otherPiecesIndexedConstraintScript = ""
     var resultShouldBeDraw = false
 }
+
+data class onMessageToShowInDialogEvent(val title: String, val message: String)
 
 data class BoomButtonParameters(val textId: Int, val iconId: Int, val colorId: Int, val listener: OnBMClickListener)
 
@@ -149,6 +154,21 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         askForCancelConfirmation()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        EventBus.getDefault().unregister(this)
+    }
+
+    @Subscribe
+    fun onMessageToShowInDialogEvent(event: onMessageToShowInDialogEvent) {
+        showAlertDialog(title = event.title, message = event.message)
     }
 
     private fun buildFileContent(): String {
