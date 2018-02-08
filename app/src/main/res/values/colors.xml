@@ -19,4 +19,8 @@
     <color name="circular_progressbar_color">#c91512</color>
     <color name="position_generator_activity_boom_menu_action_save">#c24348</color>
     <color name="position_generator_activity_boom_menu_action_cancel">#199f4f</color>
+    <color name="exercise_chooser_activity_boom_menu">#bc2f82</color>
+    <color name="exercise_chooser_activity_boom_menu_action_add_exercise">#6868f1</color>
+    <color name="exercise_chooser_activity_boom_menu_action_add_folder">#dec35b</color>
+    <color name="exercise_chooser_folder_color">#da4444</color>
 </resources>

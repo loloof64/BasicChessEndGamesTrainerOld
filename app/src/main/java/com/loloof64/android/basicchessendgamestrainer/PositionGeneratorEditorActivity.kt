@@ -38,13 +38,14 @@ import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PieceKind
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
 import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
-import com.nightonke.boommenu.BoomButtons.TextInsideCircleButton
+import com.nightonke.boommenu.BoomButtons.TextOutsideCircleButton
 
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import java.io.IOException
+import java.lang.ref.WeakReference
 
 
 object PositionGeneratorValuesHolder {
@@ -91,8 +92,8 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                         textId = R.string.action_save_generator,
                         iconId = R.mipmap.ic_action_save,
                         colorId = R.color.position_generator_activity_boom_menu_action_save,
-                        listener = OnBMClickListener {
-                            val playerKingFragment = allFragments[0] as PlayerKingConstraintEditorFragment
+                        listener = PositionGeneratorEditorActivityBoomButtonListener(allFragments, {
+                            val playerKingFragment = it[0] as PlayerKingConstraintEditorFragment
                             val allScriptsAreGood =
                                     playerKingFragment.checkIsScriptIsValidAndShowEventualError()
                             if (allScriptsAreGood){
@@ -103,19 +104,19 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                                 val message = resources.getString(R.string.correct_scripts_errors_first)
                                 showAlertDialog(title, message)
                             }
-                        }
+                        })
                 )
                 1 -> BoomButtonParameters(
                         textId = R.string.action_cancel_generator,
                         iconId = R.mipmap.ic_action_cancel,
                         colorId = R.color.position_generator_activity_boom_menu_action_cancel,
-                        listener = OnBMClickListener {
+                        listener = PositionGeneratorEditorActivityBoomButtonListener(allFragments, {
                             askForCancelConfirmation()
-                        }
+                        })
                 )
                 else -> throw RuntimeException("Unexpected pieceIndex value $pieceIndex")
             }
-            val builder = TextInsideCircleButton.Builder().
+            val builder = TextOutsideCircleButton.Builder().
                     listener(buttonParameters.listener).
                     normalImageRes(buttonParameters.iconId).
                     normalTextRes(buttonParameters.textId).
@@ -197,7 +198,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 if (fileName.isNotEmpty()){
                     val fileNameWithExtension = if (fileName.endsWith(".txt")) fileName else "$fileName.txt"
 
-                    if (FilesManager.existsInCurrentDirectory(fileNameWithExtension)) {
+                    if (FilesManager.alreadyFileOrFolderInCurrentDirectory(fileNameWithExtension)) {
                         askIfFileShouldBeOverwritten(fileNameWithExtension)
                     }
                     else {
@@ -217,7 +218,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
     private fun saveFile(name: String) {
         val content = buildFileContent()
         try {
-            FilesManager.saveTextFile(name, content)
+            FilesManager.saveTextFileInCurrentDirectory(name, content)
             finish()
         }
         catch (ex: IOException) {
@@ -288,5 +289,14 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         override fun setDropDownViewTheme(theme: Theme?) {
             mDropDownHelper.dropDownViewTheme = theme
         }
+    }
+}
+
+class PositionGeneratorEditorActivityBoomButtonListener(internalFragments: Array<Fragment>,
+                                                        private val action: (internalFragments: Array<Fragment>) -> Unit) : OnBMClickListener {
+    private val internalFragmentsRef = WeakReference(internalFragments)
+
+    override fun onBoomButtonClick(index: Int) {
+        if (internalFragmentsRef.get() != null) action(internalFragmentsRef.get()!!)
     }
 }

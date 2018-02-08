@@ -115,4 +115,11 @@ of endgame.[CR][CR]
     <string name="confirm_cancel_script_editing_message">Do you really want to quit script editing ?</string>
     <string name="result_should_be_draw">Result should be draw</string>
     <string name="theoretic_result_option">Theoretic result</string>
+    <string name="action_menu_add_exercise">Add file</string>
+    <string name="action_menu_add_folder">Add folder</string>
+    <string name="new_folder_creation">New folder creation</string>
+    <string name="folder_name_prompt">Folder name :</string>
+    <string name="empty_folder_name">Empty folder name : cancellation !</string>
+    <string name="folder_creation_error">Folder creation error</string>
+    <string name="faced_folder_creation_restriction">Faced restrictions when trying to create folder !</string>
 </resources>

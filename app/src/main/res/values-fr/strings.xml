@@ -119,4 +119,11 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="confirm_cancel_script_editing_message">Voulez-vous vraiment quitter l\'édition de script ?</string>
     <string name="result_should_be_draw">Le résultat devrait être une nulle.</string>
     <string name="theoretic_result_option">Résultat théorique</string>
+    <string name="action_menu_add_exercise">Ajouter exercice</string>
+    <string name="action_menu_add_folder">Ajouter dossier</string>
+    <string name="new_folder_creation">Création nouveau dossier</string>
+    <string name="folder_name_prompt">Nom du dossier :</string>
+    <string name="empty_folder_name">Nom de dossier vide : annulation !</string>
+    <string name="folder_creation_error">Erreur de création de dossier</string>
+    <string name="faced_folder_creation_restriction">Restrictions rencontrées lors de l\'éssai de création du dossier !</string>
 </resources>

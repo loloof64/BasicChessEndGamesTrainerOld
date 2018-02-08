@@ -24,6 +24,7 @@ import java.io.*
 object FilesManager {
     const val newLine = "\n"
     const val playerKingHeader = "# player king"
+    const val parentFolderName = ".."
 
     private val topDirectory = File(MyApplication.appContext.filesDir, "script")
     private var currentDirectory = topDirectory
@@ -32,12 +33,12 @@ object FilesManager {
         topDirectory.mkdir()
     }
 
-    fun existsInCurrentDirectory(name: String): Boolean = currentDirectory.listFiles().any { it.name == name }
+    fun alreadyFileOrFolderInCurrentDirectory(name: String): Boolean = currentDirectory.listFiles().any { it.name == name }
 
     /*
     Save and overwrite text file.
      */
-    fun saveTextFile(name: String, content: String) {
+    fun saveTextFileInCurrentDirectory(name: String, content: String) {
         val contentLines = content.split("""\n+""".toRegex())
 
         val file = File(currentDirectory, name)
@@ -47,6 +48,11 @@ object FilesManager {
                 reader.newLine()
             }
         }
+    }
+
+    fun createFolderInCurrentDirectory(name: String) {
+        val newDirectory = File(currentDirectory, name)
+        newDirectory.mkdir()
     }
 
     fun getCurrentDirectoryFiles() : Array<File> = currentDirectory.listFiles()

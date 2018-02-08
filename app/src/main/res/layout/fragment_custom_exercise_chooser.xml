@@ -1,20 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab_add_custom_exercise"
+    <com.nightonke.boommenu.BoomMenuButton
+        android:id="@+id/fab_custom_exercise_menu"
         android:src="@mipmap/ic_add"
+        app:bmb_normalColor="@color/exercise_chooser_activity_boom_menu"
+        app:bmb_buttonEnum="textOutsideCircle"
+        app:bmb_piecePlaceEnum="piecePlace_dot_2_1"
+        app:bmb_buttonPlaceEnum="buttonPlace_sc_2_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/customExercisesListView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/fab_add_custom_exercise"
+        android:layout_below="@id/fab_custom_exercise_menu"
     />
 
 </RelativeLayout>

@@ -35,7 +35,7 @@ interface ItemLongClickListener {
     fun onLongClick(position: Int)
 }
 
-data class CustomExerciseInfo(val name: String, val mustDraw: Boolean)
+data class CustomExerciseInfo(val isFolder: Boolean, val name: String, val mustDraw: Boolean)
 
 class CustomExercisesListAdapter(private val itemClickListener: ItemClickListener,
                                  private val itemLongClickListener: ItemLongClickListener)
@@ -44,7 +44,7 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
     private var exercisesList: List<CustomExerciseInfo> = listOf()
 
     init {
-        loadScriptFilesList()
+        loadFilesAndFoldersList()
     }
 
     companion object {
@@ -68,8 +68,11 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
         holder?.textView?.setOnClickListener{ itemClickListener.onClick(position) }
         holder?.textView?.setOnLongClickListener { itemLongClickListener.onLongClick(position); true }
         holder?.textView?.setBackgroundColor(
-                if (exercisesList[position].mustDraw) getColor(R.color.exercise_chooser_nullifying_color)
-                else getColor(R.color.exercise_chooser_winning_color)
+                when {
+                    exercisesList[position].isFolder -> getColor(R.color.exercise_chooser_folder_color)
+                    exercisesList[position].mustDraw -> getColor(R.color.exercise_chooser_nullifying_color)
+                    else -> getColor(R.color.exercise_chooser_winning_color)
+                }
         )
     }
 
@@ -77,11 +80,13 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
         return exercisesList.size
     }
 
-    fun loadScriptFilesList() {
-        exercisesList = FilesManager.getCurrentDirectoryFiles().filter { it.name.endsWith(".txt") }.map{
-            val mustDraw = readFirstLine(it) == "1"
-            CustomExerciseInfo(it.nameWithoutExtension, mustDraw)
-        }.sortedBy { it.name }
+    fun loadFilesAndFoldersList() {
+        exercisesList = FilesManager.getCurrentDirectoryFiles()
+                .filter { it.isDirectory || it.name.endsWith(".txt") }
+                .map{
+                    val mustDraw = if (it.isDirectory) false else readFirstLine(it) == "1"
+                    CustomExerciseInfo(isFolder = it.isDirectory, name = it.nameWithoutExtension, mustDraw = mustDraw)
+                }.sortedWith(compareBy({!it.isFolder}, {it.name}))
         notifyDataSetChanged()
     }
 
