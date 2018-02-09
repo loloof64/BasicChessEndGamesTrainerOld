@@ -16,7 +16,7 @@
     <string name="black_play_for_mate">Black play for mate</string>
     <string name="should_be_draw">It should be draw</string>
     <string name="exercise_kr_k">King+Rook/King</string>
-    <string name="position_generation_error">Failed to generate position !</string>
+    <string name="position_generation_error">Failed to generate position ! Please retry.</string>
     <string name="restarting_exercise_alert_title">Restart exercise ?</string>
     <string name="restarting_exercise_alert_message">About to restart exercise : are you sure ?</string>
     <string name="yes">Yes</string>
@@ -123,4 +123,6 @@ of endgame.[CR][CR]
     <string name="folder_creation_error">Folder creation error</string>
     <string name="faced_folder_creation_restriction">Faced restrictions when trying to create folder !</string>
     <string name="description_element_type">Element type (file/folder)</string>
+    <string name="exercise_loading_error">Exercise loading error</string>
+    <string name="could_not_load_file">Failed to load exercise %s !</string>
 </resources>

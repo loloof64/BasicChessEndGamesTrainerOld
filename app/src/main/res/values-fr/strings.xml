@@ -16,7 +16,7 @@
     <string name="black_play_for_mate">Les Noirs jouent pour le mat</string>
     <string name="exercise_kr_k">Roi+Tour/Roi</string>
     <string name="should_be_draw">Cela devrait être nulle !</string>
-    <string name="position_generation_error">Echec de génération de position !</string>
+    <string name="position_generation_error">Echec de génération de position ! Veuillez réessayer.</string>
     <string name="restarting_exercise_alert_title">Recommencer l\'exercice ?</string>
     <string name="restarting_exercise_alert_message">Sur le point de recommencer l\'exercice : en êtes-vous sûr ?</string>
     <string name="yes">Oui</string>
@@ -127,4 +127,6 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="folder_creation_error">Erreur de création de dossier</string>
     <string name="faced_folder_creation_restriction">Restrictions rencontrées lors de l\'éssai de création du dossier !</string>
     <string name="description_element_type">Type d\élément (fichier/dossier)</string>
+    <string name="exercise_loading_error">Erreur de chargement d\'exercice</string>
+    <string name="could_not_load_file">Echec du chargement de l\'exercice %s !</string>
 </resources>

@@ -41,9 +41,8 @@ class PredefinedExerciseChooserFragment : Fragment() {
         predefinedExercisesListView.adapter = PredefinedExercisesListAdapter(availableGenerators, object : ItemClickListener {
             override fun onClick(position: Int) {
                 val intent = Intent(activity, PlayingActivity::class.java)
-                val bundle = Bundle()
-                bundle.putInt(PlayingActivity.generatorIndexKey, position)
-                intent.putExtras(bundle)
+                intent.putExtra(PlayingActivity.usingCustomGeneratorConstraintsKey, false)
+                intent.putExtra(PlayingActivity.predefinedGeneratorIndexKey, position)
                 startActivity(intent)
             }
         })

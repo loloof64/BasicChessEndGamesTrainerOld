@@ -28,21 +28,25 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
-import android.widget.Toast
-import com.loloof64.android.basicchessendgamestrainer.BoomButtonParameters
-import com.loloof64.android.basicchessendgamestrainer.MyApplication
-import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorEditorActivity
-import com.loloof64.android.basicchessendgamestrainer.R
+import com.loloof64.android.basicchessendgamestrainer.*
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PositionConstraintBailErrorStrategy
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.BailSingleKingConstraintLexer
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBooleanExpr
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBuilder
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintParser
 import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextOutsideCircleButton
 import kotlinx.android.synthetic.main.fragment_custom_exercise_chooser.*
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
+import java.io.BufferedReader
+import java.io.FileReader
 import java.lang.ref.WeakReference
+import java.util.logging.Logger
 
 class CustomExerciseChooserFragment : Fragment() {
     private lateinit var adapter: CustomExercisesListAdapter
-
-    fun getExercisesListAdapter(): CustomExercisesListAdapter = adapter
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_custom_exercise_chooser, container, false)
@@ -50,18 +54,31 @@ class CustomExerciseChooserFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         customExercisesListView.layoutManager = LinearLayoutManager(activity)
-        adapter = CustomExercisesListAdapter(CustomExerciseChooserFragmentItemClickListener(
-                this, {
-            fragment: Fragment, position: Int ->
+        adapter = CustomExercisesListAdapter(itemClickListener = CustomExerciseChooserFragmentItemClickListener(
+                parentFragment = this,
+                action = {
+                    fragment: CustomExerciseChooserFragment, position: Int ->
                 // TODO If it is an exercise run it, otherwise if parent folder, try to go up, else go into folder
-        }),
-                CustomExerciseChooserFragmentItemLongClickListener(this, {
-                    fragment: Fragment, position: Int ->
-                    /*
-                     TODO if it is an exercise show popup menu with edit/rename/delete options
-                     else it is not parent folder show popup menu with rename/delete options
-                      */
-                }))
+                    val clickedElement = fragment.adapter.getElementAtPosition(position)
+                    when {
+                        clickedElement.isFolder -> {
+
+                        }
+                        else -> {
+                            fragment.launchExercise(clickedElement.name)
+                        }
+                    }
+                }),
+                itemLongClickListener = CustomExerciseChooserFragmentItemLongClickListener(
+                        parentFragment = this,
+                        action = {
+                            fragment: CustomExerciseChooserFragment, position: Int ->
+                            /*
+                             TODO if it is an exercise show popup menu with edit/rename/delete options
+                             else it is not parent folder show popup menu with rename/delete options
+                              */
+                        }
+                ))
         customExercisesListView.adapter = adapter
 
         (0 until fab_custom_exercise_menu.piecePlaceEnum.pieceNumber()).forEach { pieceIndex ->
@@ -125,6 +142,75 @@ class CustomExerciseChooserFragment : Fragment() {
         }
     }
 
+    private fun launchExercise(exerciseNameWithoutExtension: String) {
+        val constraints = loadConstraintsFromFile(exerciseNameWithoutExtension) ?: return
+        PositionGeneratorFromANTLR.setConstraints(constraints)
+
+        val intent = Intent(activity, PlayingActivity::class.java)
+        intent.putExtra(PlayingActivity.usingCustomGeneratorConstraintsKey, true)
+        startActivity(intent)
+    }
+
+    private fun loadConstraintsFromFile(exerciseNameWithoutExtension: String): PositionGeneratorConstraints? {
+        val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.nameWithoutExtension == exerciseNameWithoutExtension }
+        if (exerciseFile != null){
+            val playerKingConstraintBuilder = StringBuilder()
+            val computerKingConstraintBuilder = StringBuilder()
+
+            BufferedReader(FileReader(exerciseFile)).use {
+                var currentLine: String?
+
+                // skipping lines before player king constraint section
+                do {
+                    currentLine = it.readLine()
+                    ///////////////////////////////
+                    Logger.getLogger("loloof64").info("Current [skipped] line is $currentLine")
+                    ///////////////////////////////
+                } while(currentLine != null && currentLine != FilesManager.playerKingHeader)
+
+                // filling player king constraint string
+                do {
+                    currentLine = it.readLine()
+                    ///////////////////////////////
+                    Logger.getLogger("loloof64").info("Current line is $currentLine")
+                    ///////////////////////////////
+                    if (currentLine != null) playerKingConstraintBuilder.append(currentLine)
+                } while (currentLine != null && currentLine != FilesManager.computerKingHeader)
+            }
+
+            return PositionGeneratorConstraints(
+                    playerKingConstraint = buildPlayerKingConstraintFromString(playerKingConstraintBuilder.toString()),
+                    computerKingConstraint = buildComputerKingConstraintFromString(computerKingConstraintBuilder.toString())
+            )
+        }
+        else {
+            val title = resources.getString(R.string.exercise_loading_error)
+            val message = resources.getString(R.string.could_not_load_file, exerciseNameWithoutExtension)
+            showAlertDialog(title, message)
+            return null
+        }
+    }
+
+    private fun buildPlayerKingConstraintFromString(constraintStr: String) : SingleKingConstraintBooleanExpr? {
+        if (constraintStr.isEmpty()) return null
+
+
+        val inputStream = CharStreams.fromString(constraintStr)
+        val lexer = BailSingleKingConstraintLexer(inputStream)
+        val tokens = CommonTokenStream(lexer)
+        val parser = SingleKingConstraintParser(tokens)
+        parser.errorHandler = PositionConstraintBailErrorStrategy()
+        val tree = parser.singleKingConstraint()
+        SingleKingConstraintBuilder.clearVariables()
+        return SingleKingConstraintBuilder.visit(tree) as SingleKingConstraintBooleanExpr
+    }
+
+    private fun buildComputerKingConstraintFromString(constraintStr: String) : SingleKingConstraintBooleanExpr? {
+        if (constraintStr.isEmpty()) return null
+        //todo change the following
+        return null
+    }
+
     override fun onStart() {
         super.onStart()
         adapter.loadFilesAndFoldersList()
@@ -149,7 +235,7 @@ class CustomExerciseChooserFragment : Fragment() {
 
 class CustomExerciseChooserFragmentItemClickListener(
         parentFragment: CustomExerciseChooserFragment,
-        private val action : (Fragment, Int) -> Unit
+        private val action : (CustomExerciseChooserFragment, Int) -> Unit
 ) : ItemClickListener {
 
     private var parentFragmentRef = WeakReference(parentFragment)
@@ -162,7 +248,7 @@ class CustomExerciseChooserFragmentItemClickListener(
 
 class CustomExerciseChooserFragmentItemLongClickListener(
         parentFragment: CustomExerciseChooserFragment,
-        private val action : (Fragment, Int) -> Unit
+        private val action : (CustomExerciseChooserFragment, Int) -> Unit
 ): ItemLongClickListener {
 
     private var parentFragmentRef = WeakReference(parentFragment)

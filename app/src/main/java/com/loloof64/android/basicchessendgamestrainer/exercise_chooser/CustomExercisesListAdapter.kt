@@ -95,6 +95,10 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
         notifyDataSetChanged()
     }
 
+    fun getElementAtPosition(position: Int) : CustomExerciseInfo {
+        return exercisesList[position]
+    }
+
     private fun readFirstLine(file: File) : String {
         lateinit var line: String
         BufferedReader(FileReader(file)).use {

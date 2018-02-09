@@ -34,11 +34,14 @@ import android.view.View
 import android.widget.Toast
 import com.github.bhlangonijr.chesslib.Piece
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerator
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGeneratorConstraints
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGeneratorFromANTLR
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
 import kotlinx.android.synthetic.main.activity_playing.*
 import java.lang.ref.WeakReference
 import java.util.*
+import java.util.logging.Logger
 
 class SpaceLeftAndRightItemDecorator(private val space: Int): RecyclerView.ItemDecoration(){
     override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
@@ -60,7 +63,8 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val playerGoalIDKey = "PlayerGoalID"
         val playerGoalInAlertModeKey = "PlayerGoalInAlertMode"
         val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
-        val generatorIndexKey = "GeneratorIndex"
+        val usingCustomGeneratorConstraintsKey = "IsUsingCustomGeneratorConstraints"
+        val predefinedGeneratorIndexKey = "PredefinedGeneratorIndex"
         val adapterSanItemsKey = "AdapterSanItems"
         val adapterFenItemsKey = "AdapterFenItems"
         val startedToWriteMovesKey = "StartedToWriteMoves"
@@ -77,7 +81,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val blacksAreDownKey = "BlacksAreDown"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        val emptyPosition = ""
     }
+
+    private var usingCustomGenerator = false
 
     override fun reactToPromotionPieceSelection(piece: Piece) {
         playingBoard.validatePromotionMove(piece)
@@ -106,13 +113,15 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
 
         EngineInteraction.initStockfishProcessIfNotDoneYet()
 
-        generatorIndex = intent.extras?.getInt(generatorIndexKey) ?: 0
-        val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
+        usingCustomGenerator = intent.extras?.getBoolean(usingCustomGeneratorConstraintsKey) ?: false
+
+        val generatedPosition = generatePosition()
+
         if (generatedPosition.isNotEmpty()) {
             newGame(generatedPosition)
         }
         else {
-            Toast.makeText(this, R.string.position_generation_error, Toast.LENGTH_LONG).show()
+            showAlertDialog("", resources.getString(R.string.position_generation_error))
         }
     }
 
@@ -199,6 +208,16 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         }
     }
 
+    private fun showAlertDialog(title : String, message: String) {
+        val dialog = AlertDialog.Builder(this).create()
+        dialog.setTitle(title)
+        dialog.setMessage(message)
+        val buttonText = this.resources.getString(R.string.OK)
+        dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }
+
+        dialog.show()
+    }
+
     fun askForPromotionPiece() {
         val title = getString(R.string.promotion_chooser_title)
         val dialog = PromotionPieceChooserDialogFragment.newInstance(title, playingBoard.isWhiteToPlay())
@@ -243,11 +262,20 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setTitle(R.string.new_exercise_alert_title)
                 .setMessage(R.string.new_exercise_alert_message)
                 .setPositiveButton(R.string.yes, {_, _ ->
-                    val generatedPosition = PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
-                    newGame(generatedPosition)
+                    newGame(generatePosition())
                 })
                 .setNegativeButton(R.string.no, null)
                 .show()
+    }
+
+    private fun generatePosition(): String {
+        return if (usingCustomGenerator){
+            PositionGeneratorFromANTLR.generatePosition()
+        }
+        else {
+            generatorIndex = intent.extras?.getInt(predefinedGeneratorIndexKey) ?: 0
+            PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
+        }
     }
 
     fun addPositionInMovesList(san: String, fen: String, moveToHighlight: MoveToHighlight?) {

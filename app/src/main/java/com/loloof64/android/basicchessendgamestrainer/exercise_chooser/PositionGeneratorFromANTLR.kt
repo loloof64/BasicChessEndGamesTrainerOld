@@ -23,6 +23,7 @@ import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintNumericExpr
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.eval
 import java.util.*
+import java.util.logging.Logger
 
 class PositionGeneratorConstraints(
         val playerKingConstraint: SingleKingConstraintBooleanExpr?,
@@ -58,8 +59,6 @@ object PositionGeneratorFromANTLR {
 
     private val random = Random()
 
-    val DEFAULT_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-
     var allConstraints: PositionGeneratorConstraints = NO_CONSTRAINT
 
     fun setConstraints(constraints: PositionGeneratorConstraints) {
@@ -71,10 +70,8 @@ object PositionGeneratorFromANTLR {
         val playerHasWhite = random.nextBoolean()
         val startFen = "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1"
 
-        return placeComputerKingInPosition(
-                startFen = placePlayerKingInPosition(startFen = startFen, playerHasWhite = playerHasWhite),
-                playerHasWhite = playerHasWhite
-        )
+        val positionWithPlayerKing = placePlayerKingInPosition(startFen = startFen, playerHasWhite = playerHasWhite)
+        return placeComputerKingInPosition(startFen = positionWithPlayerKing, playerHasWhite = playerHasWhite)
     }
 
     private fun addPieceToPositionOrReturnNullIfCellAlreadyOccupied(startFen: String, pieceToAdd: Piece, pieceCell: Square): String? {
@@ -135,10 +132,10 @@ object PositionGeneratorFromANTLR {
                     positionFEN = builtPosition, playerHasWhite = playerHasWhite)
 
             if (builtPositionIsLegal) {
-                if (allConstraints.playerKingConstraint != null){
+                if (allConstraints.computerKingConstraint != null){
                     val intValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
                     val booleanValues = mapOf("playerHasWhite" to playerHasWhite)
-                    val buildSuccess = eval(expr = allConstraints.playerKingConstraint!!,
+                    val buildSuccess = eval(expr = allConstraints.computerKingConstraint!!,
                             intValues = intValues, booleanValues = booleanValues
                     )
                     if (buildSuccess) return builtPosition!!

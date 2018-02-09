@@ -180,6 +180,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         contentBuilder.append(FilesManager.newLine)
 
         contentBuilder.append(FilesManager.playerKingHeader)
+        contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(PositionGeneratorValuesHolder.playerKingConstraintScript)
         contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(FilesManager.newLine)
