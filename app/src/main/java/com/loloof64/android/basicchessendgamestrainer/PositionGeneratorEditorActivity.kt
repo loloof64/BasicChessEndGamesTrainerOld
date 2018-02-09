@@ -172,6 +172,16 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         showAlertDialog(title = event.title, message = event.message)
     }
 
+    fun showAlertDialog(title : String, message: String) {
+        val dialog = AlertDialog.Builder(this).create()
+        dialog.setTitle(title)
+        dialog.setMessage(message)
+        val buttonText = this.resources.getString(R.string.OK)
+        dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }
+
+        dialog.show()
+    }
+
     private fun buildFileContent(): String {
         val contentBuilder = StringBuilder()
 
@@ -181,7 +191,15 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
         contentBuilder.append(FilesManager.playerKingHeader)
         contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(PositionGeneratorValuesHolder.playerKingConstraintScript)
+        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.newLine)
+
+        contentBuilder.append(FilesManager.computerKingHeader)
+        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(PositionGeneratorValuesHolder.computerKingConstraintScript)
         contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(FilesManager.newLine)
 
@@ -225,16 +243,6 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         catch (ex: IOException) {
             Toast.makeText(this, R.string.could_not_save_file, Toast.LENGTH_SHORT).show()
         }
-    }
-
-    private fun showAlertDialog(title : String, message: String) {
-        val dialog = AlertDialog.Builder(this).create()
-        dialog.setTitle(title)
-        dialog.setMessage(message)
-        val buttonText = this.resources.getString(R.string.OK)
-        dialog.setButton(AlertDialog.BUTTON_NEUTRAL, buttonText) { currDialog, _ -> currDialog?.dismiss() }
-
-        dialog.show()
     }
 
     private fun askIfFileShouldBeOverwritten(name: String) {

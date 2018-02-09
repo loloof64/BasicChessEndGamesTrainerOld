@@ -25,6 +25,7 @@ object FilesManager {
     const val newLine = "\n"
     const val playerKingHeader = "# player king"
     const val computerKingHeader = "# computer king"
+    const val mutualKingsHeader = "# kings mutual"
     const val parentFolderName = ".."
 
     private val topDirectory = File(MyApplication.appContext.filesDir, "script")

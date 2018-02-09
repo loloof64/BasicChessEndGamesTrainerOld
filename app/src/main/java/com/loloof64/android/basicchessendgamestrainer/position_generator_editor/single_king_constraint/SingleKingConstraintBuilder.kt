@@ -19,11 +19,17 @@
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint
 
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
+import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
+import com.loloof64.android.basicchessendgamestrainer.onMessageToShowInDialogEvent
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PositionConstraintBailErrorStrategy
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintBaseVisitor
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintParser
+import org.antlr.v4.runtime.CharStreams
+import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.misc.ParseCancellationException
+import org.greenrobot.eventbus.EventBus
 
 data class GenericExprVariable(val name: String, val value: SingleKingConstraintGenericExpr)
 
@@ -48,7 +54,65 @@ object SingleKingConstraintBuilder : SingleKingConstraintBaseVisitor<SingleKingC
         builtVariables.clear()
     }
 
-    fun getVariables() = builtVariables.toList()
+    fun getVariables(): List<GenericExprVariable> = builtVariables.toList()
+
+    fun checkIsScriptStringIsValid(scriptString: String,
+                                   sampleIntValues : Map<String, Int>,
+                                   sampleBooleanValues: Map<String, Boolean>) {
+        val resultExpr = buildExprObjectFromScript(scriptString)
+        testCanEvaluateExpressionWithDefaultVariablesSetAndShowEventualError(
+                expr = resultExpr,
+                sampleIntValues = sampleIntValues,
+                sampleBooleanValues = sampleBooleanValues
+        )
+    }
+
+    private fun buildExprObjectFromScript(scriptString: String) : SingleKingConstraintBooleanExpr {
+        val inputStream = CharStreams.fromString(scriptString)
+        val lexer = BailSingleKingConstraintLexer(inputStream)
+        val tokens = CommonTokenStream(lexer)
+        val parser = SingleKingConstraintParser(tokens)
+        parser.errorHandler = PositionConstraintBailErrorStrategy()
+        val tree = parser.singleKingConstraint()
+        SingleKingConstraintBuilder.clearVariables()
+        return SingleKingConstraintBuilder.visit(tree) as SingleKingConstraintBooleanExpr
+    }
+
+    private fun testCanEvaluateExpressionWithDefaultVariablesSetAndShowEventualError(
+            expr: SingleKingConstraintBooleanExpr,
+            sampleIntValues : Map<String, Int>,
+            sampleBooleanValues: Map<String, Boolean>
+    ) {
+            val intValues = sampleIntValues.toMutableMap()
+            val booleanValues = sampleBooleanValues.toMutableMap()
+
+            val resources = MyApplication.appContext.resources
+
+            val variables = SingleKingConstraintBuilder.getVariables()
+            // We must evaluate all variables before evaluating the final script expression
+            variables.forEach {
+                when (it.value) {
+                    is SingleKingConstraintNumericExpr -> {
+                        if (sampleIntValues.containsKey(it.name)) {
+                            val error = resources.getString(R.string.parser_overriding_predefined_variable, it.name)
+                            throw ParseCancellationException(error)
+                        }
+                        else intValues[it.name] = eval(expr = it.value, intValues = intValues, booleanValues = booleanValues)
+                    }
+                    is SingleKingConstraintBooleanExpr -> {
+                        if (sampleBooleanValues.containsKey(it.name)) {
+                            val error = resources.getString(R.string.parser_overriding_predefined_variable, it.name)
+                            throw ParseCancellationException(error)
+                        }
+                        else booleanValues[it.name] = eval(expr = it.value, intValues = intValues, booleanValues = booleanValues)
+                    }
+                }
+
+            }
+
+
+            eval(expr = expr, intValues = intValues, booleanValues = booleanValues)
+    }
 
     override fun visitTerminalExpr(ctx: SingleKingConstraintParser.TerminalExprContext?): SingleKingConstraintGenericExpr {
         return visit(ctx?.booleanExpr())

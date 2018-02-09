@@ -43,7 +43,6 @@ import org.antlr.v4.runtime.CommonTokenStream
 import java.io.BufferedReader
 import java.io.FileReader
 import java.lang.ref.WeakReference
-import java.util.logging.Logger
 
 class CustomExerciseChooserFragment : Fragment() {
     private lateinit var adapter: CustomExercisesListAdapter
@@ -152,6 +151,15 @@ class CustomExerciseChooserFragment : Fragment() {
     }
 
     private fun loadConstraintsFromFile(exerciseNameWithoutExtension: String): PositionGeneratorConstraints? {
+        fun String?.doesNotStartPlayerKingConstraint(): Boolean =
+                this != null && this != FilesManager.playerKingHeader
+
+        fun String?.doesNotStartComputerKingConstraint(): Boolean =
+                this != null && this != FilesManager.computerKingHeader
+
+        fun String?.doesNotStartKingsMutualConstraint(): Boolean =
+                this != null && this != FilesManager.mutualKingsHeader
+
         val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.nameWithoutExtension == exerciseNameWithoutExtension }
         if (exerciseFile != null){
             val playerKingConstraintBuilder = StringBuilder()
@@ -163,24 +171,24 @@ class CustomExerciseChooserFragment : Fragment() {
                 // skipping lines before player king constraint section
                 do {
                     currentLine = it.readLine()
-                    ///////////////////////////////
-                    Logger.getLogger("loloof64").info("Current [skipped] line is $currentLine")
-                    ///////////////////////////////
-                } while(currentLine != null && currentLine != FilesManager.playerKingHeader)
+                } while(currentLine.doesNotStartPlayerKingConstraint())
 
                 // filling player king constraint string
                 do {
                     currentLine = it.readLine()
-                    ///////////////////////////////
-                    Logger.getLogger("loloof64").info("Current line is $currentLine")
-                    ///////////////////////////////
-                    if (currentLine != null) playerKingConstraintBuilder.append(currentLine)
-                } while (currentLine != null && currentLine != FilesManager.computerKingHeader)
+                    if (currentLine.doesNotStartComputerKingConstraint()) playerKingConstraintBuilder.append(currentLine)
+                } while (currentLine.doesNotStartComputerKingConstraint())
+
+                // filling computer king constraint string
+                do {
+                    currentLine = it.readLine()
+                    if (currentLine.doesNotStartKingsMutualConstraint()) computerKingConstraintBuilder.append(currentLine)
+                } while(currentLine.doesNotStartKingsMutualConstraint())
             }
 
             return PositionGeneratorConstraints(
-                    playerKingConstraint = buildPlayerKingConstraintFromString(playerKingConstraintBuilder.toString()),
-                    computerKingConstraint = buildComputerKingConstraintFromString(computerKingConstraintBuilder.toString())
+                    playerKingConstraint = buildSingleKingConstraintFromString(playerKingConstraintBuilder.toString()),
+                    computerKingConstraint = buildSingleKingConstraintFromString(computerKingConstraintBuilder.toString())
             )
         }
         else {
@@ -191,7 +199,7 @@ class CustomExerciseChooserFragment : Fragment() {
         }
     }
 
-    private fun buildPlayerKingConstraintFromString(constraintStr: String) : SingleKingConstraintBooleanExpr? {
+    private fun buildSingleKingConstraintFromString(constraintStr: String) : SingleKingConstraintBooleanExpr? {
         if (constraintStr.isEmpty()) return null
 
 
@@ -203,12 +211,6 @@ class CustomExerciseChooserFragment : Fragment() {
         val tree = parser.singleKingConstraint()
         SingleKingConstraintBuilder.clearVariables()
         return SingleKingConstraintBuilder.visit(tree) as SingleKingConstraintBooleanExpr
-    }
-
-    private fun buildComputerKingConstraintFromString(constraintStr: String) : SingleKingConstraintBooleanExpr? {
-        if (constraintStr.isEmpty()) return null
-        //todo change the following
-        return null
     }
 
     override fun onStart() {
