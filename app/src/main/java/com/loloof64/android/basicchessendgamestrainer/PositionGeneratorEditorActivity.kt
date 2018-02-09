@@ -76,6 +76,8 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 OtherPiecesIndexedConstraintEditorFragment.newInstance(),
                 SetIfResultShouldBeDrawFragment.newInstance()
         )
+
+        val isEditingAnExistingFileKey = "EditingExistingFile"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -84,6 +86,20 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
+
+        if (intent.extras?.getBoolean(isEditingAnExistingFileKey) == true) {
+            // todo load current script values
+        }
+        else {
+            PositionGeneratorValuesHolder.resultShouldBeDraw = false
+            PositionGeneratorValuesHolder.playerKingConstraintScript = ""
+            PositionGeneratorValuesHolder.computerKingConstraintScript = ""
+            PositionGeneratorValuesHolder.kingsMutualConstraintScript = ""
+            PositionGeneratorValuesHolder.otherPiecesCount.clear()
+            PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScript = ""
+            PositionGeneratorValuesHolder.otherPiecesMutualConstraintScript = ""
+            PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScript = ""
+        }
 
         val boomMenuButtonPiecesNumber = position_generator_activity_boom_menu_button.piecePlaceEnum.pieceNumber()
         (0 until boomMenuButtonPiecesNumber).forEach {pieceIndex ->
