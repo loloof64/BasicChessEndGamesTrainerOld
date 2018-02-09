@@ -90,7 +90,7 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
                 .filter { it.isDirectory || it.name.endsWith(".txt") }
                 .map{
                     val mustDraw = if (it.isDirectory) false else readFirstLine(it) == "1"
-                    CustomExerciseInfo(isFolder = it.isDirectory, name = it.nameWithoutExtension, mustDraw = mustDraw)
+                    CustomExerciseInfo(isFolder = it.isDirectory, name = it.name, mustDraw = mustDraw)
                 }.sortedWith(compareBy({!it.isFolder}, {it.name}))
         notifyDataSetChanged()
     }

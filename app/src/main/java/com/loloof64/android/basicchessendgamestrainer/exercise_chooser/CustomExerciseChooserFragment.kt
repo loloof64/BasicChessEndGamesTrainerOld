@@ -141,8 +141,8 @@ class CustomExerciseChooserFragment : Fragment() {
         }
     }
 
-    private fun launchExercise(exerciseNameWithoutExtension: String) {
-        val constraints = loadConstraintsFromFile(exerciseNameWithoutExtension) ?: return
+    private fun launchExercise(exerciseNameWithExtension: String) {
+        val constraints = loadConstraintsFromFile(exerciseNameWithExtension) ?: return
         PositionGeneratorFromANTLR.setConstraints(constraints)
 
         val intent = Intent(activity, PlayingActivity::class.java)
@@ -150,7 +150,7 @@ class CustomExerciseChooserFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun loadConstraintsFromFile(exerciseNameWithoutExtension: String): PositionGeneratorConstraints? {
+    private fun loadConstraintsFromFile(exerciseNameWithExtension: String): PositionGeneratorConstraints? {
         fun String?.doesNotStartPlayerKingConstraint(): Boolean =
                 this != null && this != FilesManager.playerKingHeader
 
@@ -160,7 +160,7 @@ class CustomExerciseChooserFragment : Fragment() {
         fun String?.doesNotStartKingsMutualConstraint(): Boolean =
                 this != null && this != FilesManager.mutualKingsHeader
 
-        val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.nameWithoutExtension == exerciseNameWithoutExtension }
+        val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.name == exerciseNameWithExtension }
         if (exerciseFile != null){
             val playerKingConstraintBuilder = StringBuilder()
             val computerKingConstraintBuilder = StringBuilder()
@@ -193,7 +193,7 @@ class CustomExerciseChooserFragment : Fragment() {
         }
         else {
             val title = resources.getString(R.string.exercise_loading_error)
-            val message = resources.getString(R.string.could_not_load_file, exerciseNameWithoutExtension)
+            val message = resources.getString(R.string.could_not_load_file, exerciseNameWithExtension)
             showAlertDialog(title, message)
             return null
         }
