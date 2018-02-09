@@ -104,15 +104,22 @@ class CustomExerciseChooserFragment : Fragment() {
                                     .setPositiveButton(R.string.OK, {dialog: DialogInterface?, _: Int ->
                                         val folderName = input.text.toString()
                                         if (folderName.isNotEmpty()) {
-                                            try {
-                                                FilesManager.createFolderInCurrentDirectory(folderName)
-                                                it.adapter.loadFilesAndFoldersList()
-                                            }
-                                            catch (ex: SecurityException) {
-                                                val resources = MyApplication.appContext.resources
-                                                val title = resources.getString(R.string.folder_creation_error)
-                                                val message = resources.getString(R.string.faced_folder_creation_restriction)
+                                            if (FilesManager.alreadyFileOrFolderInCurrentDirectory(folderName)){
+                                                val title = resources.getString(R.string.folder_already_exists_title)
+                                                val message = resources.getString(R.string.folder_already_exists_message, folderName)
                                                 it.showAlertDialog(title, message)
+                                            }
+                                            else {
+                                                try {
+                                                    FilesManager.createFolderInCurrentDirectory(folderName)
+                                                    it.adapter.loadFilesAndFoldersList()
+                                                }
+                                                catch (ex: SecurityException) {
+                                                    val resources = MyApplication.appContext.resources
+                                                    val title = resources.getString(R.string.folder_creation_error)
+                                                    val message = resources.getString(R.string.faced_folder_creation_restriction)
+                                                    it.showAlertDialog(title, message)
+                                                }
                                             }
                                         }
                                         else {

@@ -125,4 +125,6 @@ of endgame.[CR][CR]
     <string name="description_element_type">Element type (file/folder)</string>
     <string name="exercise_loading_error">Exercise loading error</string>
     <string name="could_not_load_file">Failed to load exercise %s !</string>
+    <string name="folder_already_exists_title">Folder already exists</string>
+    <string name="folder_already_exists_message">Folder %s already exists in current directory !</string>
 </resources>

@@ -129,4 +129,6 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="description_element_type">Type d\élément (fichier/dossier)</string>
     <string name="exercise_loading_error">Erreur de chargement d\'exercice</string>
     <string name="could_not_load_file">Echec du chargement de l\'exercice %s !</string>
+    <string name="folder_already_exists_title">Le dossier existe déjà</string>
+    <string name="folder_already_exists_message">Le dossier %s existe déjà dans le dossier courant !</string>
 </resources>
