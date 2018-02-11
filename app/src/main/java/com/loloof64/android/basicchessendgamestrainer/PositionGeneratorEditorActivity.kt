@@ -232,7 +232,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         super.onRestoreInstanceState(savedInstanceState)
         if (savedInstanceState != null) {
             isEditingAnExistingFile = savedInstanceState.getBoolean(isEditingAnExistingFileKey)
-            currentEditedFileName = savedInstanceState.getString(currentEditedFileName)
+            currentEditedFileName = savedInstanceState.getString(editedFileNameKey) ?: ""
         }
     }
 
@@ -264,6 +264,13 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(PositionGeneratorValuesHolder.computerKingConstraintScript)
+        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.newLine)
+
+        contentBuilder.append(FilesManager.mutualKingsHeader)
+        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(PositionGeneratorValuesHolder.kingsMutualConstraintScript)
         contentBuilder.append(FilesManager.newLine)
         contentBuilder.append(FilesManager.newLine)
 

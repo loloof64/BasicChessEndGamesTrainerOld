@@ -31,6 +31,18 @@ import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.
 import kotlinx.android.synthetic.main.fragment_editing_player_king_constraint.*
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.greenrobot.eventbus.EventBus
+import java.lang.ref.WeakReference
+
+class CheckScriptButtonOnClickListener(activity: PositionGeneratorEditorActivity,
+                                       val action : (parentActivity: PositionGeneratorEditorActivity) -> Unit
+) : View.OnClickListener {
+    private val parentActivityRef = WeakReference(activity)
+
+    override fun onClick(v: View?) {
+        if (parentActivityRef.get() != null) action(parentActivityRef.get()!!)
+    }
+
+}
 
 class PlayerKingConstraintEditorFragment : Fragment() {
 
@@ -39,13 +51,13 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        button_check_player_king_constraint.setOnClickListener {
-            if (checkIsScriptIsValidAndShowEventualError()) {
-                val parentActivity = activity as PositionGeneratorEditorActivity
-                val message = parentActivity.resources.getString(R.string.script_valid)
-                parentActivity.showAlertDialog(title = "", message = message)
-            }
-        }
+        button_check_player_king_constraint.setOnClickListener(CheckScriptButtonOnClickListener(activity as PositionGeneratorEditorActivity,
+                {parentActivity ->
+                    if (checkIsScriptIsValidAndShowEventualError()) {
+                        val message = parentActivity.resources.getString(R.string.script_valid)
+                        parentActivity.showAlertDialog(title = "", message = message)
+                    }
+                }))
 
         generator_editor_field_player_king_constraint.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(str: Editable?) {

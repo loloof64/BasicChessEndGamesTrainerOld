@@ -40,30 +40,7 @@
                     consequat lacus sed convallis facilisis. Nulla facilisi. Quisque elementum orci
                      a finibus consequat. Cras eros neque, blandit at nisi nec, hendrerit luctus nulla.
                       Nulla accumsan turpis lacus, at vulputate ligula consequat et. Suspendisse potenti.
-                        Aliquam iaculis et ex pellentesque aliquet. Nulla porttitor placerat nulla, quis posuere
-                         lacus tincidunt nec. Aliquam eget sapien tellus. Praesent mattis sem eu odio tristique, eleifend
-                          hendrerit mi varius. Quisque euismod tellus et imperdiet dictum. Ut congue
-                           quis velit et mattis. Mauris aliquam, enim vel ultricies viverra, arcu metus
-                            semper mi, non porttitor dolor eros sit amet metus. Nam sed mi fermentum,
-                             molestie libero id, varius arcu.  Pellentesque pretium nisl vel ultricies
-                              vulputate. Morbi congue ullamcorper ante. Pellentesque et est sit amet
-                               dolor euismod dignissim id facilisis lectus. Maecenas id diam in dui
-                               pellentesque ultricies. In lobortis nunc sed leo sollicitudin, quis
-                               pharetra enim feugiat. Pellentesque tristique felis quis magna ullamcorper
-                                pharetra. Aliquam nisl mi, molestie eu dui nec, eleifend porttitor
-                                augue. Suspendisse leo neque, bibendum at faucibus nec, dignissim vitae est.
-                                 Etiam finibus eros nunc, eget scelerisque odio scelerisque id.
-                                 Proin diam neque, sollicitudin ut elementum vitae, venenatis ut nibh.
-                                  Nam dui nunc, elementum in mi eget, aliquet vestibulum orci.
-                                   Aenean lobortis leo consequat sagittis facilisis. Mauris a
-                                   turpis rhoncus, rutrum urna quis, condimentum lacus.  Suspendisse
-                                   non augue lobortis, luctus ex a, sodales tellus. Phasellus mattis,
-                                    purus a pellentesque laoreet, leo arcu placerat mauris, in
-                                    interdum neque lorem vitae nulla. Fusce cursus semper mi, at tincidunt lectus interdum quis.
-                                     Vivamus sit amet purus ac massa venenatis viverra. Nunc lorem augue,
-                                     scelerisque non porta et, egestas ut magna. Duis a ipsum eu tellus faucibus gravida
-                                      eu quis est. Nunc lobortis blandit ipsum ut imperdiet. Integer id magna at tellus interdum gravida eget posuere
-                                       sapien. Nam at lacinia nisi. Nam egestas consectetur lacinia."
+                        Aliquam iaculis et ex pellentesque aliquet. Nulla porttitor placerat nulla, quis posuere"
         />
     <Button
         android:id="@+id/button_check_computer_king_constraint"

@@ -33,6 +33,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import com.github.bhlangonijr.chesslib.Piece
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerationLoopException
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerator
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGeneratorFromANTLR
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
@@ -268,11 +269,27 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
 
     private fun generatePosition(): String {
         return if (usingCustomGenerator){
-            PositionGeneratorFromANTLR.generatePosition()
+            try {
+                PositionGeneratorFromANTLR.generatePosition()
+            }
+            catch (ex: PositionGenerationLoopException) {
+                val resources = MyApplication.appContext.resources
+                val message = resources.getString(R.string.position_generation_error)
+                showAlertDialog(title = "", message = message)
+                PositionGeneratorFromANTLR.DEFAULT_POSITION
+            }
         }
         else {
-            generatorIndex = intent.extras?.getInt(predefinedGeneratorIndexKey) ?: 0
-            PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
+            try {
+                generatorIndex = intent.extras?.getInt(predefinedGeneratorIndexKey) ?: 0
+                PositionGenerator(availableGenerators[generatorIndex].constraints).generatePosition(random.nextBoolean())
+            }
+            catch (ex: PositionGenerationLoopException) {
+                val resources = MyApplication.appContext.resources
+                val message = resources.getString(R.string.position_generation_error)
+                showAlertDialog(title = "", message = message)
+                PositionGeneratorFromANTLR.DEFAULT_POSITION
+            }
         }
     }
 

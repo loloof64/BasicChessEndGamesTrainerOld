@@ -1,7 +1,53 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
+
+    <TextView
+        android:id="@+id/generator_editor_label_kings_mutual_constraint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:labelFor="@id/generator_editor_field_kings_mutual_constraint"
+        android:textStyle="bold"
+        android:text="@string/constraint_script"
+        android:textSize="@dimen/label_for_fields_size" />
+
+    <EditText
+        android:id="@+id/generator_editor_field_kings_mutual_constraint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/generator_editor_label_kings_mutual_constraint"
+        android:fadeScrollbars="false"
+        android:inputType="textMultiLine"
+        android:lines="20"
+        android:scrollbars="horizontal|vertical"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        Phasellus eget dui lorem. Donec sit amet tellus lectus. Phasellus feugiat lacus interdum velit pellentesque
+         iaculis. Mauris malesuada elit ex, nec volutpat augue laoreet eget. Mauris finibus diam a cursus maximus. Nulla
+          facilisi. Aliquam dignissim mi mauris, ut laoreet urna rhoncus sit amet. Proin erat est, fringilla in risus ut,
+           viverra commodo mauris. Duis egestas justo vel porttitor rhoncus. Vivamus sed imperdiet
+            dui. Fusce posuere sagittis erat, quis blandit eros volutpat pulvinar.
+             Maecenas in erat at dui varius elementum. Fusce vulputate semper ex mollis feugiat.
+              Nam ultrices ipsum vel lorem fermentum, eu iaculis nisi condimentum. Aenean
+               gravida augue sem, non hendrerit augue maximus eu. Nunc sed viverra quam.
+                Pellentesque porta, elit vitae ultricies faucibus, risus nisi bibendum libero,
+                 sed laoreet elit ligula vitae urna. Pellentesque pharetra nisl vitae augue sodales,
+                  sit amet fringilla neque facilisis. Orci varius natoque penatibus et magnis dis
+                   parturient montes, nascetur ridiculus mus. Duis aliquam imperdiet diam. Mauris
+                    consequat lacus sed convallis facilisis. Nulla facilisi. Quisque elementum orci
+                     a finibus consequat. Cras eros neque, blandit at nisi nec, hendrerit luctus nulla.
+                      Nulla accumsan turpis lacus, at vulputate ligula consequat et. Suspendisse potenti.
+                        Aliquam iaculis et ex pellentesque aliquet. Nulla porttitor placerat nulla, quis posuere"
+        />
+    <Button
+        android:id="@+id/button_check_kings_mutual_constraint"
+        android:text="@string/check_constraint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/generator_editor_label_kings_mutual_constraint"
+        android:layout_toEndOf="@id/generator_editor_label_kings_mutual_constraint"/>
 
 </RelativeLayout>

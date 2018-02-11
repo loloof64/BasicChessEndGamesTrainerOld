@@ -106,6 +106,7 @@ class CustomExerciseChooserFragment : Fragment() {
                                                         intent.putExtra(PositionGeneratorEditorActivity.resultShouldBeDrawKey, constraints?.resultShouldBeDraw)
                                                         intent.putExtra(PositionGeneratorEditorActivity.playerKingConstraintScriptKey, constraints?.playerKingConstraint ?: "")
                                                         intent.putExtra(PositionGeneratorEditorActivity.computerKingConstraintScriptKey, constraints?.computerKingConstraint ?: "")
+                                                        intent.putExtra(PositionGeneratorEditorActivity.kingsMutualConstraintScriptKey, constraints?.kingsMutualConstraint ?: "")
                                                         startActivity(intent)
                                                     }
                                                 }
@@ -129,7 +130,7 @@ class CustomExerciseChooserFragment : Fragment() {
                         colorId = R.color.exercise_chooser_activity_boom_menu_action_add_exercise,
                         listener = CustomExerciseChooserFragmentBoomButtonListener(this, {
                             val intent = Intent(it.activity, PositionGeneratorEditorActivity::class.java)
-                            intent.extras.putBoolean(PositionGeneratorEditorActivity.isEditingAnExistingFileKey, false)
+                            intent.putExtra(PositionGeneratorEditorActivity.isEditingAnExistingFileKey, false)
                             startActivity(intent)
                         })
                 )
@@ -209,10 +210,14 @@ class CustomExerciseChooserFragment : Fragment() {
         fun String?.doesNotStartKingsMutualConstraint(): Boolean =
                 this != null && this != FilesManager.mutualKingsHeader
 
+        fun String?.doesNotStartOtherPiecesCountConstraint(): Boolean =
+                this != null && this != FilesManager.otherPiecesCountHeader
+
         val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.name == exerciseNameWithExtension }
         if (exerciseFile != null){
             val playerKingConstraintBuilder = StringBuilder()
             val computerKingConstraintBuilder = StringBuilder()
+            val kingsMutualConstraintBuilder = StringBuilder()
             var resultShouldBeDraw = false
 
             BufferedReader(FileReader(exerciseFile)).use {
@@ -238,12 +243,19 @@ class CustomExerciseChooserFragment : Fragment() {
                     currentLine = it.readLine()
                     if (currentLine.doesNotStartKingsMutualConstraint()) computerKingConstraintBuilder.append(currentLine)
                 } while(currentLine.doesNotStartKingsMutualConstraint())
+
+                //filling other pieces count string
+                do {
+                    currentLine = it.readLine()
+                    if (currentLine.doesNotStartOtherPiecesCountConstraint()) kingsMutualConstraintBuilder.append(currentLine)
+                } while (currentLine.doesNotStartOtherPiecesCountConstraint())
             }
 
             return PositionGeneratorConstraintsScripts(
                     resultShouldBeDraw = resultShouldBeDraw,
                     playerKingConstraint = playerKingConstraintBuilder.toString(),
-                    computerKingConstraint = computerKingConstraintBuilder.toString()
+                    computerKingConstraint = computerKingConstraintBuilder.toString(),
+                    kingsMutualConstraint = kingsMutualConstraintBuilder.toString()
             )
         }
         else {
@@ -259,7 +271,8 @@ class CustomExerciseChooserFragment : Fragment() {
 
             return PositionGeneratorConstraintsExpr(
                     playerKingConstraint = buildScriptExprFromString(constraintsScripts.playerKingConstraint),
-                    computerKingConstraint = buildScriptExprFromString(constraintsScripts.computerKingConstraint)
+                    computerKingConstraint = buildScriptExprFromString(constraintsScripts.computerKingConstraint),
+                    kingsMutualConstraint = buildScriptExprFromString(constraintsScripts.kingsMutualConstraint)
             )
     }
 

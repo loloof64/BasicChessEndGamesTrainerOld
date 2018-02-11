@@ -25,16 +25,20 @@ import java.util.*
 
 class PositionGeneratorConstraintsExpr(
         val playerKingConstraint: ScriptLanguageBooleanExpr?,
-        val computerKingConstraint: ScriptLanguageBooleanExpr?
+        val computerKingConstraint: ScriptLanguageBooleanExpr?,
+        val kingsMutualConstraint: ScriptLanguageBooleanExpr?
 )
 
 data class PositionGeneratorConstraintsScripts(
         val resultShouldBeDraw: Boolean,
         val playerKingConstraint: String,
-        val computerKingConstraint: String
+        val computerKingConstraint: String,
+        val kingsMutualConstraint: String
 )
 
 object PositionGeneratorFromANTLR {
+
+    val DEFAULT_POSITION = "k1K5/8/8/8/8/8/8/8 w - - 0 1"
 
     private data class BoardCoordinate(val file: Int, val rank : Int){
         init {
@@ -54,22 +58,28 @@ object PositionGeneratorFromANTLR {
         return Square.encode(rank, file)
     }
 
-    private const val maxLoopsIterations = 250
+    private const val maxLoopsIterations = 300
 
     private val NO_CONSTRAINT = PositionGeneratorConstraintsExpr(
             playerKingConstraint = null,
-            computerKingConstraint = null
+            computerKingConstraint = null,
+            kingsMutualConstraint = null
     )
 
     private val random = Random()
 
     private var allConstraints: PositionGeneratorConstraintsExpr = NO_CONSTRAINT
 
+    private var playerKingCell = BoardCoordinate(file = 0, rank = 0)
+    private var computerKingCell = BoardCoordinate(file = 0, rank = 0)
+
     fun setConstraints(constraints: PositionGeneratorConstraintsExpr) {
         allConstraints = constraints
     }
 
     fun generatePosition(): String {
+        playerKingCell = BoardCoordinate(file = 0, rank = 0)
+        computerKingCell = BoardCoordinate(file = 0, rank = 0)
 
         val playerHasWhite = random.nextBoolean()
         val startFen = "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1"
@@ -105,12 +115,16 @@ object PositionGeneratorFromANTLR {
                 if (allConstraints.playerKingConstraint != null){
                     val intValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
                     val booleanValues = mapOf("playerHasWhite" to playerHasWhite)
-                    val buildSuccess = eval(expr = allConstraints.playerKingConstraint!!,
+                    val playerKingConstraintRespected = eval(expr = allConstraints.playerKingConstraint!!,
                             intValues = intValues, booleanValues = booleanValues
                     )
-                    if (buildSuccess) return builtPosition
+                    if (playerKingConstraintRespected) {
+                        playerKingCell = kingCell
+                        return builtPosition
+                    }
                 }
                 else {
+                    playerKingCell = kingCell
                     return builtPosition
                 }
             }
@@ -137,14 +151,35 @@ object PositionGeneratorFromANTLR {
 
             if (builtPositionIsLegal) {
                 if (allConstraints.computerKingConstraint != null){
-                    val intValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
-                    val booleanValues = mapOf("playerHasWhite" to playerHasWhite)
-                    val buildSuccess = eval(expr = allConstraints.computerKingConstraint!!,
-                            intValues = intValues, booleanValues = booleanValues
+                    val computerKingCstrIntValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
+                    val computerKingCstrBooleanValues = mapOf("playerHasWhite" to playerHasWhite)
+                    val computerKingConstraintRespected = eval(expr = allConstraints.computerKingConstraint!!,
+                            intValues = computerKingCstrIntValues, booleanValues = computerKingCstrBooleanValues
                     )
-                    if (buildSuccess) return builtPosition!!
+                    if (computerKingConstraintRespected) {
+                        if (allConstraints.kingsMutualConstraint != null) {
+                            val kingsMutualCstrIntValues = mapOf(
+                                    "playerKingFile" to playerKingCell.file,
+                                    "playerKingRank" to playerKingCell.rank,
+                                    "computerKingFile" to kingCell.file,
+                                    "computerKingRank" to kingCell.rank
+                            )
+                            val kingsMutualCstrBooleanValues = mapOf("playerHasWhite" to playerHasWhite)
+                            val kingsMutualConstraintRespected = eval(expr = allConstraints.kingsMutualConstraint!!,
+                                    intValues = kingsMutualCstrIntValues, booleanValues = kingsMutualCstrBooleanValues)
+                            if (kingsMutualConstraintRespected){
+                                computerKingCell = kingCell
+                                return builtPosition!!
+                            }
+                        }
+                        else {
+                            computerKingCell = kingCell
+                            return builtPosition!!
+                        }
+                    }
                 }
                 else {
+                    computerKingCell = kingCell
                     return builtPosition!!
                 }
             }

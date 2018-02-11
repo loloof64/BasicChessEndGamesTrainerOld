@@ -80,12 +80,8 @@ class PositionGenerator(private val constraints : PositionConstraints) {
         _position.halfMoveCounter = 0
         _position.moveCounter = 1
 
-        try {
-            placeKings(playerHasWhite)
-            placeOtherPieces(playerHasWhite)
-        } catch (e: PositionGenerationLoopException){
-            return ""
-        }
+        placeKings(playerHasWhite)
+        placeOtherPieces(playerHasWhite)
 
         Logger.getLogger("BasicChessEndgamesTrainer").info("Generated position is '${_position.fen}'")
 

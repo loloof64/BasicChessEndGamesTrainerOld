@@ -38,13 +38,14 @@ class ComputerKingConstraintEditorFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        button_check_computer_king_constraint.setOnClickListener {
-            if (checkIsScriptIsValidAndShowEventualError()) {
-                val parentActivity = activity as PositionGeneratorEditorActivity
-                val message = parentActivity.resources.getString(R.string.script_valid)
-                parentActivity.showAlertDialog(title = "", message = message)
-            }
-        }
+        button_check_computer_king_constraint.setOnClickListener(CheckScriptButtonOnClickListener(
+                activity as PositionGeneratorEditorActivity,
+                {parentActivity ->
+                    if (checkIsScriptIsValidAndShowEventualError()) {
+                        val message = parentActivity.resources.getString(R.string.script_valid)
+                        parentActivity.showAlertDialog(title = "", message = message)
+                    }
+                }))
 
         generator_editor_field_computer_king_constraint.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(str: Editable?) {
