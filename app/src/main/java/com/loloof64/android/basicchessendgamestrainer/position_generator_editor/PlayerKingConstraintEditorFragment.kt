@@ -27,7 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.loloof64.android.basicchessendgamestrainer.*
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.*
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.*
 import kotlinx.android.synthetic.main.fragment_editing_player_king_constraint.*
 import org.antlr.v4.runtime.misc.ParseCancellationException
 import org.greenrobot.eventbus.EventBus
@@ -96,7 +96,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         val sampleBooleanValues = mapOf("playerHasWhite" to true)
 
        return try {
-           SingleKingConstraintBuilder.checkIsScriptStringIsValid(
+           ScriptLanguageBuilder.checkIsScriptStringIsValid(
                    scriptString = PositionGeneratorValuesHolder.playerKingConstraintScript,
                    sampleIntValues = samplesIntValues,
                    sampleBooleanValues = sampleBooleanValues

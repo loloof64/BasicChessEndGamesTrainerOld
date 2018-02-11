@@ -32,10 +32,10 @@ import android.view.*
 import android.widget.EditText
 import com.loloof64.android.basicchessendgamestrainer.*
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PositionConstraintBailErrorStrategy
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.BailSingleKingConstraintLexer
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBooleanExpr
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBuilder
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintParser
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.BailScriptLanguageLexer
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBooleanExpr
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBuilder
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.antlr4.ScriptLanguageParser
 import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextOutsideCircleButton
@@ -258,23 +258,23 @@ class CustomExerciseChooserFragment : Fragment() {
             val constraintsScripts = loadConstraintsScriptsFromFile((exerciseNameWithExtension)) ?: return null
 
             return PositionGeneratorConstraintsExpr(
-                    playerKingConstraint = buildSingleKingConstraintFromString(constraintsScripts.playerKingConstraint),
-                    computerKingConstraint = buildSingleKingConstraintFromString(constraintsScripts.computerKingConstraint)
+                    playerKingConstraint = buildScriptExprFromString(constraintsScripts.playerKingConstraint),
+                    computerKingConstraint = buildScriptExprFromString(constraintsScripts.computerKingConstraint)
             )
     }
 
-    private fun buildSingleKingConstraintFromString(constraintStr: String) : SingleKingConstraintBooleanExpr? {
+    private fun buildScriptExprFromString(constraintStr: String) : ScriptLanguageBooleanExpr? {
         if (constraintStr.isEmpty()) return null
 
 
         val inputStream = CharStreams.fromString(constraintStr)
-        val lexer = BailSingleKingConstraintLexer(inputStream)
+        val lexer = BailScriptLanguageLexer(inputStream)
         val tokens = CommonTokenStream(lexer)
-        val parser = SingleKingConstraintParser(tokens)
+        val parser = ScriptLanguageParser(tokens)
         parser.errorHandler = PositionConstraintBailErrorStrategy()
-        val tree = parser.singleKingConstraint()
-        SingleKingConstraintBuilder.clearVariables()
-        return SingleKingConstraintBuilder.visit(tree) as SingleKingConstraintBooleanExpr
+        val tree = parser.scriptLanguage()
+        ScriptLanguageBuilder.clearVariables()
+        return ScriptLanguageBuilder.visit(tree) as ScriptLanguageBooleanExpr
     }
 
     override fun onStart() {

@@ -15,17 +15,17 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint
+package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language
 
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.antlr4.SingleKingConstraintLexer
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.antlr4.ScriptLanguageLexer
 import org.antlr.v4.runtime.CharStream
 import org.antlr.v4.runtime.LexerNoViableAltException
 import org.antlr.v4.runtime.misc.Interval
 import org.antlr.v4.runtime.misc.ParseCancellationException
 
-class BailSingleKingConstraintLexer(val input: CharStream) : SingleKingConstraintLexer(input) {
+class BailScriptLanguageLexer(val input: CharStream) : ScriptLanguageLexer(input) {
     override fun recover(error: LexerNoViableAltException?) {
         val lowerBound = error?.startIndex!!
         val offendingText = input.getText(Interval(lowerBound, lowerBound))
