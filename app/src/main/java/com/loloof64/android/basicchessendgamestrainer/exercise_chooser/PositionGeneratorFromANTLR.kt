@@ -20,14 +20,18 @@ package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 import com.github.bhlangonijr.chesslib.*
 import com.github.bhlangonijr.chesslib.Side
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintBooleanExpr
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.SingleKingConstraintNumericExpr
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.single_king_constraint.eval
 import java.util.*
-import java.util.logging.Logger
 
-class PositionGeneratorConstraints(
+class PositionGeneratorConstraintsExpr(
         val playerKingConstraint: SingleKingConstraintBooleanExpr?,
         val computerKingConstraint: SingleKingConstraintBooleanExpr?
+)
+
+data class PositionGeneratorConstraintsScripts(
+        val resultShouldBeDraw: Boolean,
+        val playerKingConstraint: String,
+        val computerKingConstraint: String
 )
 
 object PositionGeneratorFromANTLR {
@@ -52,16 +56,16 @@ object PositionGeneratorFromANTLR {
 
     private val maxLoopsIterations = 250
 
-    private val NO_CONSTRAINT = PositionGeneratorConstraints(
+    private val NO_CONSTRAINT = PositionGeneratorConstraintsExpr(
             playerKingConstraint = null,
             computerKingConstraint = null
     )
 
     private val random = Random()
 
-    var allConstraints: PositionGeneratorConstraints = NO_CONSTRAINT
+    var allConstraints: PositionGeneratorConstraintsExpr = NO_CONSTRAINT
 
-    fun setConstraints(constraints: PositionGeneratorConstraints) {
+    fun setConstraints(constraints: PositionGeneratorConstraintsExpr) {
         allConstraints = constraints
     }
 

@@ -18,15 +18,17 @@
 
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
+import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AlertDialog
+import android.support.v7.view.menu.MenuBuilder
+import android.support.v7.view.menu.MenuPopupHelper
 import android.support.v7.widget.LinearLayoutManager
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.support.v7.widget.PopupMenu
+import android.view.*
 import android.widget.EditText
 import com.loloof64.android.basicchessendgamestrainer.*
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PositionConstraintBailErrorStrategy
@@ -46,36 +48,75 @@ import java.lang.ref.WeakReference
 
 class CustomExerciseChooserFragment : Fragment() {
     private lateinit var adapter: CustomExercisesListAdapter
+    private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_custom_exercise_chooser, container, false)
     }
 
+    @SuppressLint("RestrictedApi")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        customExercisesListView.layoutManager = LinearLayoutManager(activity)
+        layoutManager = LinearLayoutManager(activity)
+        customExercisesListView.layoutManager = layoutManager
         adapter = CustomExercisesListAdapter(itemClickListener = CustomExerciseChooserFragmentItemClickListener(
                 parentFragment = this,
                 action = {
-                    fragment: CustomExerciseChooserFragment, position: Int ->
+                    parentFragment: CustomExerciseChooserFragment, position: Int ->
                 // TODO If it is an exercise run it, otherwise if parent folder, try to go up, else go into folder
-                    val clickedElement = fragment.adapter.getElementAtPosition(position)
+                    val clickedElement = parentFragment.adapter.getElementAtPosition(position)
                     when {
                         clickedElement.isFolder -> {
 
                         }
                         else -> {
-                            fragment.launchExercise(clickedElement.name)
+                            parentFragment.launchExercise(clickedElement.name)
                         }
                     }
                 }),
                 itemLongClickListener = CustomExerciseChooserFragmentItemLongClickListener(
                         parentFragment = this,
                         action = {
-                            fragment: CustomExerciseChooserFragment, position: Int ->
+                            parentFragment: CustomExerciseChooserFragment, position: Int ->
                             /*
                              TODO if it is an exercise show popup menu with edit/rename/delete options
                              else it is not parent folder show popup menu with rename/delete options
                               */
+
+                            val clickedElement = parentFragment.adapter.getElementAtPosition(position)
+                            when {
+                                clickedElement.isFolder -> {
+
+                                }
+                                else -> {
+                                    val concernedView = parentFragment.layoutManager.findViewByPosition(position)
+                                    val popupMenu = PopupMenu(parentFragment.activity!!, concernedView)
+                                    popupMenu.menuInflater.inflate(R.menu.custom_exercise_item_popum_menu, popupMenu.menu)
+                                    popupMenu.setOnMenuItemClickListener(CustomExerciseChooserFragmentPopupMenuItemListener(
+                                            parentFragment = parentFragment,
+                                            position = position,
+                                            action = {popUpParentFragment, menuItemId ->
+                                                when(menuItemId){
+                                                    R.id.custom_exercise_edit -> {
+                                                        val intent = Intent(popUpParentFragment.activity, PositionGeneratorEditorActivity::class.java)
+                                                        val fileName = popUpParentFragment.adapter.getElementAtPosition(position).name
+                                                        val constraints = popUpParentFragment.loadConstraintsScriptsFromFile(fileName)
+
+                                                        intent.putExtra(PositionGeneratorEditorActivity.isEditingAnExistingFileKey, true)
+                                                        intent.putExtra(PositionGeneratorEditorActivity.editedFileNameKey, fileName)
+                                                        intent.putExtra(PositionGeneratorEditorActivity.resultShouldBeDrawKey, constraints?.resultShouldBeDraw)
+                                                        intent.putExtra(PositionGeneratorEditorActivity.playerKingConstraintScriptKey, constraints?.playerKingConstraint ?: "")
+                                                        intent.putExtra(PositionGeneratorEditorActivity.computerKingConstraintScriptKey, constraints?.computerKingConstraint ?: "")
+                                                        startActivity(intent)
+                                                    }
+                                                }
+                                            }
+                                    ))
+
+                                    val menuHelper = MenuPopupHelper(parentFragment.activity!!, popupMenu.menu as MenuBuilder, concernedView)
+                                    menuHelper.setForceShowIcon(true)
+                                    menuHelper.show()
+                                }
+                            }
                         }
                 ))
         customExercisesListView.adapter = adapter
@@ -88,6 +129,7 @@ class CustomExerciseChooserFragment : Fragment() {
                         colorId = R.color.exercise_chooser_activity_boom_menu_action_add_exercise,
                         listener = CustomExerciseChooserFragmentBoomButtonListener(this, {
                             val intent = Intent(it.activity, PositionGeneratorEditorActivity::class.java)
+                            intent.extras.putBoolean(PositionGeneratorEditorActivity.isEditingAnExistingFileKey, false)
                             startActivity(intent)
                         })
                 )
@@ -149,7 +191,7 @@ class CustomExerciseChooserFragment : Fragment() {
     }
 
     private fun launchExercise(exerciseNameWithExtension: String) {
-        val constraints = loadConstraintsFromFile(exerciseNameWithExtension) ?: return
+        val constraints = loadConstraintsExprFromFile(exerciseNameWithExtension) ?: return
         PositionGeneratorFromANTLR.setConstraints(constraints)
 
         val intent = Intent(activity, PlayingActivity::class.java)
@@ -157,7 +199,7 @@ class CustomExerciseChooserFragment : Fragment() {
         startActivity(intent)
     }
 
-    private fun loadConstraintsFromFile(exerciseNameWithExtension: String): PositionGeneratorConstraints? {
+    private fun loadConstraintsScriptsFromFile(exerciseNameWithExtension: String): PositionGeneratorConstraintsScripts? {
         fun String?.doesNotStartPlayerKingConstraint(): Boolean =
                 this != null && this != FilesManager.playerKingHeader
 
@@ -171,9 +213,14 @@ class CustomExerciseChooserFragment : Fragment() {
         if (exerciseFile != null){
             val playerKingConstraintBuilder = StringBuilder()
             val computerKingConstraintBuilder = StringBuilder()
+            var resultShouldBeDraw = false
 
             BufferedReader(FileReader(exerciseFile)).use {
                 var currentLine: String?
+
+                //First line is draw result
+                currentLine = it.readLine()
+                resultShouldBeDraw = if (currentLine == null) false else currentLine == FilesManager.DRAW_LINE_VALUE
 
                 // skipping lines before player king constraint section
                 do {
@@ -193,9 +240,10 @@ class CustomExerciseChooserFragment : Fragment() {
                 } while(currentLine.doesNotStartKingsMutualConstraint())
             }
 
-            return PositionGeneratorConstraints(
-                    playerKingConstraint = buildSingleKingConstraintFromString(playerKingConstraintBuilder.toString()),
-                    computerKingConstraint = buildSingleKingConstraintFromString(computerKingConstraintBuilder.toString())
+            return PositionGeneratorConstraintsScripts(
+                    resultShouldBeDraw = resultShouldBeDraw,
+                    playerKingConstraint = playerKingConstraintBuilder.toString(),
+                    computerKingConstraint = computerKingConstraintBuilder.toString()
             )
         }
         else {
@@ -204,6 +252,15 @@ class CustomExerciseChooserFragment : Fragment() {
             showAlertDialog(title, message)
             return null
         }
+    }
+
+    private fun loadConstraintsExprFromFile(exerciseNameWithExtension: String): PositionGeneratorConstraintsExpr? {
+            val constraintsScripts = loadConstraintsScriptsFromFile((exerciseNameWithExtension)) ?: return null
+
+            return PositionGeneratorConstraintsExpr(
+                    playerKingConstraint = buildSingleKingConstraintFromString(constraintsScripts.playerKingConstraint),
+                    computerKingConstraint = buildSingleKingConstraintFromString(constraintsScripts.computerKingConstraint)
+            )
     }
 
     private fun buildSingleKingConstraintFromString(constraintStr: String) : SingleKingConstraintBooleanExpr? {
@@ -275,4 +332,19 @@ class CustomExerciseChooserFragmentBoomButtonListener(parentFragment: CustomExer
     override fun onBoomButtonClick(index: Int) {
         if (parentFragmentRef.get() != null) action(parentFragmentRef.get()!!)
     }
+}
+
+class CustomExerciseChooserFragmentPopupMenuItemListener(
+        parentFragment: CustomExerciseChooserFragment,
+        val position: Int,
+        private val action: (CustomExerciseChooserFragment, menuItemId: Int) -> Unit
+) : PopupMenu.OnMenuItemClickListener {
+
+    private val parentFragmentRef = WeakReference(parentFragment)
+
+    override fun onMenuItemClick(item: MenuItem?): Boolean {
+        if (parentFragmentRef.get() != null && item != null) action(parentFragmentRef.get()!!, item.itemId)
+        return true
+    }
+
 }

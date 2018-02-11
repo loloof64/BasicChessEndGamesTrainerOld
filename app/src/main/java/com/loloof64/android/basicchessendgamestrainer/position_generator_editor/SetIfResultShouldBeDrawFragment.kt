@@ -40,6 +40,14 @@ class SetIfResultShouldBeDrawFragment : Fragment() {
         result_should_not_be_draw_button.setOnClickListener {
             PositionGeneratorValuesHolder.resultShouldBeDraw = false
         }
+
+        should_result_be_draw_buttons_group.clearCheck()
+        if (PositionGeneratorValuesHolder.resultShouldBeDraw) {
+            result_should_be_draw_button.isChecked = true
+        }
+        else {
+            result_should_not_be_draw_button.isChecked = true
+        }
     }
 
     companion object {

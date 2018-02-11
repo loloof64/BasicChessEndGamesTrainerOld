@@ -61,6 +61,8 @@ class PlayerKingConstraintEditorFragment : Fragment() {
 
             }
         })
+
+        generator_editor_field_player_king_constraint.setText(PositionGeneratorValuesHolder.playerKingConstraintScript)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

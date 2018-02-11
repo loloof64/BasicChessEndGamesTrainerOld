@@ -34,14 +34,12 @@ import android.view.View
 import android.widget.Toast
 import com.github.bhlangonijr.chesslib.Piece
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerator
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGeneratorConstraints
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGeneratorFromANTLR
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
 import kotlinx.android.synthetic.main.activity_playing.*
 import java.lang.ref.WeakReference
 import java.util.*
-import java.util.logging.Logger
 
 class SpaceLeftAndRightItemDecorator(private val space: Int): RecyclerView.ItemDecoration(){
     override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {

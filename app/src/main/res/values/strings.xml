@@ -127,4 +127,6 @@ of endgame.[CR][CR]
     <string name="could_not_load_file">Failed to load exercise %s !</string>
     <string name="folder_already_exists_title">Folder already exists</string>
     <string name="folder_already_exists_message">Folder %s already exists in current directory !</string>
+    <string name="custom_exercise_edit">Edit</string>
+    <string name="custom_exercise_delete">Delete</string>
 </resources>

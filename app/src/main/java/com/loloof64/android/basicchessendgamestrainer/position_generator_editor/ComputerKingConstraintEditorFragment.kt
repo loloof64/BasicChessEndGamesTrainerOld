@@ -60,6 +60,8 @@ class ComputerKingConstraintEditorFragment : Fragment() {
 
             }
         })
+
+        generator_editor_field_computer_king_constraint.setText(PositionGeneratorValuesHolder.computerKingConstraintScript)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

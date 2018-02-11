@@ -31,6 +31,7 @@ import android.content.Context
 import android.content.DialogInterface
 import android.support.v7.widget.ThemedSpinnerAdapter
 import android.content.res.Resources.Theme
+import android.os.PersistableBundle
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
 import android.widget.Toast
@@ -52,7 +53,7 @@ object PositionGeneratorValuesHolder {
     var playerKingConstraintScript = ""
     var computerKingConstraintScript = ""
     var kingsMutualConstraintScript = ""
-    val otherPiecesCount = mutableMapOf<PieceKind, Int>()
+    var otherPiecesCount = mutableMapOf<PieceKind, Int>()
     var otherPiecesGlobalConstraintScript = ""
     var otherPiecesMutualConstraintScript = ""
     var otherPiecesIndexedConstraintScript = ""
@@ -64,6 +65,9 @@ data class onMessageToShowInDialogEvent(val title: String, val message: String)
 data class BoomButtonParameters(val textId: Int, val iconId: Int, val colorId: Int, val listener: OnBMClickListener)
 
 class PositionGeneratorEditorActivity : AppCompatActivity() {
+
+    private var isEditingAnExistingFile = false
+    private var currentEditedFileName = ""
 
     companion object {
         val allFragments = arrayOf(
@@ -78,6 +82,15 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         )
 
         val isEditingAnExistingFileKey = "EditingExistingFile"
+        val resultShouldBeDrawKey = "resultShouldBeDraw"
+        val playerKingConstraintScriptKey = "playerKingConstraintScript"
+        val computerKingConstraintScriptKey = "computerKingConstraintScript"
+        val kingsMutualConstraintScriptKey = "kingsMutualConstraintScript"
+        val otherPiecesCountKey = "otherPiecesCount"
+        val otherPiecesGlobalConstraintScriptKey = "otherPiecesGlobalConstraintScript"
+        val otherPiecesMutualConstraintScriptKey = "otherPiecesMutualConstraintScript"
+        val otherPiecesIndexedConstraintScriptKey = "otherPiecesIndexedConstraintScript"
+        val editedFileNameKey = "editedFileName"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,8 +100,18 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
+
         if (intent.extras?.getBoolean(isEditingAnExistingFileKey) == true) {
-            // todo load current script values
+            PositionGeneratorValuesHolder.resultShouldBeDraw = intent.extras?.getBoolean(resultShouldBeDrawKey) ?: false
+            PositionGeneratorValuesHolder.playerKingConstraintScript = intent.extras?.getString(playerKingConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.computerKingConstraintScript = intent.extras?.getString(computerKingConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.kingsMutualConstraintScript = intent.extras?.getString(kingsMutualConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.otherPiecesCount = loadOtherPiecesCount(intent.extras?.getString(otherPiecesCountKey) ?: "")
+            PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScript = intent.extras?.getString(otherPiecesGlobalConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.otherPiecesMutualConstraintScript = intent.extras?.getString(otherPiecesMutualConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScript = intent.extras?.getString(otherPiecesIndexedConstraintScriptKey) ?: ""
+            isEditingAnExistingFile = true
+            currentEditedFileName = intent.extras?.getString(editedFileNameKey)!!
         }
         else {
             PositionGeneratorValuesHolder.resultShouldBeDraw = false
@@ -113,7 +136,12 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                             val allScriptsAreGood =
                                     playerKingFragment.checkIsScriptIsValidAndShowEventualError()
                             if (allScriptsAreGood){
-                                promptForFileName()
+                                if (isEditingAnExistingFile){
+                                    askIfFileShouldBeOverwritten(currentEditedFileName)
+                                }
+                                else {
+                                    promptForFileName()
+                                }
                             }
                             else {
                                 val title = resources.getString(R.string.script_errors)
@@ -169,6 +197,12 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
     }
 
+    private fun loadOtherPiecesCount(piecesCountScript: String): MutableMap<PieceKind, Int> {
+        //todo fill the piece kind counts map
+        val mapToReturn = mutableMapOf<PieceKind, Int>()
+        return mapToReturn
+    }
+
     override fun onBackPressed() {
         askForCancelConfirmation()
     }
@@ -186,6 +220,20 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
     @Subscribe
     fun onMessageToShowInDialogEvent(event: onMessageToShowInDialogEvent) {
         showAlertDialog(title = event.title, message = event.message)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle?, outPersistentState: PersistableBundle?) {
+        super.onSaveInstanceState(outState, outPersistentState)
+        outState?.putBoolean(isEditingAnExistingFileKey, isEditingAnExistingFile)
+        outState?.putString(editedFileNameKey, currentEditedFileName)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+        super.onRestoreInstanceState(savedInstanceState)
+        if (savedInstanceState != null) {
+            isEditingAnExistingFile = savedInstanceState.getBoolean(isEditingAnExistingFileKey)
+            currentEditedFileName = savedInstanceState.getString(currentEditedFileName)
+        }
     }
 
     fun showAlertDialog(title : String, message: String) {
