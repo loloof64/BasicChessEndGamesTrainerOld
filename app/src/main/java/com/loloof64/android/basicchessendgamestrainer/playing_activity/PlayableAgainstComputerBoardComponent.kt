@@ -30,7 +30,6 @@ import com.github.bhlangonijr.chesslib.move.MoveGenerator
 import com.github.bhlangonijr.chesslib.move.MoveList
 import com.loloof64.android.basicchessendgamestrainer.PlayingActivity
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.buildSquare
 import java.lang.Math.abs
 import java.util.logging.Logger
 

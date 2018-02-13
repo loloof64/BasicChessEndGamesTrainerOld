@@ -18,8 +18,11 @@
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
 import com.github.bhlangonijr.chesslib.*
-import com.github.bhlangonijr.chesslib.Side
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceKindCount
+import com.github.bhlangonijr.chesslib.Side as ChessLibSide
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceKindCount as EditorPieceKindCount
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceKind as EditorPieceKind
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceType as EditorPieceType
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.Side as EditorSide
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBooleanExpr
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.eval
 import java.util.*
@@ -28,7 +31,7 @@ class PositionGeneratorConstraintsExpr(
         val playerKingConstraint: ScriptLanguageBooleanExpr?,
         val computerKingConstraint: ScriptLanguageBooleanExpr?,
         val kingsMutualConstraint: ScriptLanguageBooleanExpr?,
-        val otherPiecesCountConstraint: List<PieceKindCount>
+        val otherPiecesCountConstraint: List<EditorPieceKindCount>
 )
 
 data class PositionGeneratorConstraintsScripts(
@@ -89,7 +92,8 @@ object PositionGeneratorFromANTLR {
         val startFen = "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1"
 
         val positionWithPlayerKing = placePlayerKingInPosition(startFen = startFen, playerHasWhite = playerHasWhite)
-        return placeComputerKingInPosition(startFen = positionWithPlayerKing, playerHasWhite = playerHasWhite)
+        val positionWithBothKings = placeComputerKingInPosition(startFen = positionWithPlayerKing, playerHasWhite = playerHasWhite)
+        return placeOtherPiecesInPosition(startFen = positionWithBothKings, playerHasWhite = playerHasWhite)
     }
 
     private fun addPieceToPositionOrReturnNullIfCellAlreadyOccupied(startFen: String, pieceToAdd: Piece, pieceCell: Square): String? {
@@ -193,10 +197,69 @@ object PositionGeneratorFromANTLR {
         throw PositionGenerationLoopException("Failed to place computer king !")
     }
 
+    private fun placeOtherPiecesInPosition(startFen: String, playerHasWhite: Boolean): String {
+
+        fun Int.loops(callback : (Int) -> Unit) {
+            for (i in 0 until this) callback(i)
+        }
+
+        fun pieceKindToPiece(kind: EditorPieceKind, whitePiece: Boolean): Piece =
+                when(kind.pieceType){
+                    EditorPieceType.Pawn -> if (whitePiece) Piece.WHITE_PAWN else Piece.BLACK_PAWN
+                    EditorPieceType.Knight -> if (whitePiece) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT
+                    EditorPieceType.Bishop -> if (whitePiece) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP
+                    EditorPieceType.Rook -> if (whitePiece) Piece.WHITE_ROOK else Piece.BLACK_ROOK
+                    EditorPieceType.Queen -> if (whitePiece) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN
+                    EditorPieceType.King -> if (whitePiece) Piece.WHITE_KING else Piece.BLACK_KING
+                }
+
+        fun buildSquare(rank: Int, file: Int) =
+                Square.encode(Rank.values()[rank], File.values()[file])
+
+        val currentPosition = Board()
+        currentPosition.loadFromFEN(startFen)
+
+        allConstraints.otherPiecesCountConstraint.forEach { (kind, count) ->
+            val savedCoordinates = arrayListOf<BoardCoordinate>()
+            count.loops { index ->
+                var loopSuccess = false
+                for (loopIter in 0..maxLoopsIterations) {
+                    val isAPieceOfPlayer = kind.side == EditorSide.Player
+                    val isAPieceOfComputer = !isAPieceOfPlayer
+                    val computerHasWhite = !playerHasWhite
+                    val mustBeWhitePiece = (isAPieceOfPlayer && playerHasWhite)
+                            || (isAPieceOfComputer && computerHasWhite)
+
+                    val pieceCell = generateCell()
+
+                    val tempPosition = addPieceToPositionOrReturnNullIfCellAlreadyOccupied(
+                            startFen = currentPosition.fen,
+                            pieceToAdd = pieceKindToPiece(kind = kind, whitePiece = mustBeWhitePiece),
+                            pieceCell = buildSquare(
+                                    rank = pieceCell.rank, file = pieceCell.file
+                            )
+                    )
+
+                    val forbiddenPosition = tempPosition == null ||
+                            computerKingInChessForPosition(tempPosition, playerHasWhite)
+                    if (forbiddenPosition) continue
+
+                    currentPosition.loadFromFEN(tempPosition)
+                    savedCoordinates += pieceCell
+                    loopSuccess = true
+                    break
+                }
+                if (!loopSuccess) throw PositionGenerationLoopException()
+            }
+        }
+
+        return currentPosition.fen
+    }
+
     private fun computerKingInChessForPosition(positionFEN: String, playerHasWhite: Boolean) : Boolean =
     Board().apply {
         loadFromFEN(positionFEN)
-        sideToMove = if (playerHasWhite) Side.BLACK else Side.WHITE
+        sideToMove = if (playerHasWhite) ChessLibSide.BLACK else ChessLibSide.WHITE
     }.isKingAttacked
 
 }

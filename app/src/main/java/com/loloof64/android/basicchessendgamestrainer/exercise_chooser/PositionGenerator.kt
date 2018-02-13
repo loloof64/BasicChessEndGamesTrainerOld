@@ -27,23 +27,6 @@ class PositionGenerationLoopException(message: String = "") : Exception(message)
 
 private val maxLoopsIterations = 250
 
-fun Int.loops(callback : (Int) -> Unit) {
-    for (i in 0 until this) callback(i)
-}
-
-fun buildSquare(rank: Int, file: Int) =
-        Square.encode(Rank.values()[rank], File.values()[file])
-
-fun pieceKindToPiece(kind: PieceKind, whitePiece: Boolean): Piece =
-        when(kind.pieceType){
-            PieceType.pawn -> if (whitePiece) Piece.WHITE_PAWN else Piece.BLACK_PAWN
-            PieceType.knight -> if (whitePiece) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT
-            PieceType.bishop -> if (whitePiece) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP
-            PieceType.rook -> if (whitePiece) Piece.WHITE_ROOK else Piece.BLACK_ROOK
-            PieceType.queen -> if (whitePiece) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN
-            PieceType.king -> if (whitePiece) Piece.WHITE_KING else Piece.BLACK_KING
-        }
-
 class PositionGenerator(private val constraints : PositionConstraints) {
 
     private data class BoardCoordinate(val file: Int, val rank : Int){
@@ -92,6 +75,9 @@ class PositionGenerator(private val constraints : PositionConstraints) {
     private var oppositeKingCell = BoardCoordinate(file = 0, rank = 0)
 
     private fun placeKings(playerHasWhite: Boolean){
+        fun buildSquare(rank: Int, file: Int) =
+                Square.encode(Rank.values()[rank], File.values()[file])
+
         var loopSuccess = false
         for (iters in 0..maxLoopsIterations){ // setting up player king
 
@@ -148,6 +134,24 @@ class PositionGenerator(private val constraints : PositionConstraints) {
     }
 
     private fun placeOtherPieces(playerHasWhite: Boolean){
+
+        fun Int.loops(callback : (Int) -> Unit) {
+            for (i in 0 until this) callback(i)
+        }
+
+        fun buildSquare(rank: Int, file: Int) =
+                Square.encode(Rank.values()[rank], File.values()[file])
+
+        fun pieceKindToPiece(kind: PieceKind, whitePiece: Boolean): Piece =
+                when(kind.pieceType){
+                    PieceType.pawn -> if (whitePiece) Piece.WHITE_PAWN else Piece.BLACK_PAWN
+                    PieceType.knight -> if (whitePiece) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT
+                    PieceType.bishop -> if (whitePiece) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP
+                    PieceType.rook -> if (whitePiece) Piece.WHITE_ROOK else Piece.BLACK_ROOK
+                    PieceType.queen -> if (whitePiece) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN
+                    PieceType.king -> if (whitePiece) Piece.WHITE_KING else Piece.BLACK_KING
+                }
+
         constraints.otherPiecesCountsConstraint.forEach { (kind, count) ->
 
             val savedCoordinates = arrayListOf<BoardCoordinate>()

@@ -21,10 +21,14 @@ package com.loloof64.android.basicchessendgamestrainer.playing_activity
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import com.github.bhlangonijr.chesslib.Rank
+import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.buildSquare
 import java.io.*
+
+fun buildSquare(rank: Int, file: Int) =
+        Square.encode(Rank.values()[rank], com.github.bhlangonijr.chesslib.File.values()[file])
 
 fun String.asMove(): Move {
     fun Char.toFile() = this.toInt() - 'a'.toInt()

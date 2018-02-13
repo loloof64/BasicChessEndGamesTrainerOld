@@ -26,11 +26,8 @@ import android.graphics.Typeface
 import android.support.graphics.drawable.VectorDrawableCompat
 import android.util.AttributeSet
 import android.view.View
-import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.Piece
-import com.github.bhlangonijr.chesslib.Side
+import com.github.bhlangonijr.chesslib.*
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.buildSquare
 
 infix fun Int.min(other : Int) = if (this < other) this else other
 infix fun Int.max(other : Int) = if (this > other) this else other
@@ -142,6 +139,10 @@ abstract class BoardComponent(context: Context, attrs: AttributeSet?, defStyleAt
     }
 
     private fun drawPieces(canvas: Canvas, cellSize: Int) {
+        fun buildSquare(rank: Int, file: Int) =
+                Square.encode(Rank.values()[rank], File.values()[file])
+
+
         for (cellRank in (0 until 8)) {
             for (cellFile in (0 until 8)) {
                 val piece = relatedPosition().getPiece(buildSquare(cellRank, cellFile))
