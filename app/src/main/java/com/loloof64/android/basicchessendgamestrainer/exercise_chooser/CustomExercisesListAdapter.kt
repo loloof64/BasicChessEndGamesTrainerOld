@@ -50,7 +50,7 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
     }
 
     companion object {
-        class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
+        class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val nameView: TextView = view.findViewById(R.id.custom_exercise_fragment_file_name)
             val imageView: ImageView = view.findViewById(R.id.custom_exercise_fragment_file_type)
         }

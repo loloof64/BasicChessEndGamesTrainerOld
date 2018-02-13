@@ -19,15 +19,67 @@ package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import com.loloof64.android.basicchessendgamestrainer.R
+import kotlinx.android.synthetic.main.fragment_editing_other_pieces_count_constraint.*
+import java.lang.ref.WeakReference
 
 class OtherPiecesCountConstraintEditorFragment: Fragment() {
 
+    private lateinit var listViewAdapter:OtherPiecesKindCountListArrayAdapter
+
+    fun getListViewAdapter(): OtherPiecesKindCountListArrayAdapter = listViewAdapter
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_editing_other_pieces_count_constraint, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val spinnerCountAdapter = ArrayAdapter.createFromResource(
+                activity,
+                R.array.piece_kind_count_spinner,
+                android.R.layout.simple_spinner_item
+        )
+        spinnerCountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner_add_piece_kind_count.adapter = spinnerCountAdapter
+
+        val spinnerOwnerAdapter = ArrayAdapter.createFromResource(
+            activity,
+                R.array.player_computer_spinner,
+                android.R.layout.simple_spinner_item
+        )
+        spinnerOwnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner_add_piece_kind_owner.adapter = spinnerOwnerAdapter
+
+        val spinnerKindAdapter = ArrayAdapter.createFromResource(
+                activity,
+                R.array.piece_type_spinner,
+                android.R.layout.simple_spinner_item
+        )
+        spinnerKindAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner_add_piece_kind_type.adapter = spinnerKindAdapter
+
+        listViewAdapter = OtherPiecesKindCountListArrayAdapter()
+        recycler_view_other_pieces_count.layoutManager = LinearLayoutManager(activity!!)
+        recycler_view_other_pieces_count.adapter = listViewAdapter
+
+        button_add_piece_kind_count.setOnClickListener(ButtonAddPieceKindCountOnClickListener(
+                parentFragment = this
+        ))
+    }
+
+    fun getCurrentDefinedPieceCount(): PieceKindCount {
+        return PieceKindCount(
+                pieceKind = PieceKind(
+                        pieceType = PieceType.values()[spinner_add_piece_kind_type.selectedItemPosition],
+                        side = Side.values()[spinner_add_piece_kind_owner.selectedItemPosition]
+                ),
+                count = 1  + spinner_add_piece_kind_count.selectedItemPosition
+        )
     }
 
     companion object {
@@ -36,4 +88,15 @@ class OtherPiecesCountConstraintEditorFragment: Fragment() {
         }
     }
 
+}
+
+class ButtonAddPieceKindCountOnClickListener(parentFragment : OtherPiecesCountConstraintEditorFragment) : View.OnClickListener {
+
+    private val parentFragmentRef = WeakReference(parentFragment)
+
+    override fun onClick(v: View?) {
+        if (parentFragmentRef.get() != null) {
+            parentFragmentRef.get()!!.getListViewAdapter().tryToAddPieceCount(parentFragmentRef.get()!!.getCurrentDefinedPieceCount())
+        }
+    }
 }

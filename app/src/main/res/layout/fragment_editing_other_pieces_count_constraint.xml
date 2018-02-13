@@ -4,4 +4,41 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <Button
+        android:id="@+id/button_add_piece_kind_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_add_piece_kind_count"/>
+
+    <Spinner
+        android:id="@+id/spinner_add_piece_kind_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/button_add_piece_kind_count"
+        />
+
+    <Spinner
+        android:id="@+id/spinner_add_piece_kind_type"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/spinner_add_piece_kind_count"
+        />
+
+    <Spinner
+        android:id="@+id/spinner_add_piece_kind_owner"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toEndOf="@id/spinner_add_piece_kind_type"
+        />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycler_view_other_pieces_count"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/button_add_piece_kind_count"
+        android:fadeScrollbars="false"
+        android:scrollbarSize="5dp"
+        android:scrollbarThumbVertical="@android:color/holo_blue_bright"
+        android:scrollbars="vertical" />
+
 </RelativeLayout>

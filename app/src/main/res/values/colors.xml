@@ -23,4 +23,7 @@
     <color name="exercise_chooser_activity_boom_menu_action_add_exercise">#6868f1</color>
     <color name="exercise_chooser_activity_boom_menu_action_add_folder">#dec35b</color>
     <color name="exercise_chooser_folder_color">#da4444</color>
+    <color name="other_piece_count_color">#aaaaff</color>
+    <color name="other_piece_owner_color">#50ba67</color>
+    <color name="other_piece_type_color">#c95858</color>
 </resources>

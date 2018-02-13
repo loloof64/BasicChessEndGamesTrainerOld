@@ -97,7 +97,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
             val title = resources.getString(R.string.player_king_constraints)
             val errorMessage = resources.getString(R.string.empty_script_error)
 
-            EventBus.getDefault().post(onMessageToShowInDialogEvent(title, errorMessage))
+            EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, errorMessage))
             return true
         }
 
@@ -124,7 +124,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
 
            val titleFormat = resources.getString(R.string.parse_error_dialog_title)
            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
-           EventBus.getDefault().post(onMessageToShowInDialogEvent(title, message))
+           EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, message))
 
            false
        }
@@ -134,7 +134,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
            val constraintTypeStr = resources.getString(R.string.player_king_constraints)
            val titleFormat = resources.getString(R.string.parse_error_dialog_title)
            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
-           EventBus.getDefault().post(onMessageToShowInDialogEvent(title, message))
+           EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, message))
            false
        }
     }

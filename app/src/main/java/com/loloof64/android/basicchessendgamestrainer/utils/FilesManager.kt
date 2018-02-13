@@ -27,6 +27,7 @@ object FilesManager {
     const val computerKingHeader = "# computer king"
     const val mutualKingsHeader = "# kings mutual"
     const val otherPiecesCountHeader = "# other pieces count"
+    const val otherPiecesGlobalHeader = "#other pieces global"
     const val parentFolderName = ".."
     const val DRAW_LINE_VALUE = "1"
 

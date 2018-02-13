@@ -80,7 +80,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="title_activity_position_generator_editor">Editeur pour générateur de position</string>
     <string name="player_king_constraints">contraintes roi joueur</string>
     <string name="computer_king_constraints">contraintes roi ordinateur</string>
-    <string name="other_pieces_count_constraints">contraintes compte autres pièces</string>
+    <string name="other_pieces_count_constraints">compte autres pièces</string>
     <string name="other_pieces_mutual_constraints">contraintes mutuelles autres pièces</string>
     <string name="other_pieces_indexed_constraints">contraintes indexées autres pièces</string>
     <string name="other_pieces_global_constraints">contraintes globales autres pièces</string>
@@ -133,4 +133,19 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="folder_already_exists_message">Le dossier %s existe déjà dans le dossier courant !</string>
     <string name="custom_exercise_edit">Editer</string>
     <string name="custom_exercise_delete">Effacer</string>
+    <string name="button_add_piece_kind_count">Ajouter</string>
+    <string name="delete_piece_kind_count">Enlever le nombre de pièces de la liste des pièces à ajouter.</string>
+    <string name="piece_kind_already_in_list">Un compte a déjà été ajouté pour cette configuration pièce/possesseur !</string>
+    <string name="adding_too_many_queens">Un joueur dispose d\'un maximum de 9 dames sur un échiquier !</string>
+    <string-array name="player_computer_spinner">
+        <item>Joueur</item>
+        <item>Ordinateur</item>
+    </string-array>
+    <string-array name="piece_type_spinner">
+        <item>Pion</item>
+        <item>Cavalier</item>
+        <item>Fou</item>
+        <item>Tour</item>
+        <item>Dame</item>
+    </string-array>
 </resources>

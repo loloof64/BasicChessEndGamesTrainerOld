@@ -31,6 +31,7 @@ import android.support.v7.widget.PopupMenu
 import android.view.*
 import android.widget.EditText
 import com.loloof64.android.basicchessendgamestrainer.*
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.OtherPiecesKindCountListArrayAdapter
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PositionConstraintBailErrorStrategy
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.BailScriptLanguageLexer
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBooleanExpr
@@ -107,6 +108,7 @@ class CustomExerciseChooserFragment : Fragment() {
                                                         intent.putExtra(PositionGeneratorEditorActivity.playerKingConstraintScriptKey, constraints?.playerKingConstraint ?: "")
                                                         intent.putExtra(PositionGeneratorEditorActivity.computerKingConstraintScriptKey, constraints?.computerKingConstraint ?: "")
                                                         intent.putExtra(PositionGeneratorEditorActivity.kingsMutualConstraintScriptKey, constraints?.kingsMutualConstraint ?: "")
+                                                        intent.putExtra(PositionGeneratorEditorActivity.otherPiecesCountKey, constraints?.otherPiecesCountConstraint ?: "")
                                                         startActivity(intent)
                                                     }
                                                 }
@@ -201,23 +203,27 @@ class CustomExerciseChooserFragment : Fragment() {
     }
 
     private fun loadConstraintsScriptsFromFile(exerciseNameWithExtension: String): PositionGeneratorConstraintsScripts? {
-        fun String?.doesNotStartPlayerKingConstraint(): Boolean =
+        fun String?.doesNotStartPlayerKingConstraintOrEndFile(): Boolean =
                 this != null && this != FilesManager.playerKingHeader
 
-        fun String?.doesNotStartComputerKingConstraint(): Boolean =
+        fun String?.doesNotStartComputerKingConstraintOrEndFile(): Boolean =
                 this != null && this != FilesManager.computerKingHeader
 
-        fun String?.doesNotStartKingsMutualConstraint(): Boolean =
+        fun String?.doesNotStartKingsMutualConstraintOrEndFile(): Boolean =
                 this != null && this != FilesManager.mutualKingsHeader
 
-        fun String?.doesNotStartOtherPiecesCountConstraint(): Boolean =
+        fun String?.doesNotStartOtherPiecesCountConstraintOrEndFile(): Boolean =
                 this != null && this != FilesManager.otherPiecesCountHeader
+
+        fun String?.doesNotStartOtherPiecesGlobalConstraintOrEndFile(): Boolean =
+                this != null && this != FilesManager.otherPiecesGlobalHeader
 
         val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.name == exerciseNameWithExtension }
         if (exerciseFile != null){
             val playerKingConstraintBuilder = StringBuilder()
             val computerKingConstraintBuilder = StringBuilder()
             val kingsMutualConstraintBuilder = StringBuilder()
+            val otherPiecesCountBuilder = StringBuilder()
             var resultShouldBeDraw = false
 
             BufferedReader(FileReader(exerciseFile)).use {
@@ -230,32 +236,39 @@ class CustomExerciseChooserFragment : Fragment() {
                 // skipping lines before player king constraint section
                 do {
                     currentLine = it.readLine()
-                } while(currentLine.doesNotStartPlayerKingConstraint())
+                } while(currentLine.doesNotStartPlayerKingConstraintOrEndFile())
 
                 // filling player king constraint string
                 do {
                     currentLine = it.readLine()
-                    if (currentLine.doesNotStartComputerKingConstraint()) playerKingConstraintBuilder.append(currentLine)
-                } while (currentLine.doesNotStartComputerKingConstraint())
+                    if (currentLine.doesNotStartComputerKingConstraintOrEndFile()) playerKingConstraintBuilder.append(currentLine)
+                } while (currentLine.doesNotStartComputerKingConstraintOrEndFile())
 
                 // filling computer king constraint string
                 do {
                     currentLine = it.readLine()
-                    if (currentLine.doesNotStartKingsMutualConstraint()) computerKingConstraintBuilder.append(currentLine)
-                } while(currentLine.doesNotStartKingsMutualConstraint())
+                    if (currentLine.doesNotStartKingsMutualConstraintOrEndFile()) computerKingConstraintBuilder.append(currentLine)
+                } while(currentLine.doesNotStartKingsMutualConstraintOrEndFile())
+
+                //filling kings mutual constraint string
+                do {
+                    currentLine = it.readLine()
+                    if (currentLine.doesNotStartOtherPiecesCountConstraintOrEndFile()) kingsMutualConstraintBuilder.append(currentLine)
+                } while (currentLine.doesNotStartOtherPiecesCountConstraintOrEndFile())
 
                 //filling other pieces count string
                 do {
                     currentLine = it.readLine()
-                    if (currentLine.doesNotStartOtherPiecesCountConstraint()) kingsMutualConstraintBuilder.append(currentLine)
-                } while (currentLine.doesNotStartOtherPiecesCountConstraint())
+                    if (currentLine.doesNotStartOtherPiecesGlobalConstraintOrEndFile()) otherPiecesCountBuilder.append(currentLine)
+                } while (currentLine.doesNotStartOtherPiecesGlobalConstraintOrEndFile())
             }
 
             return PositionGeneratorConstraintsScripts(
                     resultShouldBeDraw = resultShouldBeDraw,
                     playerKingConstraint = playerKingConstraintBuilder.toString(),
                     computerKingConstraint = computerKingConstraintBuilder.toString(),
-                    kingsMutualConstraint = kingsMutualConstraintBuilder.toString()
+                    kingsMutualConstraint = kingsMutualConstraintBuilder.toString(),
+                    otherPiecesCountConstraint = otherPiecesCountBuilder.toString()
             )
         }
         else {
@@ -272,7 +285,8 @@ class CustomExerciseChooserFragment : Fragment() {
             return PositionGeneratorConstraintsExpr(
                     playerKingConstraint = buildScriptExprFromString(constraintsScripts.playerKingConstraint),
                     computerKingConstraint = buildScriptExprFromString(constraintsScripts.computerKingConstraint),
-                    kingsMutualConstraint = buildScriptExprFromString(constraintsScripts.kingsMutualConstraint)
+                    kingsMutualConstraint = buildScriptExprFromString(constraintsScripts.kingsMutualConstraint),
+                    otherPiecesCountConstraint = OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(constraintsScripts.otherPiecesCountConstraint)
             )
     }
 

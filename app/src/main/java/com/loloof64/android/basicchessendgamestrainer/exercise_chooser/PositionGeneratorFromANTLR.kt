@@ -19,6 +19,7 @@ package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
 import com.github.bhlangonijr.chesslib.*
 import com.github.bhlangonijr.chesslib.Side
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceKindCount
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBooleanExpr
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.eval
 import java.util.*
@@ -26,19 +27,21 @@ import java.util.*
 class PositionGeneratorConstraintsExpr(
         val playerKingConstraint: ScriptLanguageBooleanExpr?,
         val computerKingConstraint: ScriptLanguageBooleanExpr?,
-        val kingsMutualConstraint: ScriptLanguageBooleanExpr?
+        val kingsMutualConstraint: ScriptLanguageBooleanExpr?,
+        val otherPiecesCountConstraint: List<PieceKindCount>
 )
 
 data class PositionGeneratorConstraintsScripts(
         val resultShouldBeDraw: Boolean,
         val playerKingConstraint: String,
         val computerKingConstraint: String,
-        val kingsMutualConstraint: String
+        val kingsMutualConstraint: String,
+        val otherPiecesCountConstraint: String
 )
 
 object PositionGeneratorFromANTLR {
 
-    val DEFAULT_POSITION = "k1K5/8/8/8/8/8/8/8 w - - 0 1"
+    const val DEFAULT_POSITION = "k1K5/8/8/8/8/8/8/8 w - - 0 1"
 
     private data class BoardCoordinate(val file: Int, val rank : Int){
         init {
@@ -63,7 +66,8 @@ object PositionGeneratorFromANTLR {
     private val NO_CONSTRAINT = PositionGeneratorConstraintsExpr(
             playerKingConstraint = null,
             computerKingConstraint = null,
-            kingsMutualConstraint = null
+            kingsMutualConstraint = null,
+            otherPiecesCountConstraint = listOf()
     )
 
     private val random = Random()
