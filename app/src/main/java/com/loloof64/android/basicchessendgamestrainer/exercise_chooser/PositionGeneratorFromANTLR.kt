@@ -150,10 +150,10 @@ object PositionGeneratorFromANTLR {
                     pieceCell = coordinatesToChessCell(kingCell)
             )
 
-            val builtPositionIsLegal = builtPosition != null && !computerKingInChessForPosition(
-                    positionFEN = builtPosition, playerHasWhite = playerHasWhite)
+            val builtPositionIsConformAndLegal = builtPosition != null && !computerKingInChessForPosition(
+                    positionFEN = builtPosition, playerHasWhite = playerHasWhite) && ICTKChessLib.isLegalPositionString(builtPosition)
 
-            if (builtPositionIsLegal) {
+            if (builtPositionIsConformAndLegal) {
                 if (allConstraints.computerKingConstraint != null){
                     val computerKingCstrIntValues = mapOf("file" to kingCell.file, "rank" to kingCell.rank)
                     val computerKingCstrBooleanValues = mapOf("playerHasWhite" to playerHasWhite)
@@ -232,7 +232,8 @@ object PositionGeneratorFromANTLR {
                     )
 
                     val forbiddenPosition = tempPosition == null ||
-                            computerKingInChessForPosition(tempPosition, playerHasWhite)
+                            computerKingInChessForPosition(tempPosition, playerHasWhite) ||
+                            ! ICTKChessLib.isLegalPositionString(tempPosition)
                     if (forbiddenPosition) continue
 
                     currentPosition = ICTKChessLib.buildPositionFromString(tempPosition!!)
