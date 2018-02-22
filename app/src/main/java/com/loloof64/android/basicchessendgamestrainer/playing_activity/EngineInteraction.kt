@@ -21,23 +21,31 @@ package com.loloof64.android.basicchessendgamestrainer.playing_activity
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
-import com.github.bhlangonijr.chesslib.Rank
-import com.github.bhlangonijr.chesslib.Square
-import com.github.bhlangonijr.chesslib.move.Move
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
+import com.loloof64.android.basicchessendgamestrainer.utils.ChessCell
+import com.loloof64.android.basicchessendgamestrainer.utils.ChessMove
+import com.loloof64.android.basicchessendgamestrainer.utils.PromotionPieceType
 import java.io.*
 
-fun buildSquare(rank: Int, file: Int) =
-        Square.encode(Rank.values()[rank], com.github.bhlangonijr.chesslib.File.values()[file])
-
-fun String.asMove(): Move {
+fun String.asMove(): ChessMove {
     fun Char.toFile() = this.toInt() - 'a'.toInt()
     fun Char.toRank() = this.toInt() - '1'.toInt()
 
-    return Move(
-            buildSquare(this[1].toRank(), this[0].toFile()),
-            buildSquare(this[3].toRank(), this[2].toFile())
+    return ChessMove(
+            ChessCell(rank = this[1].toRank(), file = this[0].toFile()),
+            ChessCell(rank = this[3].toRank(), file = this[2].toFile())
     )
+}
+
+fun String.getPromotionPiece(): PromotionPieceType {
+    val lastChar = this.last()
+    return when (lastChar){
+        'Q' -> PromotionPieceType.Queen
+        'R' -> PromotionPieceType.Rook
+        'B' -> PromotionPieceType.Bishop
+        'N' -> PromotionPieceType.Knight
+        else -> PromotionPieceType.Queen
+    }
 }
 
 fun runOnUI(block : () -> Unit){
@@ -87,7 +95,7 @@ object EngineInteraction {
         }
         else if (bestMoveLineRegex.containsMatchIn(outputString)) {
                 val moveStr = bestMoveLineRegex.find(outputString)?.groups?.get(1)?.value
-                runOnUI { uciObserver.consumeMove(moveStr!!.asMove()) }
+                runOnUI { uciObserver.consumeMove(moveStr!!.asMove(), moveStr.getPromotionPiece()) }
         }
         else {
             println("Unrecognized uci output '$outputString'")
@@ -175,6 +183,6 @@ object EngineInteraction {
 }
 
 interface SimpleUciObserver {
-    fun consumeMove(move: Move)
+    fun consumeMove(move: ChessMove, promotionPieceType: PromotionPieceType = PromotionPieceType.Queen)
     fun consumeScore(score: Int)
 }

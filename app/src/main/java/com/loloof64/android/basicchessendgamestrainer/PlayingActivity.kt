@@ -32,12 +32,12 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import com.github.bhlangonijr.chesslib.Piece
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerationLoopException
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGenerator
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionGeneratorFromANTLR
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.availableGenerators
 import com.loloof64.android.basicchessendgamestrainer.playing_activity.*
+import com.loloof64.android.basicchessendgamestrainer.utils.PromotionPieceType
 import kotlinx.android.synthetic.main.activity_playing.*
 import java.lang.ref.WeakReference
 import java.util.*
@@ -80,12 +80,11 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         val blacksAreDownKey = "BlacksAreDown"
 
         val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
-        val emptyPosition = ""
     }
 
     private var usingCustomGenerator = false
 
-    override fun reactToPromotionPieceSelection(piece: Piece) {
+    override fun reactToPromotionPieceSelection(piece: PromotionPieceType) {
         playingBoard.validatePromotionMove(piece)
         playingBoard.checkIfGameFinished()
         if (!playingBoard.gameFinished()) playingBoard.makeComputerPlay()

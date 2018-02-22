@@ -18,82 +18,64 @@
 
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
-import com.github.bhlangonijr.chesslib.*
+import com.loloof64.android.basicchessendgamestrainer.utils.*
 import java.util.*
 import java.util.logging.Logger
-import com.github.bhlangonijr.chesslib.Side as LibSide
 
 class PositionGenerationLoopException(message: String = "") : Exception(message)
 
-private val maxLoopsIterations = 250
+private const val maxLoopsIterations = 250
+const val empty_board_fen = "8/8/8/8/8/8/8/8 w - - 0 1"
 
 class PositionGenerator(private val constraints : PositionConstraints) {
 
-    private data class BoardCoordinate(val file: Int, val rank : Int){
-        init {
-            require(file in (0 until 8))
-            require(rank in (0 until 8))
-        }
-    }
-
-    private fun generateCell() = BoardCoordinate(
+    private fun generateCell() = ChessCell(
             file = _random.nextInt(8),
             rank = _random.nextInt(8)
     )
 
-    private fun buildPositionOrNullIfCellAlreadyOccupied(startFen: String, pieceToAdd: Piece, pieceCell: Square): Board? {
-        val builtPosition = Board()
-        builtPosition.loadFromFEN(startFen)
+    private fun buildPositionOrNullIfCellAlreadyOccupiedOrResultingPositionIllegal(startFen: String, pieceToAdd: ChessPiece, pieceCell: ChessCell, checkIfResultPositionLegal: Boolean = true): IPosition? {
+        val builtPosition : IPosition = ICTKChessLib.buildPositionFromString(startFen)
 
-        val wantedCellOccupied = builtPosition.getPiece(pieceCell) != Piece.NONE
+        val wantedCellOccupied = builtPosition.getPieceAtCell(pieceCell) != null
         if (wantedCellOccupied) return null
 
-        builtPosition.setPiece(pieceToAdd, pieceCell)
+        builtPosition.modifyPositionByAddingPieceAt(piece = pieceToAdd, cell = pieceCell)
+        if (checkIfResultPositionLegal && !ICTKChessLib.isLegalPositionString(builtPosition.toFEN())) return null
         return builtPosition
     }
 
-    private fun enemyKingInChessFor(position: Board, playerHasWhite: Boolean) : Boolean =
-        Board().apply {
-            loadFromFEN(position.fen)
-            sideToMove = if (playerHasWhite) LibSide.BLACK else LibSide.WHITE
-        }.isKingAttacked
-
     fun generatePosition(playerHasWhite: Boolean = true): String {
-        _position.loadFromFEN( "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1")
-        _position.halfMoveCounter = 0
-        _position.moveCounter = 1
+        _position = ICTKChessLib.buildPositionFromString(positionFEN = "8/8/8/8/8/8/8/8 ${if (playerHasWhite) 'w' else 'b'} - - 0 1")
 
         placeKings(playerHasWhite)
         placeOtherPieces(playerHasWhite)
 
-        Logger.getLogger("BasicChessEndgamesTrainer").info("Generated position is '${_position.fen}'")
+        Logger.getLogger("BasicChessEndgamesTrainer").info("Generated position is '${_position.toFEN()}'")
 
-        return _position.fen
+        return _position.toFEN()
     }
 
-    private var playerKingCell = BoardCoordinate(file = 0, rank = 0)
-    private var oppositeKingCell = BoardCoordinate(file = 0, rank = 0)
+    private var playerKingCell = ChessCell(file = 0, rank = 0)
+    private var oppositeKingCell = ChessCell(file = 0, rank = 0)
 
     private fun placeKings(playerHasWhite: Boolean){
-        fun buildSquare(rank: Int, file: Int) =
-                Square.encode(Rank.values()[rank], File.values()[file])
-
         var loopSuccess = false
         for (iters in 0..maxLoopsIterations){ // setting up player king
 
             val kingCell = generateCell()
-            val tempPosition = buildPositionOrNullIfCellAlreadyOccupied(
-                    startFen = _position.fen,
-                    pieceToAdd = if (playerHasWhite) Piece.WHITE_KING else Piece.BLACK_KING,
-                    pieceCell = buildSquare(rank = kingCell.rank, file = kingCell.file)
-            )
-            if (tempPosition == null) continue
+            val tempPosition = buildPositionOrNullIfCellAlreadyOccupiedOrResultingPositionIllegal(
+                    startFen = _position.toFEN(),
+                    pieceToAdd = if (playerHasWhite) ChessPiece(ChessPieceType.King, whiteOwner = true) else ChessPiece(ChessPieceType.King, whiteOwner = false),
+                    pieceCell = kingCell,
+                    checkIfResultPositionLegal = false
+            ) ?: continue
 
-
-            if (constraints.checkPlayerKingConstraint(
+            val playerKingConstraintRespected = constraints.checkPlayerKingConstraint(
                     file = kingCell.file, rank = kingCell.rank,
-                    playerHasWhite = playerHasWhite)) {
-                _position.loadFromFEN(tempPosition.fen)
+                    playerHasWhite = playerHasWhite)
+            if (playerKingConstraintRespected) {
+                _position = ICTKChessLib.buildPositionFromString(tempPosition.toFEN(), checkIfResultPositionLegal = false)
                 playerKingCell = kingCell
                 loopSuccess = true
                 break
@@ -106,26 +88,26 @@ class PositionGenerator(private val constraints : PositionConstraints) {
 
             val kingCell = generateCell()
 
-            val tempPosition = buildPositionOrNullIfCellAlreadyOccupied(
-                    startFen = _position.fen,
-                    pieceToAdd = if (playerHasWhite) Piece.BLACK_KING else Piece.WHITE_KING,
-                    pieceCell = buildSquare(
-                            rank = kingCell.rank, file = kingCell.file
-                    )
-            )
+            val tempPosition = buildPositionOrNullIfCellAlreadyOccupiedOrResultingPositionIllegal(
+                    startFen = _position.toFEN(),
+                    pieceToAdd = if (playerHasWhite) ChessPiece(ChessPieceType.King, whiteOwner = false) else ChessPiece(ChessPieceType.King, whiteOwner = true),
+                    pieceCell = kingCell,
+                    checkIfResultPositionLegal = true
+            ) ?: continue
 
-            if (tempPosition == null) continue
-            if (enemyKingInChessFor(tempPosition, playerHasWhite)) continue
+            if (!ICTKChessLib.isLegalPositionString(tempPosition.toFEN())) continue
 
             // validate position if enemy king constraint and kings mutual constraint are respected
-            if (constraints.checkComputerKingConstraint(file = kingCell.file, rank = kingCell.rank, playerHasWhite = playerHasWhite)
+            val computerKingConstraintRespected = constraints.checkComputerKingConstraint(file = kingCell.file, rank = kingCell.rank, playerHasWhite = playerHasWhite)
                     && constraints.checkKingsMutualConstraint(
                     playerKingFile = playerKingCell.file, playerKingRank = playerKingCell.rank,
                     computerKingFile = kingCell.file, computerKingRank = kingCell.rank,
                     playerHasWhite = playerHasWhite
-            )) {
+            )
+
+            if (computerKingConstraintRespected) {
                 oppositeKingCell = kingCell
-                _position.loadFromFEN(tempPosition.fen)
+                _position = ICTKChessLib.buildPositionFromString(tempPosition.toFEN())
                 loopSuccess = true
                 break
             }
@@ -139,22 +121,19 @@ class PositionGenerator(private val constraints : PositionConstraints) {
             for (i in 0 until this) callback(i)
         }
 
-        fun buildSquare(rank: Int, file: Int) =
-                Square.encode(Rank.values()[rank], File.values()[file])
-
-        fun pieceKindToPiece(kind: PieceKind, whitePiece: Boolean): Piece =
+        fun pieceKindToChessPiece(kind: PieceKind, whitePiece: Boolean): ChessPiece =
                 when(kind.pieceType){
-                    PieceType.pawn -> if (whitePiece) Piece.WHITE_PAWN else Piece.BLACK_PAWN
-                    PieceType.knight -> if (whitePiece) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT
-                    PieceType.bishop -> if (whitePiece) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP
-                    PieceType.rook -> if (whitePiece) Piece.WHITE_ROOK else Piece.BLACK_ROOK
-                    PieceType.queen -> if (whitePiece) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN
-                    PieceType.king -> if (whitePiece) Piece.WHITE_KING else Piece.BLACK_KING
+                    PieceType.pawn -> if (whitePiece) ChessPiece(ChessPieceType.Pawn, whiteOwner = true) else ChessPiece(ChessPieceType.Pawn, whiteOwner = false)
+                    PieceType.knight -> if (whitePiece) ChessPiece(ChessPieceType.Knight, whiteOwner = true) else ChessPiece(ChessPieceType.Knight, whiteOwner = false)
+                    PieceType.bishop -> if (whitePiece) ChessPiece(ChessPieceType.Bishop, whiteOwner = true) else ChessPiece(ChessPieceType.Bishop, whiteOwner = false)
+                    PieceType.rook -> if (whitePiece) ChessPiece(ChessPieceType.Rook, whiteOwner = true) else ChessPiece(ChessPieceType.Rook, whiteOwner = false)
+                    PieceType.queen -> if (whitePiece) ChessPiece(ChessPieceType.Queen, whiteOwner = true) else ChessPiece(ChessPieceType.Queen, whiteOwner = false)
+                    PieceType.king -> if (whitePiece) ChessPiece(ChessPieceType.King, whiteOwner = true) else ChessPiece(ChessPieceType.King, whiteOwner = false)
                 }
 
         constraints.otherPiecesCountsConstraint.forEach { (kind, count) ->
 
-            val savedCoordinates = arrayListOf<BoardCoordinate>()
+            val savedCoordinates = arrayListOf<ChessCell>()
             count.loops { index ->
                 var loopSuccess = false
                 for (loopIter in 0..maxLoopsIterations) {
@@ -163,15 +142,13 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                             || (!isAPieceOfPlayer && !playerHasWhite)
 
                     val pieceCell = generateCell()
-                    val tempPosition = buildPositionOrNullIfCellAlreadyOccupied(
-                            startFen = _position.fen,
-                            pieceToAdd = pieceKindToPiece(kind, isWhitePiece),
-                            pieceCell = buildSquare(
-                                    rank = pieceCell.rank, file = pieceCell.file
-                            )
-                    )
-                    if (tempPosition == null) continue
-                    if (enemyKingInChessFor(tempPosition, playerHasWhite)) continue
+                    val tempPosition = buildPositionOrNullIfCellAlreadyOccupiedOrResultingPositionIllegal(
+                            startFen = _position.toFEN(),
+                            pieceToAdd = pieceKindToChessPiece(kind, isWhitePiece),
+                            pieceCell = pieceCell
+                    ) ?: continue
+
+                    if (!ICTKChessLib.isLegalPositionString(tempPosition.toFEN())) continue
 
                     // If for any previous piece of same kind, mutual constraint is not respected, will loop another time
                     if (savedCoordinates.any { !constraints.checkOtherPieceMutualConstraint(
@@ -190,7 +167,7 @@ class PositionGenerator(private val constraints : PositionConstraints) {
                             playerHasWhite = playerHasWhite,
                             playerKingFile = playerKingCell.file, playerKingRank = playerKingCell.rank,
                             computerKingFile = oppositeKingCell.file, computerKingRank = playerKingCell.rank)){
-                        _position.loadFromFEN(tempPosition.fen)
+                        _position = ICTKChessLib.buildPositionFromString(tempPosition.toFEN())
                         savedCoordinates += pieceCell
                         loopSuccess = true
                         break
@@ -201,7 +178,7 @@ class PositionGenerator(private val constraints : PositionConstraints) {
         }
     }
 
-    private val _position = Board()
+    private var _position:IPosition = ICTKChessLib.buildPositionFromString(empty_board_fen, checkIfResultPositionLegal = false)
     private val _random = Random()
 }
 

@@ -17,14 +17,13 @@
  */
 package com.loloof64.android.basicchessendgamestrainer.exercise_chooser
 
-import com.github.bhlangonijr.chesslib.*
-import com.github.bhlangonijr.chesslib.Side as ChessLibSide
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceKindCount as EditorPieceKindCount
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceKind as EditorPieceKind
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceType as EditorPieceType
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.Side as EditorSide
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBooleanExpr
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.eval
+import com.loloof64.android.basicchessendgamestrainer.utils.*
 import java.util.*
 
 class PositionGeneratorConstraintsExpr(
@@ -58,10 +57,8 @@ object PositionGeneratorFromANTLR {
             rank = random.nextInt(8)
     )
 
-    private fun coordinatesToSquare(coord: BoardCoordinate) : Square {
-        val rank = Rank.values()[coord.rank]
-        val file = File.values()[coord.file]
-        return Square.encode(rank, file)
+    private fun coordinatesToChessCell(coord: BoardCoordinate) : ChessCell {
+        return ChessCell(file = coord.file, rank = coord.rank)
     }
 
     private const val maxLoopsIterations = 300
@@ -96,19 +93,18 @@ object PositionGeneratorFromANTLR {
         return placeOtherPiecesInPosition(startFen = positionWithBothKings, playerHasWhite = playerHasWhite)
     }
 
-    private fun addPieceToPositionOrReturnNullIfCellAlreadyOccupied(startFen: String, pieceToAdd: Piece, pieceCell: Square): String? {
-        val builtPosition = Board()
-        builtPosition.loadFromFEN(startFen)
+    private fun addPieceToPositionOrReturnNullIfCellAlreadyOccupied(startFen: String, pieceToAdd: ChessPiece, pieceCell: ChessCell): String? {
+        val builtPosition = ICTKChessLib.buildPositionFromString(startFen)
 
-        val wantedCellOccupied = builtPosition.getPiece(pieceCell) != Piece.NONE
+        val wantedCellOccupied = builtPosition.getPieceAtCell(pieceCell) != null
         if (wantedCellOccupied) return null
 
-        builtPosition.setPiece(pieceToAdd, pieceCell)
-        return builtPosition.fen
+        builtPosition.modifyPositionByAddingPieceAt(pieceToAdd, pieceCell)
+        return builtPosition.toFEN()
     }
 
     private fun placePlayerKingInPosition(startFen: String, playerHasWhite: Boolean): String {
-        val kingPiece = if (playerHasWhite) Piece.WHITE_KING else Piece.BLACK_KING
+        val kingPiece = ChessPiece(ChessPieceType.King, whiteOwner = playerHasWhite)
 
         for (tryNumber in 0..maxLoopsIterations){
 
@@ -116,7 +112,7 @@ object PositionGeneratorFromANTLR {
             val builtPosition = addPieceToPositionOrReturnNullIfCellAlreadyOccupied(
                     startFen = startFen,
                     pieceToAdd = kingPiece,
-                    pieceCell = coordinatesToSquare(kingCell)
+                    pieceCell = coordinatesToChessCell(kingCell)
             )
 
             if (builtPosition != null) {
@@ -143,7 +139,7 @@ object PositionGeneratorFromANTLR {
     }
 
     private fun placeComputerKingInPosition(startFen: String, playerHasWhite: Boolean): String {
-        val kingPiece = if (playerHasWhite) Piece.BLACK_KING else Piece.WHITE_KING
+        val kingPiece =  ChessPiece(ChessPieceType.King, whiteOwner = !playerHasWhite)
 
         for (tryNumber in 0..maxLoopsIterations){
 
@@ -151,7 +147,7 @@ object PositionGeneratorFromANTLR {
             val builtPosition = addPieceToPositionOrReturnNullIfCellAlreadyOccupied(
                     startFen = startFen,
                     pieceToAdd = kingPiece,
-                    pieceCell = coordinatesToSquare(kingCell)
+                    pieceCell = coordinatesToChessCell(kingCell)
             )
 
             val builtPositionIsLegal = builtPosition != null && !computerKingInChessForPosition(
@@ -203,25 +199,22 @@ object PositionGeneratorFromANTLR {
             for (i in 0 until this) callback(i)
         }
 
-        fun pieceKindToPiece(kind: EditorPieceKind, whitePiece: Boolean): Piece =
+        fun pieceKindToChessPiece(kind: EditorPieceKind, whitePiece: Boolean): ChessPiece =
                 when(kind.pieceType){
-                    EditorPieceType.Pawn -> if (whitePiece) Piece.WHITE_PAWN else Piece.BLACK_PAWN
-                    EditorPieceType.Knight -> if (whitePiece) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT
-                    EditorPieceType.Bishop -> if (whitePiece) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP
-                    EditorPieceType.Rook -> if (whitePiece) Piece.WHITE_ROOK else Piece.BLACK_ROOK
-                    EditorPieceType.Queen -> if (whitePiece) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN
-                    EditorPieceType.King -> if (whitePiece) Piece.WHITE_KING else Piece.BLACK_KING
+                    EditorPieceType.Pawn -> ChessPiece(ChessPieceType.Pawn, whiteOwner = whitePiece)
+                    EditorPieceType.Knight -> ChessPiece(ChessPieceType.Knight, whiteOwner = whitePiece)
+                    EditorPieceType.Bishop -> ChessPiece(ChessPieceType.Bishop, whiteOwner = whitePiece)
+                    EditorPieceType.Rook ->  ChessPiece(ChessPieceType.Rook, whiteOwner = whitePiece)
+                    EditorPieceType.Queen ->  ChessPiece(ChessPieceType.Queen, whiteOwner = whitePiece)
+                    EditorPieceType.King ->  ChessPiece(ChessPieceType.King, whiteOwner = whitePiece)
                 }
 
-        fun buildSquare(rank: Int, file: Int) =
-                Square.encode(Rank.values()[rank], File.values()[file])
 
-        val currentPosition = Board()
-        currentPosition.loadFromFEN(startFen)
+        var currentPosition = ICTKChessLib.buildPositionFromString(startFen)
 
         allConstraints.otherPiecesCountConstraint.forEach { (kind, count) ->
             val savedCoordinates = arrayListOf<BoardCoordinate>()
-            count.loops { index ->
+            count.loops { _ ->
                 var loopSuccess = false
                 for (loopIter in 0..maxLoopsIterations) {
                     val isAPieceOfPlayer = kind.side == EditorSide.Player
@@ -230,22 +223,20 @@ object PositionGeneratorFromANTLR {
                     val mustBeWhitePiece = (isAPieceOfPlayer && playerHasWhite)
                             || (isAPieceOfComputer && computerHasWhite)
 
-                    val pieceCell = generateCell()
+                    val pieceCoordinates = generateCell()
 
                     val tempPosition = addPieceToPositionOrReturnNullIfCellAlreadyOccupied(
-                            startFen = currentPosition.fen,
-                            pieceToAdd = pieceKindToPiece(kind = kind, whitePiece = mustBeWhitePiece),
-                            pieceCell = buildSquare(
-                                    rank = pieceCell.rank, file = pieceCell.file
-                            )
+                            startFen = currentPosition.toFEN(),
+                            pieceToAdd = pieceKindToChessPiece(kind = kind, whitePiece = mustBeWhitePiece),
+                            pieceCell = coordinatesToChessCell(pieceCoordinates)
                     )
 
                     val forbiddenPosition = tempPosition == null ||
                             computerKingInChessForPosition(tempPosition, playerHasWhite)
                     if (forbiddenPosition) continue
 
-                    currentPosition.loadFromFEN(tempPosition)
-                    savedCoordinates += pieceCell
+                    currentPosition = ICTKChessLib.buildPositionFromString(tempPosition!!)
+                    savedCoordinates += pieceCoordinates
                     loopSuccess = true
                     break
                 }
@@ -253,13 +244,13 @@ object PositionGeneratorFromANTLR {
             }
         }
 
-        return currentPosition.fen
+        return currentPosition.toFEN()
     }
 
-    private fun computerKingInChessForPosition(positionFEN: String, playerHasWhite: Boolean) : Boolean =
-    Board().apply {
-        loadFromFEN(positionFEN)
-        sideToMove = if (playerHasWhite) ChessLibSide.BLACK else ChessLibSide.WHITE
-    }.isKingAttacked
+    private fun computerKingInChessForPosition(positionFEN: String, playerHasWhite: Boolean) : Boolean {
+        val currentPositionWithTurnReversed = ICTKChessLib.buildPositionFromString(positionFEN)
+        currentPositionWithTurnReversed.modifyPositionBySettingIfWhiteToMove(! playerHasWhite)
+        return currentPositionWithTurnReversed.kingInChess()
+    }
 
 }

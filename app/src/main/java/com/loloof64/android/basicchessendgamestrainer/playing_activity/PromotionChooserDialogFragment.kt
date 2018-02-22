@@ -27,15 +27,15 @@ import android.support.v7.app.AlertDialog.Builder
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
-import com.github.bhlangonijr.chesslib.Piece
 import com.loloof64.android.basicchessendgamestrainer.R
+import com.loloof64.android.basicchessendgamestrainer.utils.PromotionPieceType
 import java.lang.ref.WeakReference
 
 class PromotionPieceChooserDialogFragment : DialogFragment() {
 
     companion object {
-        val TitleKey = "title"
-        val WhiteToPlayKey = "whiteToPlay"
+        const val TitleKey = "title"
+        const val WhiteToPlayKey = "whiteToPlay"
 
         fun newInstance(title: String, whiteToPlay: Boolean) : PromotionPieceChooserDialogFragment {
             val dialog = PromotionPieceChooserDialogFragment()
@@ -47,7 +47,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         }
 
         interface Listener {
-            fun reactToPromotionPieceSelection(piece: Piece)
+            fun reactToPromotionPieceSelection(piece: PromotionPieceType)
         }
     }
 
@@ -82,13 +82,13 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
         promotionChooserKnightButton.setImageResource(if (whiteToPlay) R.drawable.chess_nl else R.drawable.chess_nd)
 
         queenPromotionListener = PromotionButtonOnClickListener(listener as Listener,
-                if (whiteToPlay) Piece.WHITE_QUEEN else Piece.BLACK_QUEEN)
+                PromotionPieceType.Queen)
         rookPromotionListener = PromotionButtonOnClickListener(listener as Listener,
-                if (whiteToPlay) Piece.WHITE_ROOK else Piece.BLACK_ROOK)
+                PromotionPieceType.Rook)
         bishopPromotionListener = PromotionButtonOnClickListener(listener as Listener,
-                if (whiteToPlay) Piece.WHITE_BISHOP else Piece.BLACK_BISHOP)
+                PromotionPieceType.Bishop)
         knightPromotionListener = PromotionButtonOnClickListener(listener as Listener,
-                if (whiteToPlay) Piece.WHITE_KNIGHT else Piece.BLACK_KNIGHT)
+                PromotionPieceType.Knight)
 
         promotionChooserQueenButton.setOnClickListener(queenPromotionListener)
         promotionChooserRookButton.setOnClickListener(rookPromotionListener)
@@ -116,7 +116,7 @@ class PromotionPieceChooserDialogFragment : DialogFragment() {
 }
 
 class PromotionButtonOnClickListener(listener: PromotionPieceChooserDialogFragment.Companion.Listener,
-                                     val promotionPiece: Piece) : View.OnClickListener {
+                                     private val promotionPiece: PromotionPieceType) : View.OnClickListener {
 
     override fun onClick(relatedView: View?) {
         refListener.get()?.reactToPromotionPieceSelection(promotionPiece)
