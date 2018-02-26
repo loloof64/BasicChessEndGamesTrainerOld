@@ -95,9 +95,16 @@ class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKin
                     currentDefinedPieceCount.count > 9
             val tooManyPawns = currentDefinedPieceCount.pieceKind.pieceType == PieceType.Pawn &&
                     currentDefinedPieceCount.count > 8
+            val futurePieceCountState = PositionGeneratorValuesHolder.otherPiecesCount.toMutableList()
+            futurePieceCountState.add(currentDefinedPieceCount)
+            val playerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Player }.map { it.count }.sum()
+            val computerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Computer }.map { it.count }.sum()
+
+            val tooManyPieces = playerPiecesCount > 15 || computerPiecesCount > 15
             when {
                 tooManyQueens -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_queens, Toast.LENGTH_LONG).show()
                 tooManyPawns -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pawns, Toast.LENGTH_LONG).show()
+                tooManyPieces -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pieces, Toast.LENGTH_LONG).show()
                 else -> {
                     PositionGeneratorValuesHolder.otherPiecesCount.add(currentDefinedPieceCount)
                     notifyDataSetChanged()
@@ -139,6 +146,13 @@ class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKin
                     else -> throw RuntimeException("This piece kind code (${parts[1]}) cannot be accepted.")
                 }
                 val count = Integer.parseInt(parts[2])
+
+                val tooManyQueens = type == PieceType.Queen && count > 9
+                val tooManyPawns = type == PieceType.Pawn && count > 8
+
+                if (tooManyPawns) throw RuntimeException("There must be at least 8 pawns per side !")
+                if (tooManyQueens) throw RuntimeException("There must be at least 9 queens per side !")
+
                 return PieceKindCount(pieceKind = PieceKind(pieceType = type, side = side), count = count)
             }
 
@@ -146,6 +160,12 @@ class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKin
             piecesCountString.split(pieceCountLineSeparator).filter { it.isNotEmpty() }.map { lineToPieceCount(it) }.forEach { kindCount ->
                 if (listToReturn.none { it.pieceKind == kindCount.pieceKind }) listToReturn.add(kindCount)
             }
+
+            val playerPiecesCount = listToReturn.filter { it.pieceKind.side == Side.Player }.map { it.count }.sum()
+            val computerPiecesCount = listToReturn.filter { it.pieceKind.side == Side.Computer }.map { it.count }.sum()
+
+            if (playerPiecesCount > 16) throw RuntimeException("There is too many pieces for player ($playerPiecesCount > 16) !")
+            if (computerPiecesCount > 16) throw RuntimeException("There is too many pieces for computer ($computerPiecesCount > 16) !")
 
             return listToReturn.toList()
         }
