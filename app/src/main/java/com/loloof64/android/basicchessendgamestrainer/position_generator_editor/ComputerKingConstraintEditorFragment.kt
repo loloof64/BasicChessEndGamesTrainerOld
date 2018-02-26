@@ -27,10 +27,7 @@ import android.view.ViewGroup
 import com.loloof64.android.basicchessendgamestrainer.*
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBuilder
-import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.VariableIsNotAffectedException
 import kotlinx.android.synthetic.main.fragment_editing_computer_king_constraint.*
-import org.antlr.v4.runtime.misc.ParseCancellationException
-import org.greenrobot.eventbus.EventBus
 
 class ComputerKingConstraintEditorFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
@@ -78,16 +75,7 @@ class ComputerKingConstraintEditorFragment : Fragment() {
         }
     }
 
-    fun checkIsScriptIsValidAndShowEventualError(): Boolean {
-        val scriptIsEmpty = PositionGeneratorValuesHolder.computerKingConstraintScript.isEmpty()
-        if (scriptIsEmpty){
-            val resources = MyApplication.appContext.resources
-            val title = resources.getString(R.string.computer_king_constraints)
-            val errorMessage = resources.getString(R.string.empty_script_error)
-
-            EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, errorMessage))
-            return true
-        }
+    private fun checkIsScriptIsValidAndShowEventualError(): Boolean {
 
         val samplesIntValues = mapOf(
                 "file" to PositionConstraints.FileA,
@@ -95,36 +83,12 @@ class ComputerKingConstraintEditorFragment : Fragment() {
         )
         val sampleBooleanValues = mapOf("playerHasWhite" to true)
 
-        return try {
-            ScriptLanguageBuilder.checkIsScriptStringIsValid(
-                    scriptString = PositionGeneratorValuesHolder.computerKingConstraintScript,
-                    sampleIntValues = samplesIntValues,
-                    sampleBooleanValues = sampleBooleanValues
-            )
-            true
-        }
-        catch (ex: VariableIsNotAffectedException) {
-            val resources = MyApplication.appContext.resources
-            val messageFormat = resources.getString(R.string.parser_variable_not_affected)
-            val message = String.format(messageFormat ?: "<Internal error : could not open format string !>", ex.name)
-
-            val constraintTypeStr = resources.getString(R.string.computer_king_constraints)
-
-            val titleFormat = resources.getString(R.string.parse_error_dialog_title)
-            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
-            EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, message))
-
-            false
-        }
-        catch (ex: ParseCancellationException){
-            val message = ex.message ?: "<Internal error : could not get ParseCancellationException message !>"
-            val resources = MyApplication.appContext.resources
-            val constraintTypeStr = resources.getString(R.string.computer_king_constraints)
-            val titleFormat = resources.getString(R.string.parse_error_dialog_title)
-            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
-            EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, message))
-            false
-        }
+        return ScriptLanguageBuilder.checkIsScriptIsValidAndShowEventualError(
+                script = PositionGeneratorValuesHolder.computerKingConstraintScript,
+                scriptSectionTitleId = R.string.computer_king_constraints,
+                sampleIntValues = samplesIntValues,
+                sampleBooleanValues = sampleBooleanValues
+        )
     }
 
     companion object {

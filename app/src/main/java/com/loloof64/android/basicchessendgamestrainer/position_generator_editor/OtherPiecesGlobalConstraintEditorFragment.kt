@@ -24,6 +24,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.loloof64.android.basicchessendgamestrainer.R
+import kotlinx.android.synthetic.main.fragment_editing_other_pieces_global_constraint.*
 
 class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
 
@@ -35,6 +36,10 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         fun newInstance(): OtherPiecesGlobalConstraintEditorFragment {
             return OtherPiecesGlobalConstraintEditorFragment()
         }
+    }
+
+    private fun loadSpinnerTitles() {
+
     }
 
 }
