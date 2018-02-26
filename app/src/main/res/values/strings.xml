@@ -133,6 +133,8 @@ of endgame.[CR][CR]
     <string name="delete_piece_kind_count">Delete piece count from pieces to add.</string>
     <string name="piece_kind_already_in_list">Already set up a count for this piece/owner configuration !</string>
     <string name="adding_too_many_queens">A player cannot have more than 9 queens on a board !</string>
+    <string name="adding_too_many_pawns">A player cannot have more than 8 pawns on a board !</string>
+    <string name="adding_too_many_pieces">A player cannot have more than 16 pieces on a board !</string>
     <string-array name="piece_kind_count_spinner">
         <item>1</item>
         <item>2</item>

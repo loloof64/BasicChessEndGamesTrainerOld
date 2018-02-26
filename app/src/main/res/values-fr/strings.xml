@@ -137,6 +137,8 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="delete_piece_kind_count">Enlever le nombre de pièces de la liste des pièces à ajouter.</string>
     <string name="piece_kind_already_in_list">Un compte a déjà été ajouté pour cette configuration pièce/possesseur !</string>
     <string name="adding_too_many_queens">Un joueur dispose d\'un maximum de 9 dames sur un échiquier !</string>
+    <string name="adding_too_many_pawns">Un joueur dispose d\'un maximum de 8 pions sur un échiquier !</string>
+    <string name="adding_too_many_pieces">Un joueur dispose d\'un maximum de 16 pièces sur un échiquier !</string>
     <string-array name="player_computer_spinner">
         <item>Joueur</item>
         <item>Ordinateur</item>

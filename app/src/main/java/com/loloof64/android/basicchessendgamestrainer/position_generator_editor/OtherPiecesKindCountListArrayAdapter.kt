@@ -92,13 +92,16 @@ class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKin
                 }
         if (notSetYetForThisPieceKind) {
             val tooManyQueens = currentDefinedPieceCount.pieceKind.pieceType == PieceType.Queen &&
-                    currentDefinedPieceCount.count >= 10
-            if (tooManyQueens){
-                Toast.makeText(MyApplication.appContext, R.string.adding_too_many_queens, Toast.LENGTH_LONG).show()
-            }
-            else {
-                PositionGeneratorValuesHolder.otherPiecesCount.add(currentDefinedPieceCount)
-                notifyDataSetChanged()
+                    currentDefinedPieceCount.count > 9
+            val tooManyPawns = currentDefinedPieceCount.pieceKind.pieceType == PieceType.Pawn &&
+                    currentDefinedPieceCount.count > 8
+            when {
+                tooManyQueens -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_queens, Toast.LENGTH_LONG).show()
+                tooManyPawns -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pawns, Toast.LENGTH_LONG).show()
+                else -> {
+                    PositionGeneratorValuesHolder.otherPiecesCount.add(currentDefinedPieceCount)
+                    notifyDataSetChanged()
+                }
             }
         } else {
             Toast.makeText(MyApplication.appContext, R.string.piece_kind_already_in_list, Toast.LENGTH_LONG).show()
