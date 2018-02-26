@@ -241,25 +241,37 @@ class CustomExerciseChooserFragment : Fragment() {
                 // filling player king constraint string
                 do {
                     currentLine = it.readLine()
-                    if (currentLine.doesNotStartComputerKingConstraintOrEndFile()) playerKingConstraintBuilder.append(currentLine)
+                    if (currentLine.doesNotStartComputerKingConstraintOrEndFile()) {
+                        playerKingConstraintBuilder.append(currentLine)
+                        playerKingConstraintBuilder.append('\n')
+                    }
                 } while (currentLine.doesNotStartComputerKingConstraintOrEndFile())
 
                 // filling computer king constraint string
                 do {
                     currentLine = it.readLine()
-                    if (currentLine.doesNotStartKingsMutualConstraintOrEndFile()) computerKingConstraintBuilder.append(currentLine)
+                    if (currentLine.doesNotStartKingsMutualConstraintOrEndFile()) {
+                        computerKingConstraintBuilder.append(currentLine)
+                        computerKingConstraintBuilder.append('\n')
+                    }
                 } while(currentLine.doesNotStartKingsMutualConstraintOrEndFile())
 
                 //filling kings mutual constraint string
                 do {
                     currentLine = it.readLine()
-                    if (currentLine.doesNotStartOtherPiecesCountConstraintOrEndFile()) kingsMutualConstraintBuilder.append(currentLine)
+                    if (currentLine.doesNotStartOtherPiecesCountConstraintOrEndFile()) {
+                        kingsMutualConstraintBuilder.append(currentLine)
+                        kingsMutualConstraintBuilder.append('\n')
+                    }
                 } while (currentLine.doesNotStartOtherPiecesCountConstraintOrEndFile())
 
                 //filling other pieces count string
                 do {
                     currentLine = it.readLine()
-                    if (currentLine.doesNotStartOtherPiecesGlobalConstraintOrEndFile()) otherPiecesCountBuilder.append(currentLine)
+                    if (currentLine.doesNotStartOtherPiecesGlobalConstraintOrEndFile()) {
+                        otherPiecesCountBuilder.append(currentLine)
+                        // We must not add any other line for this script !
+                    }
                 } while (currentLine.doesNotStartOtherPiecesGlobalConstraintOrEndFile())
             }
 
