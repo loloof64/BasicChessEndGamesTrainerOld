@@ -56,21 +56,21 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val layout = LayoutInflater.from(parent?.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layout = LayoutInflater.from(parent.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
         return CustomExercisesListAdapter.Companion.ViewHolder(layout)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         fun getColorFromId(colorId: Int) : Int {
             val context = MyApplication.getApplicationContext()
             return ResourcesCompat.getColor(context.resources, colorId, null)
         }
 
-        holder?.nameView?.text = exercisesList[position].name
-        holder?.nameView?.setOnClickListener{ itemClickListener.onClick(position) }
-        holder?.nameView?.setOnLongClickListener { itemLongClickListener.onLongClick(position); true }
-        holder?.nameView?.setBackgroundColor(
+        holder.nameView.text = exercisesList[position].name
+        holder.nameView.setOnClickListener{ itemClickListener.onClick(position) }
+        holder.nameView.setOnLongClickListener { itemLongClickListener.onLongClick(position); true }
+        holder.nameView.setBackgroundColor(
                 when {
                     exercisesList[position].isFolder -> getColorFromId(R.color.exercise_chooser_folder_color)
                     exercisesList[position].mustDraw -> getColorFromId(R.color.exercise_chooser_nullifying_color)
@@ -78,7 +78,7 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
                 }
         )
 
-        holder?.imageView?.setImageResource(if (exercisesList[position].isFolder) R.mipmap.ic_folder_type else R.mipmap.ic_file_type)
+        holder.imageView.setImageResource(if (exercisesList[position].isFolder) R.mipmap.ic_folder_type else R.mipmap.ic_file_type)
     }
 
     override fun getItemCount(): Int {

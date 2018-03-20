@@ -39,22 +39,22 @@ class PredefinedExercisesListAdapter(private val exercisesList: List<ExerciseInf
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val layout = LayoutInflater.from(parent?.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layout = LayoutInflater.from(parent.context).inflate(R.layout.exercises_list_row, parent, false) as LinearLayout
         val textView = layout.findViewById<TextView>(R.id.custom_exercise_fragment_file_name)
         layout.removeView(textView)
         return ViewHolder(textView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         fun getColor(colorId: Int) : Int {
             val context = MyApplication.getApplicationContext()
             return ResourcesCompat.getColor(context.resources, colorId, null)
         }
 
-        holder?.textView?.text = MyApplication.getApplicationContext().getString(exercisesList[position].textId)
-        holder?.textView?.setOnClickListener{ itemClickListener.onClick(position) }
-        holder?.textView?.setBackgroundColor(
+        holder.textView.text = MyApplication.getApplicationContext().getString(exercisesList[position].textId)
+        holder.textView.setOnClickListener{ itemClickListener.onClick(position) }
+        holder.textView.setBackgroundColor(
                 if (exercisesList[position].mustWin) getColor(R.color.exercise_chooser_winning_color)
                 else getColor(R.color.exercise_chooser_nullifying_color)
         )

@@ -46,8 +46,8 @@ class MovesListAdapter(private val weakRefContext: WeakReference<Context>, priva
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val layout = LayoutInflater.from(parent?.context).inflate(
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layout = LayoutInflater.from(parent.context).inflate(
                 R.layout.playing_activity_moves_list_single_item, parent, false) as LinearLayout
         val txtView = layout.findViewById<TextView>(R.id.moves_list_view_item)
         val font = Typeface.createFromAsset(MyApplication.appContext.assets, "FreeSerif.ttf")
@@ -57,15 +57,15 @@ class MovesListAdapter(private val weakRefContext: WeakReference<Context>, priva
         return ViewHolder(txtView)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
-        val currentPosition = holder?.adapterPosition ?: 0
-        holder?.textView?.text = inputsList[currentPosition].san
-        holder?.textView?.setBackgroundColor(getColor(
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val currentPosition = holder.adapterPosition
+        holder.textView.text = inputsList[currentPosition].san
+        holder.textView.setBackgroundColor(getColor(
                 if (position == _selectedNavigationItem && _switchingPositionFeatureActive) R.color.moves_history_cell_selected_color
                 else R.color.moves_history_cell_standard_color
         ))
         if (position%3 > 0) {
-            holder?.textView?.setOnClickListener {
+            holder.textView.setOnClickListener {
                 _selectedNavigationItem = currentPosition
                 updateHostView()
                 update()

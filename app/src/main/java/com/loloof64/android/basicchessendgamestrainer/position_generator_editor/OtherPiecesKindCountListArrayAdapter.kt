@@ -30,6 +30,7 @@ import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
+import com.loloof64.android.basicchessendgamestrainer.utils.RxEventBus
 import java.lang.ref.WeakReference
 
 enum class PieceType {
@@ -50,12 +51,12 @@ data class PieceKindCount(val pieceKind: PieceKind, val count: Int){
 
 class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKindCountListArrayAdapter.Companion.ViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): ViewHolder {
-        val layout = LayoutInflater.from(parent?.context).inflate(R.layout.other_pieces_count_list_row, parent, false) as LinearLayout
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layout = LayoutInflater.from(parent.context).inflate(R.layout.other_pieces_count_list_row, parent, false) as LinearLayout
         return ViewHolder(layout)
     }
 
-    override fun onBindViewHolder(holder: ViewHolder?, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         fun getColorFromId(colorId: Int) : Int {
             val context = MyApplication.getApplicationContext()
             return ResourcesCompat.getColor(context.resources, colorId, null)
@@ -64,16 +65,16 @@ class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKin
         val resources = MyApplication.appContext.resources
         val item = PositionGeneratorValuesHolder.otherPiecesCount[position]
 
-        holder?.countTextView?.text = item.count.toString()
-        holder?.countTextView?.setBackgroundColor(getColorFromId(R.color.other_piece_count_color))
+        holder.countTextView.text = item.count.toString()
+        holder.countTextView.setBackgroundColor(getColorFromId(R.color.other_piece_count_color))
 
-        holder?.ownerTextView?.text = resources.getStringArray(R.array.player_computer_spinner)[item.pieceKind.side.ordinal]
-        holder?.ownerTextView?.setBackgroundColor(getColorFromId(R.color.other_piece_owner_color))
+        holder.ownerTextView.text = resources.getStringArray(R.array.player_computer_spinner)[item.pieceKind.side.ordinal]
+        holder.ownerTextView.setBackgroundColor(getColorFromId(R.color.other_piece_owner_color))
 
-        holder?.typeTextView?.text = resources.getStringArray(R.array.piece_type_spinner)[item.pieceKind.pieceType.ordinal]
-        holder?.typeTextView?.setBackgroundColor(getColorFromId(R.color.other_piece_type_color))
+        holder.typeTextView.text = resources.getStringArray(R.array.piece_type_spinner)[item.pieceKind.pieceType.ordinal]
+        holder.typeTextView.setBackgroundColor(getColorFromId(R.color.other_piece_type_color))
 
-        holder?.deleteButton?.setOnClickListener(DeleteButtonClickListener(this, position))
+        holder.deleteButton.setOnClickListener(DeleteButtonClickListener(this, position))
     }
 
     override fun getItemCount(): Int {

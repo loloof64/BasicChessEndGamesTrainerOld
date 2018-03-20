@@ -19,17 +19,16 @@
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language
 
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
-import com.loloof64.android.basicchessendgamestrainer.OnMessageToShowInDialogEvent
-import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
+import com.loloof64.android.basicchessendgamestrainer.MessageToShowInDialogEvent
 import com.loloof64.android.basicchessendgamestrainer.R
 import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PositionConstraintBailErrorStrategy
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.antlr4.ScriptLanguageBaseVisitor
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.antlr4.ScriptLanguageParser
+import com.loloof64.android.basicchessendgamestrainer.utils.RxEventBus
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.misc.ParseCancellationException
-import org.greenrobot.eventbus.EventBus
 
 data class GenericExprVariable(val name: String, val value: ScriptLanguageGenericExpr)
 
@@ -56,7 +55,7 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
 
     private fun getVariables(): List<GenericExprVariable> = builtVariables.toList()
 
-    fun checkIsScriptStringIsValid(scriptString: String,
+    private fun checkIfScriptStringIsValid(scriptString: String,
                                    sampleIntValues : Map<String, Int>,
                                    sampleBooleanValues: Map<String, Boolean>) {
         val resultExpr = buildExprObjectFromScript(scriptString)
@@ -109,7 +108,6 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
                 }
 
             }
-
 
             eval(expr = expr, intValues = intValues, booleanValues = booleanValues)
     }
@@ -273,12 +271,12 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
             val title = resources.getString(scriptSectionTitleId)
             val errorMessage = resources.getString(R.string.empty_script_error)
 
-            EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, errorMessage))
+            RxEventBus.send(MessageToShowInDialogEvent(title, errorMessage))
             return true
         }
 
         return try {
-            ScriptLanguageBuilder.checkIsScriptStringIsValid(
+            ScriptLanguageBuilder.checkIfScriptStringIsValid(
                     scriptString = script,
                     sampleIntValues = sampleIntValues,
                     sampleBooleanValues = sampleBooleanValues
@@ -294,7 +292,7 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
 
             val titleFormat = resources.getString(R.string.parse_error_dialog_title)
             val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
-            EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, message))
+            RxEventBus.send(MessageToShowInDialogEvent(title, message))
 
             false
         }
@@ -304,7 +302,7 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
             val constraintTypeStr = resources.getString(scriptSectionTitleId)
             val titleFormat = resources.getString(R.string.parse_error_dialog_title)
             val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
-            EventBus.getDefault().post(OnMessageToShowInDialogEvent(title, message))
+            RxEventBus.send(MessageToShowInDialogEvent(title, message))
             false
         }
     }

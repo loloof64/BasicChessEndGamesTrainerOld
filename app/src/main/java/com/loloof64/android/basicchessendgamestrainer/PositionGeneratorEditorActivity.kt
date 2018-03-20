@@ -31,19 +31,19 @@ import android.content.Context
 import android.content.DialogInterface
 import android.support.v7.widget.ThemedSpinnerAdapter
 import android.content.res.Resources.Theme
-import android.os.PersistableBundle
 import android.support.v7.app.AlertDialog
 import android.widget.EditText
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*
 import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
+import com.loloof64.android.basicchessendgamestrainer.utils.RxEventBus
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextOutsideCircleButton
+import io.reactivex.disposables.Disposable
+import io.reactivex.functions.Consumer
 
 import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
-import org.greenrobot.eventbus.EventBus
-import org.greenrobot.eventbus.Subscribe
 import java.io.IOException
 import java.lang.ref.WeakReference
 
@@ -59,14 +59,26 @@ object PositionGeneratorValuesHolder {
     var resultShouldBeDraw = false
 }
 
-data class OnMessageToShowInDialogEvent(val title: String, val message: String)
+data class MessageToShowInDialogEvent(val title: String, val message: String)
 
 data class BoomButtonParameters(val textId: Int, val iconId: Int, val colorId: Int, val listener: OnBMClickListener)
+
+class PositionGeneratorEditorObserver(parentActivity: PositionGeneratorEditorActivity) : Consumer<Any> {
+    override fun accept(message: Any) {
+        when (message) {
+            is MessageToShowInDialogEvent -> parentRef.get()?.showAlertDialog(
+                    title = message.title, message = message.message)
+        }
+    }
+
+    private val parentRef = WeakReference(parentActivity)
+}
 
 class PositionGeneratorEditorActivity : AppCompatActivity() {
 
     private var isEditingAnExistingFile = false
     private var currentEditedFileName = ""
+    private lateinit var busSubscription:Disposable
 
     companion object {
         val allFragments = arrayOf(
@@ -203,17 +215,12 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        EventBus.getDefault().register(this)
+        busSubscription = RxEventBus.toSubject().subscribe(PositionGeneratorEditorObserver(parentActivity = this))
     }
 
     override fun onStop() {
+        busSubscription.dispose()
         super.onStop()
-        EventBus.getDefault().unregister(this)
-    }
-
-    @Subscribe
-    fun onMessageToShowInDialogEvent(event: OnMessageToShowInDialogEvent) {
-        showAlertDialog(title = event.title, message = event.message)
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {

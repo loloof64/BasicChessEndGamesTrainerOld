@@ -23,6 +23,8 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
+import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
 import kotlinx.android.synthetic.main.fragment_editing_other_pieces_global_constraint.*
 
@@ -32,6 +34,10 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_editing_other_pieces_global_constraint, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        loadSpinnerTitles()
+    }
+
     companion object {
         fun newInstance(): OtherPiecesGlobalConstraintEditorFragment {
             return OtherPiecesGlobalConstraintEditorFragment()
@@ -39,7 +45,16 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
     }
 
     private fun loadSpinnerTitles() {
+        val pieceTypesStrings = resources.getStringArray(R.array.piece_type_spinner)
+        val sideStrings = resources.getStringArray(R.array.player_computer_spinner)
+        val otherPiecesKinds = PositionGeneratorValuesHolder.otherPiecesCount.map { it.pieceKind }.map {
+            "${pieceTypesStrings[it.pieceType.ordinal]} ${sideStrings[it.side.ordinal]}"
+        }.toTypedArray()
 
+        val spinnerAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, otherPiecesKinds)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        generator_editor_spinner_other_piece_global_constraint.adapter = spinnerAdapter
     }
 
 }
