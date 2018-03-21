@@ -23,12 +23,18 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AdapterView.INVALID_POSITION
 import android.widget.ArrayAdapter
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
 import kotlinx.android.synthetic.main.fragment_editing_other_pieces_global_constraint.*
+import java.lang.ref.WeakReference
 
 class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
+
+    private var spinnerPiecesKind = listOf<PieceKind>()
+    private var lastSpinnerSelectedItem : PieceKind? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_editing_other_pieces_global_constraint, container, false)
@@ -36,18 +42,31 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         loadSpinnerTitles()
+        generator_editor_spinner_other_piece_global_constraint.onItemSelectedListener =
+                OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(this)
+        if (scriptsByPieceKind.isNotEmpty()){
+            generator_editor_spinner_other_piece_global_constraint.setSelection(0)
+        }
+
     }
 
     companion object {
         fun newInstance(): OtherPiecesGlobalConstraintEditorFragment {
             return OtherPiecesGlobalConstraintEditorFragment()
         }
+
+        fun deleteScriptAssociatedWithPieceKind(kind: PieceKind){
+            scriptsByPieceKind -= kind
+        }
+
+        val scriptsByPieceKind = mutableMapOf<PieceKind, String>()
     }
 
     private fun loadSpinnerTitles() {
         val pieceTypesStrings = resources.getStringArray(R.array.piece_type_spinner)
         val sideStrings = resources.getStringArray(R.array.player_computer_spinner)
-        val otherPiecesKinds = PositionGeneratorValuesHolder.otherPiecesCount.map { it.pieceKind }.map {
+        spinnerPiecesKind = PositionGeneratorValuesHolder.otherPiecesCount.map { it.pieceKind }
+        val otherPiecesKinds = spinnerPiecesKind.map {
             "${pieceTypesStrings[it.pieceType.ordinal]} ${sideStrings[it.side.ordinal]}"
         }.toTypedArray()
 
@@ -57,4 +76,52 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         generator_editor_spinner_other_piece_global_constraint.adapter = spinnerAdapter
     }
 
+    fun loadScriptMatchingSpinnerSelectionOrDisableField(){
+        /////////////////////////////
+        println("all scripts are $scriptsByPieceKind")
+        /////////////////////////////
+        val selectedItemPosition = generator_editor_spinner_other_piece_global_constraint.
+                selectedItemPosition
+        if (selectedItemPosition == INVALID_POSITION){
+            generator_editor_field_other_piece_global_constraint.isEnabled = false
+        }
+        else {
+            val selectedPieceKind = spinnerPiecesKind[selectedItemPosition]
+            val associatedScript = scriptsByPieceKind[selectedPieceKind]
+            generator_editor_field_other_piece_global_constraint.setText(associatedScript)
+            generator_editor_field_other_piece_global_constraint.isEnabled = true
+        }
+    }
+
+    fun retainCurrentScript() {
+        if (lastSpinnerSelectedItem != null){
+            scriptsByPieceKind[lastSpinnerSelectedItem!!] = generator_editor_field_other_piece_global_constraint.text.toString()
+        }
+    }
+
+    fun setLastSpinnerSelectedItem(item: PieceKind?) {
+        lastSpinnerSelectedItem = item
+    }
+
+    fun getSpinnerPiecesKind(): List<PieceKind> {
+        return spinnerPiecesKind.toList() // making a clone
+    }
+
+}
+
+class OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(parent: OtherPiecesGlobalConstraintEditorFragment):
+        AdapterView.OnItemSelectedListener {
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        parentRef.get()?.retainCurrentScript()
+        parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableField()
+        parentRef.get()?.setLastSpinnerSelectedItem(null)
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        parentRef.get()?.retainCurrentScript()
+        parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableField()
+        parentRef.get()?.setLastSpinnerSelectedItem(parentRef.get()?.getSpinnerPiecesKind()?.get(position))
+    }
+
+    private val parentRef = WeakReference(parent)
 }

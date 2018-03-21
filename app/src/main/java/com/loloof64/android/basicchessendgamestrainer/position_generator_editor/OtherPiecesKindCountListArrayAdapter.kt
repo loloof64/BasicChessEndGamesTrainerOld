@@ -207,8 +207,13 @@ class DeleteButtonClickListener(adapter: OtherPiecesKindCountListArrayAdapter,
 
     override fun onClick(view: View?) {
         if (adapterRef.get() != null && view != null) {
-            adapterRef.get()!!.deleteItem(position)
+            showDeleteConfirmationDialog()
+            //adapterRef.get()!!.deleteItem(position)
         }
+    }
+
+    fun showDeleteConfirmationDialog(){
+
     }
 
 }
