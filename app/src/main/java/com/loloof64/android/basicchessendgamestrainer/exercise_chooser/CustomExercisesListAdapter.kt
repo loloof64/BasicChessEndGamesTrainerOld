@@ -63,7 +63,7 @@ class CustomExercisesListAdapter(private val itemClickListener: ItemClickListene
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         fun getColorFromId(colorId: Int) : Int {
-            val context = MyApplication.getApplicationContext()
+            val context = MyApplication.getApplicationContext()!!
             return ResourcesCompat.getColor(context.resources, colorId, null)
         }
 

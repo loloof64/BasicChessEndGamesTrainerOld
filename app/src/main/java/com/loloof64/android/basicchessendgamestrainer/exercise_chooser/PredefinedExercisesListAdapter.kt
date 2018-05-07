@@ -48,11 +48,11 @@ class PredefinedExercisesListAdapter(private val exercisesList: List<ExerciseInf
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         fun getColor(colorId: Int) : Int {
-            val context = MyApplication.getApplicationContext()
+            val context = MyApplication.getApplicationContext()!!
             return ResourcesCompat.getColor(context.resources, colorId, null)
         }
 
-        holder.textView.text = MyApplication.getApplicationContext().getString(exercisesList[position].textId)
+        holder.textView.text = MyApplication.getApplicationContext()!!.getString(exercisesList[position].textId)
         holder.textView.setOnClickListener{ itemClickListener.onClick(position) }
         holder.textView.setBackgroundColor(
                 if (exercisesList[position].mustWin) getColor(R.color.exercise_chooser_winning_color)

@@ -24,7 +24,7 @@ import android.content.Context
 class MyApplication: Application(){
 
     companion object {
-        fun getApplicationContext() = appContext
+        fun getApplicationContext(): Context? = appContext
         fun setApplicationContext(ctx: Context) {
             appContext = ctx
         }

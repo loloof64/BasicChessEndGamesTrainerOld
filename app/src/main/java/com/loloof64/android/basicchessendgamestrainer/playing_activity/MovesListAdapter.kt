@@ -40,7 +40,7 @@ abstract class ItemClickListener {
 
 class MovesListAdapter(private val weakRefContext: WeakReference<Context>, private val itemClickListener: ItemClickListener) : RecyclerView.Adapter<MovesListAdapter.Companion.ViewHolder>() {
     @Suppress("DEPRECATION")
-    private fun getColor(colorResId: Int): Int = MyApplication.getApplicationContext().resources.getColor(colorResId)
+    private fun getColor(colorResId: Int): Int = MyApplication.getApplicationContext()!!.resources.getColor(colorResId)
 
     companion object {
         class ViewHolder(val textView: TextView) : RecyclerView.ViewHolder(textView)

@@ -35,14 +35,36 @@ import com.loloof64.android.basicchessendgamestrainer.R
 import java.lang.ref.WeakReference
 
 enum class PieceType {
-    Pawn, Knight, Bishop, Rook, Queen, King
+    Pawn, Knight, Bishop, Rook, Queen, King;
+
+    fun toLocalString(): String {
+        val myApplicationContext = MyApplication.getApplicationContext()
+        return if (myApplicationContext == null) "#[ERR]"
+        else {
+            val pieceTypeStringArray = myApplicationContext.resources.getStringArray(R.array.piece_type_spinner)
+            pieceTypeStringArray[ordinal]
+        }
+    }
 }
 
 enum class Side {
-    Player, Computer
+    Player, Computer;
+
+    fun toLocalString(): String {
+        val myApplicationContext = MyApplication.getApplicationContext()
+        return if (myApplicationContext == null) "#[ERR]"
+        else {
+            val pieceTypeStringArray = myApplicationContext.resources.getStringArray(R.array.player_computer_spinner)
+            pieceTypeStringArray[ordinal]
+        }
+    }
 }
 
-data class PieceKind(val pieceType: PieceType, val side: Side)
+data class PieceKind(val pieceType: PieceType, val side: Side) {
+    fun toLocalString(): String {
+        return "${pieceType.toLocalString()} ${side.toLocalString()}"
+    }
+}
 
 data class PieceKindCount(val pieceKind: PieceKind, val count: Int){
     init {
@@ -62,7 +84,7 @@ class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Ad
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         fun getColorFromId(colorId: Int) : Int {
             val context = MyApplication.getApplicationContext()
-            return ResourcesCompat.getColor(context.resources, colorId, null)
+            return ResourcesCompat.getColor(context!!.resources, colorId, null)
         }
 
         val resources = MyApplication.appContext.resources
@@ -219,7 +241,7 @@ class DeleteButtonClickListener(val pieceKind: PieceKind,
     private fun showDeleteConfirmationDialog(){
         val alertDialogBuilder = AlertDialog.Builder(activityRef.get()).create()
         alertDialogBuilder.setTitle(R.string.confirm_delete_piece_kind_count_title)
-        alertDialogBuilder.setMessage(activityRef.get()?.resources?.getString(R.string.confirm_delete_piece_kind_count_message, pieceKind.toString()))
+        alertDialogBuilder.setMessage(activityRef.get()?.resources?.getString(R.string.confirm_delete_piece_kind_count_message, pieceKind.toLocalString()))
         alertDialogBuilder.setButton(AlertDialog.BUTTON_POSITIVE, activityRef.get()?.resources?.getString(R.string.OK), {
             _, _ ->
             adapterRef.get()!!.deleteItem(position)
