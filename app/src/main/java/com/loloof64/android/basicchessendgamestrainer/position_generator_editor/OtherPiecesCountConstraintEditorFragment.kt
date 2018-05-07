@@ -63,7 +63,7 @@ class OtherPiecesCountConstraintEditorFragment: Fragment() {
         spinnerKindAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner_add_piece_kind_type.adapter = spinnerKindAdapter
 
-        listViewAdapter = OtherPiecesKindCountListArrayAdapter()
+        listViewAdapter = OtherPiecesKindCountListArrayAdapter(activity!!)
         recycler_view_other_pieces_count.layoutManager = LinearLayoutManager(activity!!)
         recycler_view_other_pieces_count.adapter = listViewAdapter
 

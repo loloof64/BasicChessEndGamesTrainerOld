@@ -18,6 +18,8 @@
 
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
+import android.app.Activity
+import android.app.AlertDialog
 import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -30,7 +32,6 @@ import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
-import com.loloof64.android.basicchessendgamestrainer.utils.RxEventBus
 import java.lang.ref.WeakReference
 
 enum class PieceType {
@@ -49,7 +50,9 @@ data class PieceKindCount(val pieceKind: PieceKind, val count: Int){
     }
 }
 
-class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKindCountListArrayAdapter.Companion.ViewHolder>() {
+class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Adapter<OtherPiecesKindCountListArrayAdapter.Companion.ViewHolder>() {
+
+    private val activityRef = WeakReference(activity)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layout = LayoutInflater.from(parent.context).inflate(R.layout.other_pieces_count_list_row, parent, false) as LinearLayout
@@ -74,7 +77,7 @@ class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKin
         holder.typeTextView.text = resources.getStringArray(R.array.piece_type_spinner)[item.pieceKind.pieceType.ordinal]
         holder.typeTextView.setBackgroundColor(getColorFromId(R.color.other_piece_type_color))
 
-        holder.deleteButton.setOnClickListener(DeleteButtonClickListener(this, position))
+        holder.deleteButton.setOnClickListener(DeleteButtonClickListener(pieceKind = item.pieceKind, activityRef = activityRef, adapter = this, position = position))
     }
 
     override fun getItemCount(): Int {
@@ -201,19 +204,31 @@ class OtherPiecesKindCountListArrayAdapter : RecyclerView.Adapter<OtherPiecesKin
 
 }
 
-class DeleteButtonClickListener(adapter: OtherPiecesKindCountListArrayAdapter,
+class DeleteButtonClickListener(val pieceKind: PieceKind,
+                                adapter: OtherPiecesKindCountListArrayAdapter,
+                                val activityRef: WeakReference<Activity>,
                                 val position: Int) : View.OnClickListener {
     private val adapterRef = WeakReference(adapter)
 
     override fun onClick(view: View?) {
         if (adapterRef.get() != null && view != null) {
             showDeleteConfirmationDialog()
-            //adapterRef.get()!!.deleteItem(position)
         }
     }
 
-    fun showDeleteConfirmationDialog(){
-
+    private fun showDeleteConfirmationDialog(){
+        val alertDialogBuilder = AlertDialog.Builder(activityRef.get()).create()
+        alertDialogBuilder.setTitle(R.string.confirm_delete_piece_kind_count_title)
+        alertDialogBuilder.setMessage(activityRef.get()?.resources?.getString(R.string.confirm_delete_piece_kind_count_message, pieceKind.toString()))
+        alertDialogBuilder.setButton(AlertDialog.BUTTON_POSITIVE, activityRef.get()?.resources?.getString(R.string.OK), {
+            _, _ ->
+            adapterRef.get()!!.deleteItem(position)
+            OtherPiecesGlobalConstraintEditorFragment.deleteScriptAssociatedWithPieceKind(pieceKind)
+        })
+        alertDialogBuilder.setButton(AlertDialog.BUTTON_NEGATIVE, activityRef.get()?.resources?.getString(R.string.cancel), {
+            dialog, _ -> dialog.dismiss()
+        })
+        alertDialogBuilder.show()
     }
 
 }

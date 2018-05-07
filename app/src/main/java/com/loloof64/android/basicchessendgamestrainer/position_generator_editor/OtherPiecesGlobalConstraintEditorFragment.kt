@@ -24,7 +24,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
-import android.widget.AdapterView.INVALID_POSITION
 import android.widget.ArrayAdapter
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
@@ -47,7 +46,17 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         if (scriptsByPieceKind.isNotEmpty()){
             generator_editor_spinner_other_piece_global_constraint.setSelection(0)
         }
+        loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
+    }
 
+    override fun onResume() {
+        super.onResume()
+
+        loadSpinnerTitles()
+        if (scriptsByPieceKind.isNotEmpty()){
+            generator_editor_spinner_other_piece_global_constraint.setSelection(0)
+        }
+        loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
     }
 
     companion object {
@@ -56,7 +65,7 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         }
 
         fun deleteScriptAssociatedWithPieceKind(kind: PieceKind){
-            scriptsByPieceKind -= kind
+            scriptsByPieceKind.remove(kind)
         }
 
         val scriptsByPieceKind = mutableMapOf<PieceKind, String>()
@@ -76,13 +85,11 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         generator_editor_spinner_other_piece_global_constraint.adapter = spinnerAdapter
     }
 
-    fun loadScriptMatchingSpinnerSelectionOrDisableField(){
-        /////////////////////////////
-        println("all scripts are $scriptsByPieceKind")
-        /////////////////////////////
+    fun loadScriptMatchingSpinnerSelectionOrDisableAndClearField(){
+        generator_editor_field_other_piece_global_constraint.text.clear()
         val selectedItemPosition = generator_editor_spinner_other_piece_global_constraint.
                 selectedItemPosition
-        if (selectedItemPosition == INVALID_POSITION){
+        if (spinnerPiecesKind.isEmpty()){
             generator_editor_field_other_piece_global_constraint.isEnabled = false
         }
         else {
@@ -113,14 +120,14 @@ class OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(parent: OtherPie
         AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(parent: AdapterView<*>?) {
         parentRef.get()?.retainCurrentScript()
-        parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableField()
         parentRef.get()?.setLastSpinnerSelectedItem(null)
+        parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         parentRef.get()?.retainCurrentScript()
-        parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableField()
         parentRef.get()?.setLastSpinnerSelectedItem(parentRef.get()?.getSpinnerPiecesKind()?.get(position))
+        parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
     }
 
     private val parentRef = WeakReference(parent)

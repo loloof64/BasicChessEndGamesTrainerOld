@@ -135,6 +135,8 @@ of endgame.[CR][CR]
     <string name="adding_too_many_queens">A player cannot have more than 9 queens on a board !</string>
     <string name="adding_too_many_pawns">A player cannot have more than 8 pawns on a board !</string>
     <string name="adding_too_many_pieces">A player cannot have more than 16 pieces on a board (including king) !</string>
+    <string name="confirm_delete_piece_kind_count_title">Confirm deletion ?</string>
+    <string name="confirm_delete_piece_kind_count_message">Confirm deletion for %s ? (Some scripts may be associated with this type)</string>
     <string-array name="piece_kind_count_spinner">
         <item>1</item>
         <item>2</item>
