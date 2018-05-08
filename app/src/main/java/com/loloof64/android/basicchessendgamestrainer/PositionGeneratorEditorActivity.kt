@@ -81,6 +81,14 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
     private lateinit var busSubscription:Disposable
 
     companion object {
+        val PlayerKingConstraintEditorFragmentIndex = 0
+        val ComputerKingConstraintEditorFragmentIndex = 1
+        val KingsMutualConstraintEditorFragmentIndex = 2
+        val OtherPiecesCountConstraintEditorFragmentIndex = 3
+        val OtherPiecesGlobalConstraintEditorFragmentIndex = 4
+        val OtherPiecesMutualConstraintEditorFragmentIndex = 5
+        val OtherPiecesIndexedConstraintEditorFragmentIndex = 6
+
         val allFragments = arrayOf(
                 PlayerKingConstraintEditorFragment.newInstance(),
                 ComputerKingConstraintEditorFragment.newInstance(),
@@ -271,6 +279,12 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         dialog.show()
     }
 
+    fun deleteOtherPieceGlobalConstraintScriptAssociatedWithPieceKind(pieceKind: PieceKind) {
+        val otherPiecesGlobalConstraintFrag = allFragments[OtherPiecesGlobalConstraintEditorFragmentIndex] as
+                OtherPiecesGlobalConstraintEditorFragment
+        otherPiecesGlobalConstraintFrag.deleteScriptAssociatedWithPieceKind(pieceKind)
+    }
+
     private fun buildFileContent(): String {
         val contentBuilder = StringBuilder()
 
@@ -375,6 +389,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 })
                 .show()
     }
+
 
     private class MyAdapter(context: Context, objects: Array<String>) : ArrayAdapter<String>(context, R.layout.position_generator_editor_list_item, objects), ThemedSpinnerAdapter {
         private val mDropDownHelper: ThemedSpinnerAdapter.Helper = ThemedSpinnerAdapter.Helper(context)

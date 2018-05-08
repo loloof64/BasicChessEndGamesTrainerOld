@@ -30,6 +30,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
+import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorEditorActivity
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
 import java.lang.ref.WeakReference
@@ -240,12 +241,13 @@ class DeleteButtonClickListener(val pieceKind: PieceKind,
 
     private fun showDeleteConfirmationDialog(){
         val alertDialogBuilder = AlertDialog.Builder(activityRef.get()).create()
+        val positionGeneratorEditorActivity = activityRef.get() as PositionGeneratorEditorActivity
         alertDialogBuilder.setTitle(R.string.confirm_delete_piece_kind_count_title)
         alertDialogBuilder.setMessage(activityRef.get()?.resources?.getString(R.string.confirm_delete_piece_kind_count_message, pieceKind.toLocalString()))
         alertDialogBuilder.setButton(AlertDialog.BUTTON_POSITIVE, activityRef.get()?.resources?.getString(R.string.OK), {
             _, _ ->
-            adapterRef.get()!!.deleteItem(position)
-            OtherPiecesGlobalConstraintEditorFragment.deleteScriptAssociatedWithPieceKind(pieceKind)
+            adapterRef.get()?.deleteItem(position)
+            positionGeneratorEditorActivity.deleteOtherPieceGlobalConstraintScriptAssociatedWithPieceKind(pieceKind)
         })
         alertDialogBuilder.setButton(AlertDialog.BUTTON_NEGATIVE, activityRef.get()?.resources?.getString(R.string.cancel), {
             dialog, _ -> dialog.dismiss()
