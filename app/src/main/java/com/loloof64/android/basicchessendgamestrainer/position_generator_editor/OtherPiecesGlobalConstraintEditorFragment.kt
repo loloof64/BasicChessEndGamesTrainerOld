@@ -32,7 +32,7 @@ import java.lang.ref.WeakReference
 
 class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
 
-    private var spinnerPiecesKind = listOf<PieceKind>()
+    private var spinnerPiecesKindValues = listOf<PieceKind>()
     private var lastSpinnerSelectedItem : PieceKind? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -40,20 +40,23 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        loadSpinnerTitles()
         generator_editor_spinner_other_piece_global_constraint.onItemSelectedListener =
                 OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(this)
-        if (scriptsByPieceKind.isNotEmpty()){
-            generator_editor_spinner_other_piece_global_constraint.setSelection(0)
-        }
-        loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
+        generator_editor_field_other_piece_global_constraint.onFocusChangeListener =
+                OtherPiecesGlobalConstraintEditorScriptFieldFocusListener(this)
+
+        updatePieceKindsSpinnerAndCurrentEditedScript()
     }
 
     override fun onResume() {
         super.onResume()
 
+        updatePieceKindsSpinnerAndCurrentEditedScript()
+    }
+
+    private fun updatePieceKindsSpinnerAndCurrentEditedScript() {
         loadSpinnerTitles()
-        if (scriptsByPieceKind.isNotEmpty()){
+        if (scriptsByPieceKind.isNotEmpty()) {
             generator_editor_spinner_other_piece_global_constraint.setSelection(0)
         }
         loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
@@ -74,8 +77,8 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
     private fun loadSpinnerTitles() {
         val pieceTypesStrings = resources.getStringArray(R.array.piece_type_spinner)
         val sideStrings = resources.getStringArray(R.array.player_computer_spinner)
-        spinnerPiecesKind = PositionGeneratorValuesHolder.otherPiecesCount.map { it.pieceKind }
-        val otherPiecesKinds = spinnerPiecesKind.map {
+        spinnerPiecesKindValues = PositionGeneratorValuesHolder.otherPiecesCount.map { it.pieceKind }
+        val otherPiecesKinds = spinnerPiecesKindValues.map {
             "${pieceTypesStrings[it.pieceType.ordinal]} ${sideStrings[it.side.ordinal]}"
         }.toTypedArray()
 
@@ -86,14 +89,14 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
     }
 
     fun loadScriptMatchingSpinnerSelectionOrDisableAndClearField(){
-        generator_editor_field_other_piece_global_constraint.text.clear()
-        val selectedItemPosition = generator_editor_spinner_other_piece_global_constraint.
-                selectedItemPosition
-        if (spinnerPiecesKind.isEmpty()){
+        if (spinnerPiecesKindValues.isEmpty()){
+            generator_editor_field_other_piece_global_constraint.text.clear()
             generator_editor_field_other_piece_global_constraint.isEnabled = false
         }
         else {
-            val selectedPieceKind = spinnerPiecesKind[selectedItemPosition]
+            val selectedItemPosition = generator_editor_spinner_other_piece_global_constraint.
+                    selectedItemPosition
+            val selectedPieceKind = spinnerPiecesKindValues[selectedItemPosition]
             val associatedScript = scriptsByPieceKind[selectedPieceKind]
             generator_editor_field_other_piece_global_constraint.setText(associatedScript)
             generator_editor_field_other_piece_global_constraint.isEnabled = true
@@ -106,12 +109,16 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         }
     }
 
+    fun removeScriptFieldFocus() {
+        generator_editor_field_other_piece_global_constraint.clearFocus()
+    }
+
     fun setLastSpinnerSelectedItem(item: PieceKind?) {
         lastSpinnerSelectedItem = item
     }
 
     fun getSpinnerPiecesKind(): List<PieceKind> {
-        return spinnerPiecesKind.toList() // making a clone
+        return spinnerPiecesKindValues.toList() // making a clone
     }
 
 }
@@ -119,15 +126,27 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
 class OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(parent: OtherPiecesGlobalConstraintEditorFragment):
         AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        parentRef.get()?.retainCurrentScript()
+        parentRef.get()?.removeScriptFieldFocus()
         parentRef.get()?.setLastSpinnerSelectedItem(null)
         parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        parentRef.get()?.retainCurrentScript()
+        parentRef.get()?.removeScriptFieldFocus()
         parentRef.get()?.setLastSpinnerSelectedItem(parentRef.get()?.getSpinnerPiecesKind()?.get(position))
         parentRef.get()?.loadScriptMatchingSpinnerSelectionOrDisableAndClearField()
+    }
+
+    private val parentRef = WeakReference(parent)
+}
+
+class OtherPiecesGlobalConstraintEditorScriptFieldFocusListener(parent: OtherPiecesGlobalConstraintEditorFragment):
+    View.OnFocusChangeListener
+{
+    override fun onFocusChange(v: View?, hasFocus: Boolean) {
+        if (!hasFocus){
+            parentRef.get()?.retainCurrentScript()
+        }
     }
 
     private val parentRef = WeakReference(parent)
