@@ -1,23 +1,4 @@
-/*
- * Basic Chess Endgames : generates a position of the endgame you want, then play it against computer.
-    Copyright (C) 2017-2018  Laurent Bernabe <laurent.bernabe@gmail.com>
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
-
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.antlr4;
-
 // Generated from ScriptLanguage.g4 by ANTLR 4.7.1
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
@@ -40,7 +21,8 @@ public class ScriptLanguageParser extends Parser {
 		T__9=10, T__10=11, T__11=12, T__12=13, T__13=14, T__14=15, T__15=16, T__16=17, 
 		T__17=18, T__18=19, T__19=20, T__20=21, T__21=22, T__22=23, T__23=24, 
 		T__24=25, T__25=26, T__26=27, T__27=28, T__28=29, T__29=30, T__30=31, 
-		T__31=32, T__32=33, T__33=34, T__34=35, NumericLitteral=36, ID=37, WS=38;
+		T__31=32, T__32=33, T__33=34, T__34=35, T__35=36, NumericLitteral=37, 
+		ID=38, WS=39;
 	public static final int
 		RULE_scriptLanguage = 0, RULE_variableAssign = 1, RULE_terminalExpr = 2, 
 		RULE_booleanExpr = 3, RULE_fileConstant = 4, RULE_rankConstant = 5, RULE_numericExpr = 6;
@@ -54,13 +36,13 @@ public class ScriptLanguageParser extends Parser {
 		"'<'", "'>'", "'<='", "'>='", "'='", "'<>'", "'and'", "'or'", "'FileA'", 
 		"'FileB'", "'FileC'", "'FileD'", "'FileE'", "'FileF'", "'FileG'", "'FileH'", 
 		"'Rank1'", "'Rank2'", "'Rank3'", "'Rank4'", "'Rank5'", "'Rank6'", "'Rank7'", 
-		"'Rank8'", "'abs('", "'+'", "'-'"
+		"'Rank8'", "'abs('", "'%'", "'+'", "'-'"
 	};
 	private static final String[] _SYMBOLIC_NAMES = {
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
 		null, null, null, null, null, null, null, null, null, null, null, null, 
-		"NumericLitteral", "ID", "WS"
+		null, "NumericLitteral", "ID", "WS"
 	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
@@ -412,7 +394,7 @@ public class ScriptLanguageParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(65);
+			setState(59);
 			_errHandler.sync(this);
 			switch ( getInterpreter().adaptivePredict(_input,2,_ctx) ) {
 			case 1:
@@ -437,27 +419,15 @@ public class ScriptLanguageParser extends Parser {
 				setState(43);
 				match(T__5);
 				setState(44);
-				match(T__3);
+				booleanExpr(0);
 				setState(45);
-				booleanExpr(0);
-				setState(46);
-				match(T__4);
-				setState(47);
 				match(T__6);
-				setState(48);
-				match(T__3);
-				setState(49);
+				setState(46);
 				booleanExpr(0);
-				setState(50);
-				match(T__4);
-				setState(51);
+				setState(47);
 				match(T__7);
-				setState(52);
-				match(T__3);
-				setState(53);
-				booleanExpr(0);
-				setState(54);
-				match(T__4);
+				setState(48);
+				booleanExpr(6);
 				}
 				break;
 			case 3:
@@ -465,7 +435,7 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new BooleanVariableContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(56);
+				setState(50);
 				match(ID);
 				}
 				break;
@@ -474,9 +444,9 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new NumericRelationalContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(57);
+				setState(51);
 				numericExpr(0);
-				setState(58);
+				setState(52);
 				((NumericRelationalContext)_localctx).op = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__8) | (1L << T__9) | (1L << T__10) | (1L << T__11))) != 0)) ) {
@@ -487,7 +457,7 @@ public class ScriptLanguageParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(59);
+				setState(53);
 				numericExpr(0);
 				}
 				break;
@@ -496,9 +466,9 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new NumericEqualityContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(61);
+				setState(55);
 				numericExpr(0);
-				setState(62);
+				setState(56);
 				((NumericEqualityContext)_localctx).op = _input.LT(1);
 				_la = _input.LA(1);
 				if ( !(_la==T__12 || _la==T__13) ) {
@@ -509,13 +479,13 @@ public class ScriptLanguageParser extends Parser {
 					_errHandler.reportMatch(this);
 					consume();
 				}
-				setState(63);
+				setState(57);
 				numericExpr(0);
 				}
 				break;
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(75);
+			setState(69);
 			_errHandler.sync(this);
 			_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
@@ -523,18 +493,18 @@ public class ScriptLanguageParser extends Parser {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					setState(73);
+					setState(67);
 					_errHandler.sync(this);
 					switch ( getInterpreter().adaptivePredict(_input,3,_ctx) ) {
 					case 1:
 						{
 						_localctx = new AndComparisonContext(new BooleanExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_booleanExpr);
-						setState(67);
+						setState(61);
 						if (!(precpred(_ctx, 2))) throw new FailedPredicateException(this, "precpred(_ctx, 2)");
-						setState(68);
+						setState(62);
 						match(T__14);
-						setState(69);
+						setState(63);
 						booleanExpr(3);
 						}
 						break;
@@ -542,18 +512,18 @@ public class ScriptLanguageParser extends Parser {
 						{
 						_localctx = new OrComparisonContext(new BooleanExprContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_booleanExpr);
-						setState(70);
+						setState(64);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-						setState(71);
+						setState(65);
 						match(T__15);
-						setState(72);
+						setState(66);
 						booleanExpr(2);
 						}
 						break;
 					}
 					} 
 				}
-				setState(77);
+				setState(71);
 				_errHandler.sync(this);
 				_alt = getInterpreter().adaptivePredict(_input,4,_ctx);
 			}
@@ -589,7 +559,7 @@ public class ScriptLanguageParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(78);
+			setState(72);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__16) | (1L << T__17) | (1L << T__18) | (1L << T__19) | (1L << T__20) | (1L << T__21) | (1L << T__22) | (1L << T__23))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -631,7 +601,7 @@ public class ScriptLanguageParser extends Parser {
 		try {
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(80);
+			setState(74);
 			_la = _input.LA(1);
 			if ( !((((_la) & ~0x3f) == 0 && ((1L << _la) & ((1L << T__24) | (1L << T__25) | (1L << T__26) | (1L << T__27) | (1L << T__28) | (1L << T__29) | (1L << T__30) | (1L << T__31))) != 0)) ) {
 			_errHandler.recoverInline(this);
@@ -759,6 +729,20 @@ public class ScriptLanguageParser extends Parser {
 			else return visitor.visitChildren(this);
 		}
 	}
+	public static class ModuloNumericExprContext extends NumericExprContext {
+		public List<NumericExprContext> numericExpr() {
+			return getRuleContexts(NumericExprContext.class);
+		}
+		public NumericExprContext numericExpr(int i) {
+			return getRuleContext(NumericExprContext.class,i);
+		}
+		public ModuloNumericExprContext(NumericExprContext ctx) { copyFrom(ctx); }
+		@Override
+		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
+			if ( visitor instanceof ScriptLanguageVisitor ) return ((ScriptLanguageVisitor<? extends T>)visitor).visitModuloNumericExpr(this);
+			else return visitor.visitChildren(this);
+		}
+	}
 
 	public final NumericExprContext numericExpr() throws RecognitionException {
 		return numericExpr(0);
@@ -776,7 +760,7 @@ public class ScriptLanguageParser extends Parser {
 			int _alt;
 			enterOuterAlt(_localctx, 1);
 			{
-			setState(108);
+			setState(96);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case T__3:
@@ -785,11 +769,11 @@ public class ScriptLanguageParser extends Parser {
 				_ctx = _localctx;
 				_prevctx = _localctx;
 
-				setState(83);
+				setState(77);
 				match(T__3);
-				setState(84);
+				setState(78);
 				numericExpr(0);
-				setState(85);
+				setState(79);
 				match(T__4);
 				}
 				break;
@@ -798,30 +782,18 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new ConditionalNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(87);
+				setState(81);
 				match(T__5);
-				setState(88);
-				match(T__3);
-				setState(89);
+				setState(82);
 				booleanExpr(0);
-				setState(90);
-				match(T__4);
-				setState(91);
+				setState(83);
 				match(T__6);
-				setState(92);
-				match(T__3);
-				setState(93);
+				setState(84);
 				numericExpr(0);
-				setState(94);
-				match(T__4);
-				setState(95);
+				setState(85);
 				match(T__7);
-				setState(96);
-				match(T__3);
-				setState(97);
-				numericExpr(0);
-				setState(98);
-				match(T__4);
+				setState(86);
+				numericExpr(8);
 				}
 				break;
 			case T__32:
@@ -829,11 +801,11 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new AbsoluteNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(100);
+				setState(88);
 				match(T__32);
-				setState(101);
+				setState(89);
 				numericExpr(0);
-				setState(102);
+				setState(90);
 				match(T__4);
 				}
 				break;
@@ -842,7 +814,7 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new LitteralNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(104);
+				setState(92);
 				match(NumericLitteral);
 				}
 				break;
@@ -851,7 +823,7 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new NumericVariableContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(105);
+				setState(93);
 				match(ID);
 				}
 				break;
@@ -867,7 +839,7 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new FileConstantNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(106);
+				setState(94);
 				fileConstant();
 				}
 				break;
@@ -883,7 +855,7 @@ public class ScriptLanguageParser extends Parser {
 				_localctx = new RankConstantNumericExprContext(_localctx);
 				_ctx = _localctx;
 				_prevctx = _localctx;
-				setState(107);
+				setState(95);
 				rankConstant();
 				}
 				break;
@@ -891,38 +863,56 @@ public class ScriptLanguageParser extends Parser {
 				throw new NoViableAltException(this);
 			}
 			_ctx.stop = _input.LT(-1);
-			setState(115);
+			setState(106);
 			_errHandler.sync(this);
-			_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
+			_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 			while ( _alt!=2 && _alt!=org.antlr.v4.runtime.atn.ATN.INVALID_ALT_NUMBER ) {
 				if ( _alt==1 ) {
 					if ( _parseListeners!=null ) triggerExitRuleEvent();
 					_prevctx = _localctx;
 					{
-					{
-					_localctx = new PlusMinusNumericExprContext(new NumericExprContext(_parentctx, _parentState));
-					pushNewRecursionContext(_localctx, _startState, RULE_numericExpr);
-					setState(110);
-					if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
-					setState(111);
-					((PlusMinusNumericExprContext)_localctx).op = _input.LT(1);
-					_la = _input.LA(1);
-					if ( !(_la==T__33 || _la==T__34) ) {
-						((PlusMinusNumericExprContext)_localctx).op = (Token)_errHandler.recoverInline(this);
-					}
-					else {
-						if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
-						_errHandler.reportMatch(this);
-						consume();
-					}
-					setState(112);
-					numericExpr(2);
+					setState(104);
+					_errHandler.sync(this);
+					switch ( getInterpreter().adaptivePredict(_input,6,_ctx) ) {
+					case 1:
+						{
+						_localctx = new ModuloNumericExprContext(new NumericExprContext(_parentctx, _parentState));
+						pushNewRecursionContext(_localctx, _startState, RULE_numericExpr);
+						setState(98);
+						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						setState(99);
+						match(T__33);
+						setState(100);
+						numericExpr(7);
+						}
+						break;
+					case 2:
+						{
+						_localctx = new PlusMinusNumericExprContext(new NumericExprContext(_parentctx, _parentState));
+						pushNewRecursionContext(_localctx, _startState, RULE_numericExpr);
+						setState(101);
+						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+						setState(102);
+						((PlusMinusNumericExprContext)_localctx).op = _input.LT(1);
+						_la = _input.LA(1);
+						if ( !(_la==T__34 || _la==T__35) ) {
+							((PlusMinusNumericExprContext)_localctx).op = (Token)_errHandler.recoverInline(this);
+						}
+						else {
+							if ( _input.LA(1)==Token.EOF ) matchedEOF = true;
+							_errHandler.reportMatch(this);
+							consume();
+						}
+						setState(103);
+						numericExpr(6);
+						}
+						break;
 					}
 					} 
 				}
-				setState(117);
+				setState(108);
 				_errHandler.sync(this);
-				_alt = getInterpreter().adaptivePredict(_input,6,_ctx);
+				_alt = getInterpreter().adaptivePredict(_input,7,_ctx);
 			}
 			}
 		}
@@ -958,42 +948,42 @@ public class ScriptLanguageParser extends Parser {
 	private boolean numericExpr_sempred(NumericExprContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 2:
-			return precpred(_ctx, 1);
+			return precpred(_ctx, 6);
+		case 3:
+			return precpred(_ctx, 5);
 		}
 		return true;
 	}
 
 	public static final String _serializedATN =
-		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3(y\4\2\t\2\4\3\t\3"+
+		"\3\u608b\ua72a\u8133\ub9ed\u417c\u3be7\u7786\u5964\3)p\4\2\t\2\4\3\t\3"+
 		"\4\4\t\4\4\5\t\5\4\6\t\6\4\7\t\7\4\b\t\b\3\2\7\2\22\n\2\f\2\16\2\25\13"+
 		"\2\3\2\3\2\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\3\5\3#\n\3\3\4\3\4\3"+
 		"\4\3\4\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5"+
-		"\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\3\5\5\5D\n\5\3\5\3\5\3\5\3\5"+
-		"\3\5\3\5\7\5L\n\5\f\5\16\5O\13\5\3\6\3\6\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3"+
-		"\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b"+
-		"\3\b\3\b\3\b\5\bo\n\b\3\b\3\b\3\b\7\bt\n\b\f\b\16\bw\13\b\3\b\2\4\b\16"+
-		"\t\2\4\6\b\n\f\16\2\7\3\2\13\16\3\2\17\20\3\2\23\32\3\2\33\"\3\2$%\2\u0080"+
-		"\2\23\3\2\2\2\4\"\3\2\2\2\6$\3\2\2\2\bC\3\2\2\2\nP\3\2\2\2\fR\3\2\2\2"+
-		"\16n\3\2\2\2\20\22\5\4\3\2\21\20\3\2\2\2\22\25\3\2\2\2\23\21\3\2\2\2\23"+
-		"\24\3\2\2\2\24\26\3\2\2\2\25\23\3\2\2\2\26\27\5\6\4\2\27\3\3\2\2\2\30"+
-		"\31\7\'\2\2\31\32\7\3\2\2\32\33\5\16\b\2\33\34\7\4\2\2\34#\3\2\2\2\35"+
-		"\36\7\'\2\2\36\37\7\3\2\2\37 \5\b\5\2 !\7\4\2\2!#\3\2\2\2\"\30\3\2\2\2"+
-		"\"\35\3\2\2\2#\5\3\2\2\2$%\7\5\2\2%&\5\b\5\2&\'\7\4\2\2\'\7\3\2\2\2()"+
-		"\b\5\1\2)*\7\6\2\2*+\5\b\5\2+,\7\7\2\2,D\3\2\2\2-.\7\b\2\2./\7\6\2\2/"+
-		"\60\5\b\5\2\60\61\7\7\2\2\61\62\7\t\2\2\62\63\7\6\2\2\63\64\5\b\5\2\64"+
-		"\65\7\7\2\2\65\66\7\n\2\2\66\67\7\6\2\2\678\5\b\5\289\7\7\2\29D\3\2\2"+
-		"\2:D\7\'\2\2;<\5\16\b\2<=\t\2\2\2=>\5\16\b\2>D\3\2\2\2?@\5\16\b\2@A\t"+
-		"\3\2\2AB\5\16\b\2BD\3\2\2\2C(\3\2\2\2C-\3\2\2\2C:\3\2\2\2C;\3\2\2\2C?"+
-		"\3\2\2\2DM\3\2\2\2EF\f\4\2\2FG\7\21\2\2GL\5\b\5\5HI\f\3\2\2IJ\7\22\2\2"+
-		"JL\5\b\5\4KE\3\2\2\2KH\3\2\2\2LO\3\2\2\2MK\3\2\2\2MN\3\2\2\2N\t\3\2\2"+
-		"\2OM\3\2\2\2PQ\t\4\2\2Q\13\3\2\2\2RS\t\5\2\2S\r\3\2\2\2TU\b\b\1\2UV\7"+
-		"\6\2\2VW\5\16\b\2WX\7\7\2\2Xo\3\2\2\2YZ\7\b\2\2Z[\7\6\2\2[\\\5\b\5\2\\"+
-		"]\7\7\2\2]^\7\t\2\2^_\7\6\2\2_`\5\16\b\2`a\7\7\2\2ab\7\n\2\2bc\7\6\2\2"+
-		"cd\5\16\b\2de\7\7\2\2eo\3\2\2\2fg\7#\2\2gh\5\16\b\2hi\7\7\2\2io\3\2\2"+
-		"\2jo\7&\2\2ko\7\'\2\2lo\5\n\6\2mo\5\f\7\2nT\3\2\2\2nY\3\2\2\2nf\3\2\2"+
-		"\2nj\3\2\2\2nk\3\2\2\2nl\3\2\2\2nm\3\2\2\2ou\3\2\2\2pq\f\3\2\2qr\t\6\2"+
-		"\2rt\5\16\b\4sp\3\2\2\2tw\3\2\2\2us\3\2\2\2uv\3\2\2\2v\17\3\2\2\2wu\3"+
-		"\2\2\2\t\23\"CKMnu";
+		"\3\5\3\5\3\5\3\5\3\5\5\5>\n\5\3\5\3\5\3\5\3\5\3\5\3\5\7\5F\n\5\f\5\16"+
+		"\5I\13\5\3\6\3\6\3\7\3\7\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3"+
+		"\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\3\b\5\bc\n\b\3\b\3\b\3\b\3\b\3\b\3\b\7"+
+		"\bk\n\b\f\b\16\bn\13\b\3\b\2\4\b\16\t\2\4\6\b\n\f\16\2\7\3\2\13\16\3\2"+
+		"\17\20\3\2\23\32\3\2\33\"\3\2%&\2x\2\23\3\2\2\2\4\"\3\2\2\2\6$\3\2\2\2"+
+		"\b=\3\2\2\2\nJ\3\2\2\2\fL\3\2\2\2\16b\3\2\2\2\20\22\5\4\3\2\21\20\3\2"+
+		"\2\2\22\25\3\2\2\2\23\21\3\2\2\2\23\24\3\2\2\2\24\26\3\2\2\2\25\23\3\2"+
+		"\2\2\26\27\5\6\4\2\27\3\3\2\2\2\30\31\7(\2\2\31\32\7\3\2\2\32\33\5\16"+
+		"\b\2\33\34\7\4\2\2\34#\3\2\2\2\35\36\7(\2\2\36\37\7\3\2\2\37 \5\b\5\2"+
+		" !\7\4\2\2!#\3\2\2\2\"\30\3\2\2\2\"\35\3\2\2\2#\5\3\2\2\2$%\7\5\2\2%&"+
+		"\5\b\5\2&\'\7\4\2\2\'\7\3\2\2\2()\b\5\1\2)*\7\6\2\2*+\5\b\5\2+,\7\7\2"+
+		"\2,>\3\2\2\2-.\7\b\2\2./\5\b\5\2/\60\7\t\2\2\60\61\5\b\5\2\61\62\7\n\2"+
+		"\2\62\63\5\b\5\b\63>\3\2\2\2\64>\7(\2\2\65\66\5\16\b\2\66\67\t\2\2\2\67"+
+		"8\5\16\b\28>\3\2\2\29:\5\16\b\2:;\t\3\2\2;<\5\16\b\2<>\3\2\2\2=(\3\2\2"+
+		"\2=-\3\2\2\2=\64\3\2\2\2=\65\3\2\2\2=9\3\2\2\2>G\3\2\2\2?@\f\4\2\2@A\7"+
+		"\21\2\2AF\5\b\5\5BC\f\3\2\2CD\7\22\2\2DF\5\b\5\4E?\3\2\2\2EB\3\2\2\2F"+
+		"I\3\2\2\2GE\3\2\2\2GH\3\2\2\2H\t\3\2\2\2IG\3\2\2\2JK\t\4\2\2K\13\3\2\2"+
+		"\2LM\t\5\2\2M\r\3\2\2\2NO\b\b\1\2OP\7\6\2\2PQ\5\16\b\2QR\7\7\2\2Rc\3\2"+
+		"\2\2ST\7\b\2\2TU\5\b\5\2UV\7\t\2\2VW\5\16\b\2WX\7\n\2\2XY\5\16\b\nYc\3"+
+		"\2\2\2Z[\7#\2\2[\\\5\16\b\2\\]\7\7\2\2]c\3\2\2\2^c\7\'\2\2_c\7(\2\2`c"+
+		"\5\n\6\2ac\5\f\7\2bN\3\2\2\2bS\3\2\2\2bZ\3\2\2\2b^\3\2\2\2b_\3\2\2\2b"+
+		"`\3\2\2\2ba\3\2\2\2cl\3\2\2\2de\f\b\2\2ef\7$\2\2fk\5\16\b\tgh\f\7\2\2"+
+		"hi\t\6\2\2ik\5\16\b\bjd\3\2\2\2jg\3\2\2\2kn\3\2\2\2lj\3\2\2\2lm\3\2\2"+
+		"\2m\17\3\2\2\2nl\3\2\2\2\n\23\"=EGbjl";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
 	static {

@@ -48,6 +48,7 @@ data class ConditionalScriptLanguageNumericExpr(val condition: ScriptLanguageBoo
 data class AbsoluteScriptLanguageNumericExpr(val expr: ScriptLanguageNumericExpr): ScriptLanguageNumericExpr()
 data class LiteralScriptLanguageNumericExpr(val value: Int): ScriptLanguageNumericExpr()
 data class VariableScriptLanguageNumericExpr(val name: String): ScriptLanguageNumericExpr()
+data class Modulo_ScriptLanguageNumericExpr(val expr1: ScriptLanguageNumericExpr, val expr2: ScriptLanguageNumericExpr) : ScriptLanguageNumericExpr()
 data class Plus_ScriptLanguageNumericExpr(val expr1: ScriptLanguageNumericExpr, val expr2: ScriptLanguageNumericExpr) : ScriptLanguageNumericExpr()
 data class Minus_ScriptLanguageNumericExpr(val expr1: ScriptLanguageNumericExpr, val expr2: ScriptLanguageNumericExpr) : ScriptLanguageNumericExpr()
 
@@ -67,6 +68,8 @@ fun eval(expr: ScriptLanguageNumericExpr, intValues: Map<String, Int>, booleanVa
             if (intValues.containsKey(expr.name)) intValues[expr.name]!!
             else throw VariableIsNotAffectedException(expr.name)
         }
+        is Modulo_ScriptLanguageNumericExpr -> eval(expr.expr1, intValues, booleanValues) %
+                eval(expr.expr2, intValues, booleanValues)
         is Plus_ScriptLanguageNumericExpr -> eval(expr.expr1, intValues, booleanValues) +
                 eval(expr.expr2, intValues, booleanValues)
         is Minus_ScriptLanguageNumericExpr -> eval(expr.expr1, intValues, booleanValues) -

@@ -250,6 +250,13 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
         return LiteralScriptLanguageNumericExpr(value = literalValue)
     }
 
+    override fun visitModuloNumericExpr(ctx: ScriptLanguageParser.ModuloNumericExprContext?): ScriptLanguageGenericExpr {
+        val expr1 = visit(ctx?.numericExpr(0)) as ScriptLanguageNumericExpr
+        val expr2 = visit(ctx?.numericExpr(1)) as ScriptLanguageNumericExpr
+
+        return Modulo_ScriptLanguageNumericExpr(expr1 = expr1, expr2 = expr2)
+    }
+
     override fun visitPlusMinusNumericExpr(ctx: ScriptLanguageParser.PlusMinusNumericExprContext?): ScriptLanguageGenericExpr {
         val expr1 = visit(ctx?.numericExpr(0)) as ScriptLanguageNumericExpr
         val expr2 = visit(ctx?.numericExpr(1)) as ScriptLanguageNumericExpr
