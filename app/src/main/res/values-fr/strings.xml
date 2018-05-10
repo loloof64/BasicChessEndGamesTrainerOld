@@ -152,4 +152,5 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
         <item>Tour</item>
         <item>Dame</item>
     </string-array>
+    <string name="update_constraint">Mettre à jour</string>
 </resources>
