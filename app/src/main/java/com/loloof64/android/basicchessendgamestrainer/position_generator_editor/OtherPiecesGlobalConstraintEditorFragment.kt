@@ -26,6 +26,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
 import kotlinx.android.synthetic.main.fragment_editing_other_pieces_global_constraint.*
@@ -54,6 +55,7 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
                 else spinnerPiecesKindValues[currentPieceKindIndex]
             if (currentPieceKind != null) {
                 scriptsByPieceKind[currentPieceKind] = generator_editor_field_other_piece_global_constraint.text.toString()
+                Toast.makeText(activity, R.string.updated_script, Toast.LENGTH_SHORT).show()
             }
         }
 
