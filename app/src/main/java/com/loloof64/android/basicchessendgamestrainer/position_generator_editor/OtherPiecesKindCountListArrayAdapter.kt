@@ -25,10 +25,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
-import android.widget.LinearLayout
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorEditorActivity
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
@@ -83,22 +80,12 @@ class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Ad
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        fun getColorFromId(colorId: Int) : Int {
-            val context = MyApplication.getApplicationContext()
-            return ResourcesCompat.getColor(context!!.resources, colorId, null)
-        }
-
         val resources = MyApplication.appContext.resources
         val item = PositionGeneratorValuesHolder.otherPiecesCount[position]
 
-        holder.countTextView.text = item.count.toString()
-        holder.countTextView.setBackgroundColor(getColorFromId(R.color.other_piece_count_color))
-
+        holder.countSpinner.setSelection(item.count - 1)
         holder.ownerTextView.text = resources.getStringArray(R.array.player_computer_spinner)[item.pieceKind.side.ordinal]
-        holder.ownerTextView.setBackgroundColor(getColorFromId(R.color.other_piece_owner_color))
-
         holder.typeTextView.text = resources.getStringArray(R.array.piece_type_spinner)[item.pieceKind.pieceType.ordinal]
-        holder.typeTextView.setBackgroundColor(getColorFromId(R.color.other_piece_type_color))
 
         holder.deleteButton.setOnClickListener(DeleteButtonClickListener(pieceKind = item.pieceKind, activityRef = activityRef, adapter = this, position = position))
     }
@@ -145,7 +132,7 @@ class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Ad
     companion object {
         class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
             val deleteButton: ImageButton = view.findViewById(R.id.delete_piece_kind_count)
-            val countTextView:TextView = view.findViewById(R.id.text_view_piece_kind_count)
+            val countSpinner:Spinner = view.findViewById(R.id.spinner_piece_kind_count)
             val ownerTextView:TextView = view.findViewById(R.id.text_view_piece_kind_owner)
             val typeTextView: TextView = view.findViewById(R.id.text_view_piece_kind_type)
         }

@@ -14,18 +14,21 @@
         android:src="@mipmap/ic_action_delete"
         android:contentDescription="@string/delete_piece_kind_count"/>
 
-    <TextView
-        android:id="@+id/text_view_piece_kind_count"
-        android:layout_weight="1"
+    <Spinner
+        android:id="@+id/spinner_piece_kind_count"
+        android:layout_weight="3"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:gravity="center"/>
+        android:gravity="center"
+        android:entries="@array/piece_kind_count_spinner"
+        />
 
     <TextView
         android:id="@+id/text_view_piece_kind_type"
         android:layout_weight="4"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:background="@color/other_piece_type_color"
         android:gravity="center"/>
 
     <TextView
@@ -33,6 +36,7 @@
         android:layout_weight="4"
         android:layout_width="0dp"
         android:layout_height="match_parent"
+        android:background="@color/other_piece_owner_color"
         android:gravity="center"/>
 
 </LinearLayout>

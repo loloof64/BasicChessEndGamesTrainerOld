@@ -39,30 +39,6 @@ class OtherPiecesCountConstraintEditorFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val spinnerCountAdapter = ArrayAdapter.createFromResource(
-                activity,
-                R.array.piece_kind_count_spinner,
-                android.R.layout.simple_spinner_item
-        )
-        spinnerCountAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner_add_piece_kind_count.adapter = spinnerCountAdapter
-
-        val spinnerOwnerAdapter = ArrayAdapter.createFromResource(
-            activity,
-                R.array.player_computer_spinner,
-                android.R.layout.simple_spinner_item
-        )
-        spinnerOwnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner_add_piece_kind_owner.adapter = spinnerOwnerAdapter
-
-        val spinnerKindAdapter = ArrayAdapter.createFromResource(
-                activity,
-                R.array.piece_type_spinner,
-                android.R.layout.simple_spinner_item
-        )
-        spinnerKindAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinner_add_piece_kind_type.adapter = spinnerKindAdapter
-
         listViewAdapter = OtherPiecesKindCountListArrayAdapter(activity!!)
         recycler_view_other_pieces_count.layoutManager = LinearLayoutManager(activity!!)
         recycler_view_other_pieces_count.adapter = listViewAdapter
