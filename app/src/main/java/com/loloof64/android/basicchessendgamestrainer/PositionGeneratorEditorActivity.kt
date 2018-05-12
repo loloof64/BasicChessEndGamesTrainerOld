@@ -57,6 +57,49 @@ object PositionGeneratorValuesHolder {
     var otherPiecesMutualConstraintScript = ""
     var otherPiecesIndexedConstraintScript = ""
     var resultShouldBeDraw = false
+
+    fun weCanSafelyAddThisPieceKindCount(kindCountToAdd: PieceKindCount): Boolean {
+        if (kindCountToAdd.pieceKind.pieceType == PieceType.King) return false
+        if (otherPieceKindCountAlreadySetFor(kindCountToAdd)) return false
+        if (aboutToAddTooManyPawnsWith(kindCountToAdd) || aboutToAddTooManyQueensWith(kindCountToAdd)) return false
+        if (aSideIsAboutToHaveTooManyPiecesWhenAdding(kindCountToAdd)) return false
+
+        return true
+    }
+
+    fun otherPieceKindCountAlreadySetFor(kindCountToAdd: PieceKindCount) : Boolean {
+        return otherPiecesCount.any { it.pieceKind == kindCountToAdd.pieceKind }
+    }
+
+    fun aboutToAddTooManyQueensWith(kindCountToAdd: PieceKindCount) : Boolean {
+        return kindCountToAdd.pieceKind.pieceType == PieceType.Queen &&
+                kindCountToAdd.count > 9
+    }
+
+    fun aboutToAddTooManyPawnsWith(kindCountToAdd: PieceKindCount): Boolean {
+        return kindCountToAdd.pieceKind.pieceType == PieceType.Pawn &&
+                kindCountToAdd.count > 8
+    }
+
+    fun aSideIsAboutToHaveTooManyPiecesWhenAdding(kindCountToAdd: PieceKindCount) : Boolean {
+        val futurePieceCountState = PositionGeneratorValuesHolder.otherPiecesCount.toMutableList()
+        futurePieceCountState.add(kindCountToAdd)
+        val playerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Player }.map { it.count }.sum()
+        val computerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Computer }.map { it.count }.sum()
+
+        return playerPiecesCount > 15 || computerPiecesCount > 15
+    }
+
+    fun aSideIsAboutToHaveTooManyPiecesWhenModifying(kindCountToModifyIndex: Int, newCount: Int) : Boolean {
+        val futurePieceCountState = PositionGeneratorValuesHolder.otherPiecesCount.toMutableList()
+        val oldPieceKindCount = futurePieceCountState[kindCountToModifyIndex]
+        val newPieceKindCount = oldPieceKindCount.copy(count = newCount)
+        futurePieceCountState[kindCountToModifyIndex] = newPieceKindCount
+        val playerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Player }.map { it.count }.sum()
+        val computerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Computer }.map { it.count }.sum()
+
+        return playerPiecesCount > 15 || computerPiecesCount > 15
+    }
 }
 
 data class MessageToShowInDialogEvent(val title: String, val message: String)

@@ -20,7 +20,6 @@ package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.support.v4.content.res.ResourcesCompat
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -70,9 +69,10 @@ data class PieceKindCount(val pieceKind: PieceKind, val count: Int){
     }
 }
 
-class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Adapter<OtherPiecesKindCountListArrayAdapter.Companion.ViewHolder>() {
+class OtherPiecesKindCountListArrayAdapter(private val activity: Activity) : RecyclerView.Adapter<OtherPiecesKindCountListArrayAdapter.Companion.ViewHolder>() {
 
-    private val activityRef = WeakReference(activity)
+    private var lastPieceKindCountSelectionIndex = -1
+    private lateinit var viewHolder: ViewHolder
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layout = LayoutInflater.from(parent.context).inflate(R.layout.other_pieces_count_list_row, parent, false) as LinearLayout
@@ -80,14 +80,16 @@ class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Ad
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        viewHolder = holder
         val resources = MyApplication.appContext.resources
-        val item = PositionGeneratorValuesHolder.otherPiecesCount[position]
+        val item = PositionGeneratorValuesHolder.otherPiecesCount[holder.adapterPosition]
 
         holder.countSpinner.setSelection(item.count - 1)
+        holder.countSpinner.onItemSelectedListener = PieceKindCountSpinnerSelectedItemListener(adapter = this, pieceKindItemIndex = holder.adapterPosition)
         holder.ownerTextView.text = resources.getStringArray(R.array.player_computer_spinner)[item.pieceKind.side.ordinal]
         holder.typeTextView.text = resources.getStringArray(R.array.piece_type_spinner)[item.pieceKind.pieceType.ordinal]
 
-        holder.deleteButton.setOnClickListener(DeleteButtonClickListener(pieceKind = item.pieceKind, activityRef = activityRef, adapter = this, position = position))
+        holder.deleteButton.setOnClickListener(DeleteButtonClickListener(pieceKind = item.pieceKind, activity = activity, adapter = this, position = holder.adapterPosition))
     }
 
     override fun getItemCount(): Int {
@@ -99,34 +101,52 @@ class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Ad
         notifyDataSetChanged()
     }
 
-    fun tryToAddPieceCount(currentDefinedPieceCount: PieceKindCount) {
-        val notSetYetForThisPieceKind =
-                PositionGeneratorValuesHolder.otherPiecesCount.none {
-                    it.pieceKind == currentDefinedPieceCount.pieceKind
-                }
-        if (notSetYetForThisPieceKind) {
-            val tooManyQueens = currentDefinedPieceCount.pieceKind.pieceType == PieceType.Queen &&
-                    currentDefinedPieceCount.count > 9
-            val tooManyPawns = currentDefinedPieceCount.pieceKind.pieceType == PieceType.Pawn &&
-                    currentDefinedPieceCount.count > 8
-            val futurePieceCountState = PositionGeneratorValuesHolder.otherPiecesCount.toMutableList()
-            futurePieceCountState.add(currentDefinedPieceCount)
-            val playerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Player }.map { it.count }.sum()
-            val computerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Computer }.map { it.count }.sum()
-
-            val tooManyPieces = playerPiecesCount > 15 || computerPiecesCount > 15
+    fun tryToAddPieceCount(pieceCountToAdd: PieceKindCount) {
+        if ( ! PositionGeneratorValuesHolder.otherPieceKindCountAlreadySetFor(pieceCountToAdd) ) {
             when {
-                tooManyQueens -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_queens, Toast.LENGTH_LONG).show()
-                tooManyPawns -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pawns, Toast.LENGTH_LONG).show()
-                tooManyPieces -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pieces, Toast.LENGTH_LONG).show()
+                PositionGeneratorValuesHolder.aboutToAddTooManyQueensWith(pieceCountToAdd) -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_queens, Toast.LENGTH_LONG).show()
+                PositionGeneratorValuesHolder.aboutToAddTooManyPawnsWith(pieceCountToAdd) -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pawns, Toast.LENGTH_LONG).show()
+                PositionGeneratorValuesHolder.aSideIsAboutToHaveTooManyPiecesWhenAdding(pieceCountToAdd) -> Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pieces, Toast.LENGTH_LONG).show()
                 else -> {
-                    PositionGeneratorValuesHolder.otherPiecesCount.add(currentDefinedPieceCount)
+                    PositionGeneratorValuesHolder.otherPiecesCount.add(pieceCountToAdd)
                     notifyDataSetChanged()
                 }
             }
         } else {
             Toast.makeText(MyApplication.appContext, R.string.piece_kind_already_in_list, Toast.LENGTH_LONG).show()
         }
+    }
+
+    fun tryToModifyPieceCount(pieceKindItemIndex: Int, newCount: Int) : Boolean {
+        val oldPieceKindCount = PositionGeneratorValuesHolder.otherPiecesCount[pieceKindItemIndex]
+        val newPieceKindCount = oldPieceKindCount.copy(count = newCount)
+        when {
+            PositionGeneratorValuesHolder.aboutToAddTooManyQueensWith(newPieceKindCount) -> {
+                Toast.makeText(MyApplication.appContext, R.string.adding_too_many_queens, Toast.LENGTH_LONG).show()
+                return false
+            }
+            PositionGeneratorValuesHolder.aboutToAddTooManyPawnsWith(newPieceKindCount) -> {
+                Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pawns, Toast.LENGTH_LONG).show()
+                return false
+            }
+            PositionGeneratorValuesHolder.aSideIsAboutToHaveTooManyPiecesWhenModifying(pieceKindItemIndex, newCount) -> {
+                Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pieces, Toast.LENGTH_LONG).show()
+                return false
+            }
+            else -> {
+                PositionGeneratorValuesHolder.otherPiecesCount[pieceKindItemIndex] = newPieceKindCount
+                notifyDataSetChanged()
+                return true
+            }
+        }
+    }
+
+    fun setLastPieceKindCountItemSelectionIndex(position: Int) {
+        lastPieceKindCountSelectionIndex = position
+    }
+
+    fun setLastPieceKindCountItemSelectionIndexBackInCountSpinner() {
+        viewHolder.countSpinner.setSelection(lastPieceKindCountSelectionIndex)
     }
 
     companion object {
@@ -216,9 +236,11 @@ class OtherPiecesKindCountListArrayAdapter(activity: Activity) : RecyclerView.Ad
 
 class DeleteButtonClickListener(val pieceKind: PieceKind,
                                 adapter: OtherPiecesKindCountListArrayAdapter,
-                                val activityRef: WeakReference<Activity>,
+                                val activity: Activity,
                                 val position: Int) : View.OnClickListener {
+
     private val adapterRef = WeakReference(adapter)
+    private val activityRef = WeakReference(activity)
 
     override fun onClick(view: View?) {
         if (adapterRef.get() != null && view != null) {
@@ -242,4 +264,22 @@ class DeleteButtonClickListener(val pieceKind: PieceKind,
         alertDialogBuilder.show()
     }
 
+}
+
+class PieceKindCountSpinnerSelectedItemListener(adapter: OtherPiecesKindCountListArrayAdapter,
+                                                private val pieceKindItemIndex: Int) : AdapterView.OnItemSelectedListener {
+    private val adapterRef = WeakReference(adapter)
+
+    override fun onNothingSelected(parent: AdapterView<*>?) {
+        // not needed
+    }
+
+    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+        if (adapterRef.get()?.tryToModifyPieceCount(pieceKindItemIndex = pieceKindItemIndex, newCount = position + 1) == true){
+            adapterRef.get()?.setLastPieceKindCountItemSelectionIndex(position)
+        }
+        else {
+            adapterRef.get()?.setLastPieceKindCountItemSelectionIndexBackInCountSpinner()
+        }
+    }
 }
