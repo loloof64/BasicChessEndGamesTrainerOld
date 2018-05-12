@@ -71,21 +71,17 @@ data class PieceKindCount(val pieceKind: PieceKind, val count: Int){
 
 class OtherPiecesKindCountListArrayAdapter(private val activity: Activity) : RecyclerView.Adapter<OtherPiecesKindCountListArrayAdapter.Companion.ViewHolder>() {
 
-    private var lastPieceKindCountSelectionIndex = -1
-    private lateinit var viewHolder: ViewHolder
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layout = LayoutInflater.from(parent.context).inflate(R.layout.other_pieces_count_list_row, parent, false) as LinearLayout
         return ViewHolder(layout)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        viewHolder = holder
         val resources = MyApplication.appContext.resources
         val item = PositionGeneratorValuesHolder.otherPiecesCount[holder.adapterPosition]
 
         holder.countSpinner.setSelection(item.count - 1)
-        holder.countSpinner.onItemSelectedListener = PieceKindCountSpinnerSelectedItemListener(adapter = this, pieceKindItemIndex = holder.adapterPosition)
+        holder.countSpinner.onItemSelectedListener = PieceKindCountSpinnerSelectedItemListener(adapter = this, pieceKindCountLineIndex = holder.adapterPosition, holder = holder)
         holder.ownerTextView.text = resources.getStringArray(R.array.player_computer_spinner)[item.pieceKind.side.ordinal]
         holder.typeTextView.text = resources.getStringArray(R.array.piece_type_spinner)[item.pieceKind.pieceType.ordinal]
 
@@ -117,8 +113,8 @@ class OtherPiecesKindCountListArrayAdapter(private val activity: Activity) : Rec
         }
     }
 
-    fun tryToModifyPieceCount(pieceKindItemIndex: Int, newCount: Int) : Boolean {
-        val oldPieceKindCount = PositionGeneratorValuesHolder.otherPiecesCount[pieceKindItemIndex]
+    fun tryToModifyPieceCount(pieceKindLineIndex: Int, newCount: Int) : Boolean {
+        val oldPieceKindCount = PositionGeneratorValuesHolder.otherPiecesCount[pieceKindLineIndex]
         val newPieceKindCount = oldPieceKindCount.copy(count = newCount)
         when {
             PositionGeneratorValuesHolder.aboutToAddTooManyQueensWith(newPieceKindCount) -> {
@@ -129,24 +125,16 @@ class OtherPiecesKindCountListArrayAdapter(private val activity: Activity) : Rec
                 Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pawns, Toast.LENGTH_LONG).show()
                 return false
             }
-            PositionGeneratorValuesHolder.aSideIsAboutToHaveTooManyPiecesWhenModifying(pieceKindItemIndex, newCount) -> {
+            PositionGeneratorValuesHolder.aSideIsAboutToHaveTooManyPiecesWhenModifying(pieceKindLineIndex, newCount) -> {
                 Toast.makeText(MyApplication.appContext, R.string.adding_too_many_pieces, Toast.LENGTH_LONG).show()
                 return false
             }
             else -> {
-                PositionGeneratorValuesHolder.otherPiecesCount[pieceKindItemIndex] = newPieceKindCount
+                PositionGeneratorValuesHolder.otherPiecesCount[pieceKindLineIndex] = newPieceKindCount
                 notifyDataSetChanged()
                 return true
             }
         }
-    }
-
-    fun setLastPieceKindCountItemSelectionIndex(position: Int) {
-        lastPieceKindCountSelectionIndex = position
-    }
-
-    fun setLastPieceKindCountItemSelectionIndexBackInCountSpinner() {
-        viewHolder.countSpinner.setSelection(lastPieceKindCountSelectionIndex)
     }
 
     companion object {
@@ -155,6 +143,7 @@ class OtherPiecesKindCountListArrayAdapter(private val activity: Activity) : Rec
             val countSpinner:Spinner = view.findViewById(R.id.spinner_piece_kind_count)
             val ownerTextView:TextView = view.findViewById(R.id.text_view_piece_kind_owner)
             val typeTextView: TextView = view.findViewById(R.id.text_view_piece_kind_type)
+            var lastSelectedSpinnerIndex: Int = -1
         }
 
         private const val PawnCode = "P"
@@ -267,7 +256,8 @@ class DeleteButtonClickListener(val pieceKind: PieceKind,
 }
 
 class PieceKindCountSpinnerSelectedItemListener(adapter: OtherPiecesKindCountListArrayAdapter,
-                                                private val pieceKindItemIndex: Int) : AdapterView.OnItemSelectedListener {
+                                                private val pieceKindCountLineIndex: Int,
+                                                private val holder: OtherPiecesKindCountListArrayAdapter.Companion.ViewHolder) : AdapterView.OnItemSelectedListener {
     private val adapterRef = WeakReference(adapter)
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -275,11 +265,11 @@ class PieceKindCountSpinnerSelectedItemListener(adapter: OtherPiecesKindCountLis
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        if (adapterRef.get()?.tryToModifyPieceCount(pieceKindItemIndex = pieceKindItemIndex, newCount = position + 1) == true){
-            adapterRef.get()?.setLastPieceKindCountItemSelectionIndex(position)
-        }
-        else {
-            adapterRef.get()?.setLastPieceKindCountItemSelectionIndexBackInCountSpinner()
+        if (adapterRef.get()?.tryToModifyPieceCount(pieceKindLineIndex = pieceKindCountLineIndex, newCount = position + 1) == true) {
+            holder.lastSelectedSpinnerIndex = position
+        } else {
+            holder.countSpinner.setSelection(holder.lastSelectedSpinnerIndex)
         }
     }
+
 }
