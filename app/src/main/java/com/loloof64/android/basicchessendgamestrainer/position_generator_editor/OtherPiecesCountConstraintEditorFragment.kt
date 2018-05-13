@@ -54,7 +54,7 @@ class OtherPiecesCountConstraintEditorFragment: Fragment() {
                         pieceType = PieceType.values()[spinner_add_piece_kind_type.selectedItemPosition],
                         side = Side.values()[spinner_add_piece_kind_owner.selectedItemPosition]
                 ),
-                count = 1  + spinner_add_piece_kind_count.selectedItemPosition
+                count = 1
         )
     }
 

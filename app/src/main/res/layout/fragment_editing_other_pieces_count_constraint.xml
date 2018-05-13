@@ -11,18 +11,10 @@
         android:text="@string/button_add_piece_kind_count"/>
 
     <Spinner
-        android:id="@+id/spinner_add_piece_kind_count"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/button_add_piece_kind_count"
-        android:entries="@array/piece_kind_count_spinner"
-        />
-
-    <Spinner
         android:id="@+id/spinner_add_piece_kind_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_toEndOf="@id/spinner_add_piece_kind_count"
+        android:layout_toEndOf="@id/button_add_piece_kind_count"
         android:entries="@array/piece_type_spinner"
         />
 
