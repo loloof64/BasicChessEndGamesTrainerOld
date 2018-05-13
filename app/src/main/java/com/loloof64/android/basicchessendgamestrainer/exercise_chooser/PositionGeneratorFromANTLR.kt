@@ -30,7 +30,8 @@ class PositionGeneratorConstraintsExpr(
         val playerKingConstraint: ScriptLanguageBooleanExpr?,
         val computerKingConstraint: ScriptLanguageBooleanExpr?,
         val kingsMutualConstraint: ScriptLanguageBooleanExpr?,
-        val otherPiecesCountConstraint: List<EditorPieceKindCount>
+        val otherPiecesCountConstraint: List<EditorPieceKindCount>,
+        val otherPiecesGlobalConstraints: Map<EditorPieceKind, ScriptLanguageBooleanExpr?>
 )
 
 data class PositionGeneratorConstraintsScripts(
@@ -38,7 +39,8 @@ data class PositionGeneratorConstraintsScripts(
         val playerKingConstraint: String,
         val computerKingConstraint: String,
         val kingsMutualConstraint: String,
-        val otherPiecesCountConstraint: String
+        val otherPiecesCountConstraint: String,
+        val otherPiecesGlobalConstraints: String
 )
 
 object PositionGeneratorFromANTLR {
@@ -67,7 +69,8 @@ object PositionGeneratorFromANTLR {
             playerKingConstraint = null,
             computerKingConstraint = null,
             kingsMutualConstraint = null,
-            otherPiecesCountConstraint = listOf()
+            otherPiecesCountConstraint = listOf(),
+            otherPiecesGlobalConstraints = mapOf()
     )
 
     private val random = Random()
@@ -231,9 +234,29 @@ object PositionGeneratorFromANTLR {
                             pieceCell = coordinatesToChessCell(pieceCoordinates)
                     )
 
+                    val otherPiecesGlobalConstraintsIntValues = mapOf(
+                            "file" to pieceCoordinates.file,
+                            "rank" to pieceCoordinates.rank,
+                            "playerKingFile" to playerKingCell.file,
+                            "playerKingRank" to playerKingCell.rank,
+                            "computerKingFile" to computerKingCell.file,
+                            "computerKingRank" to computerKingCell.rank
+                    )
+
+                    val commonOtherPiecesConstraintBooleanValues = mapOf(
+                            "playerHasWhite" to playerHasWhite
+                    )
+
+                    val currentPieceGlobalConstraint = allConstraints.otherPiecesGlobalConstraints[kind]
+                    val positionDoesNotRespectCurrentPieceGlobalConstraint =
+                            if (currentPieceGlobalConstraint == null) false
+                            else ! eval(currentPieceGlobalConstraint,
+                                    otherPiecesGlobalConstraintsIntValues,
+                                    commonOtherPiecesConstraintBooleanValues)
                     val forbiddenPosition = tempPosition == null ||
                             computerKingInChessForPosition(tempPosition, playerHasWhite) ||
-                            ! ICTKChessLib.isLegalPositionString(tempPosition)
+                            ! ICTKChessLib.isLegalPositionString(tempPosition) ||
+                            positionDoesNotRespectCurrentPieceGlobalConstraint
                     if (forbiddenPosition) continue
 
                     currentPosition = ICTKChessLib.buildPositionFromString(tempPosition!!)

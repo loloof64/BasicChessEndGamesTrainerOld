@@ -38,6 +38,7 @@ import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBuilder
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.antlr4.ScriptLanguageParser
 import com.loloof64.android.basicchessendgamestrainer.utils.FilesManager
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.PieceKind as EditorPieceKind
 import com.nightonke.boommenu.BoomButtons.OnBMClickListener
 import com.nightonke.boommenu.BoomButtons.TextOutsideCircleButton
 import kotlinx.android.synthetic.main.fragment_custom_exercise_chooser.*
@@ -218,12 +219,16 @@ class CustomExerciseChooserFragment : Fragment() {
         fun String?.doesNotStartOtherPiecesGlobalConstraintOrEndFile(): Boolean =
                 this != null && this != FilesManager.otherPiecesGlobalHeader
 
+        fun String?.doesNotStartOtherPiecesMutualConstraintOrEndFile(): Boolean =
+                this != null && this != FilesManager.otherPiecesMutualHeader
+
         val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.name == exerciseNameWithExtension }
         if (exerciseFile != null){
             val playerKingConstraintBuilder = StringBuilder()
             val computerKingConstraintBuilder = StringBuilder()
             val kingsMutualConstraintBuilder = StringBuilder()
             val otherPiecesCountBuilder = StringBuilder()
+            val otherPiecesGlobalBuilder = StringBuilder()
             var resultShouldBeDraw = false
 
             BufferedReader(FileReader(exerciseFile)).use {
@@ -273,6 +278,15 @@ class CustomExerciseChooserFragment : Fragment() {
                         // We must not add any other line for this script !
                     }
                 } while (currentLine.doesNotStartOtherPiecesGlobalConstraintOrEndFile())
+
+                //filling other pieces global constraint string
+                do {
+                    currentLine = it.readLine()
+                    if (currentLine.doesNotStartOtherPiecesMutualConstraintOrEndFile()) {
+                        otherPiecesGlobalBuilder.append(currentLine)
+                        otherPiecesGlobalBuilder.append('\n')
+                    }
+                } while (currentLine.doesNotStartKingsMutualConstraintOrEndFile())
             }
 
             return PositionGeneratorConstraintsScripts(
@@ -280,7 +294,8 @@ class CustomExerciseChooserFragment : Fragment() {
                     playerKingConstraint = playerKingConstraintBuilder.toString(),
                     computerKingConstraint = computerKingConstraintBuilder.toString(),
                     kingsMutualConstraint = kingsMutualConstraintBuilder.toString(),
-                    otherPiecesCountConstraint = otherPiecesCountBuilder.toString()
+                    otherPiecesCountConstraint = otherPiecesCountBuilder.toString(),
+                    otherPiecesGlobalConstraints = otherPiecesGlobalBuilder.toString()
             )
         }
         else {
@@ -298,7 +313,8 @@ class CustomExerciseChooserFragment : Fragment() {
                     playerKingConstraint = buildScriptExprFromString(constraintsScripts.playerKingConstraint),
                     computerKingConstraint = buildScriptExprFromString(constraintsScripts.computerKingConstraint),
                     kingsMutualConstraint = buildScriptExprFromString(constraintsScripts.kingsMutualConstraint),
-                    otherPiecesCountConstraint = OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(constraintsScripts.otherPiecesCountConstraint)
+                    otherPiecesCountConstraint = OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(constraintsScripts.otherPiecesCountConstraint),
+                    otherPiecesGlobalConstraints = buildMapAssociatingPieceKindToScriptExprFromString(constraintsScripts.otherPiecesGlobalConstraints)
             )
     }
 
@@ -314,6 +330,23 @@ class CustomExerciseChooserFragment : Fragment() {
         val tree = parser.scriptLanguage()
         ScriptLanguageBuilder.clearVariables()
         return ScriptLanguageBuilder.visit(tree) as ScriptLanguageBooleanExpr
+    }
+
+    private fun buildMapAssociatingPieceKindToScriptExprFromString(stringOfConstraints: String): Map<EditorPieceKind, ScriptLanguageBooleanExpr?> {
+        val scriptsMap = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(stringOfConstraints)
+        val output = mutableMapOf<EditorPieceKind, ScriptLanguageBooleanExpr?>()
+
+        scriptsMap.keys.forEach {
+            val associatedScript = scriptsMap[it]
+            if (associatedScript != null) {
+                output[it] = buildScriptExprFromString(associatedScript)
+            }
+            else {
+                output[it] = null
+            }
+        }
+
+        return output.toMap()
     }
 
     override fun onStart() {

@@ -91,6 +91,56 @@ object PositionGeneratorValuesHolder {
 
         return playerPiecesCount > 15 || computerPiecesCount > 15
     }
+
+    fun pieceKindConstraintMapSerializationString(pieceKindMap: Map<PieceKind, String>): String {
+        val builder = StringBuilder()
+
+        pieceKindMap.keys.forEach {
+            builder.append(FilesManager.PIECE_CONSTRAINT_SEPARATOR)
+            builder.append(FilesManager.NEW_LINE)
+            builder.append(it.toString())
+            builder.append(FilesManager.NEW_LINE)
+            builder.append(FilesManager.PIECE_CONSTRAINT_SEPARATOR)
+            builder.append(FilesManager.NEW_LINE)
+            builder.append(pieceKindMap[it])
+            builder.append(FilesManager.NEW_LINE)
+        }
+
+        return builder.toString()
+    }
+
+    fun pieceKindConstraintMapDeserializedFromString(serializedMap: String) : MutableMap<PieceKind, String> {
+        if (serializedMap.isEmpty()) return mutableMapOf()
+
+        val lines = serializedMap.split(FilesManager.NEW_LINE)
+        var editedPieceKind: PieceKind? = null
+        var isChangingEditedPieceKind = false
+        val output = mutableMapOf<PieceKind, String>()
+
+        lines.forEach {
+            if (it == FilesManager.PIECE_CONSTRAINT_SEPARATOR){
+                isChangingEditedPieceKind = !isChangingEditedPieceKind
+            }
+            else {
+                if (it != FilesManager.NEW_LINE) {
+                    if (isChangingEditedPieceKind){
+                        val pieceKindRegex = """PieceKind\(pieceType=(\w+), side=(\w+)\)""".toRegex()
+                        val (pieceTypeStr, sideStr) = pieceKindRegex.find(it)!!.destructured
+                        val pieceType = PieceType.valueOf(pieceTypeStr)
+                        val side = Side.valueOf(sideStr)
+                        editedPieceKind = PieceKind(pieceType = pieceType, side = side)
+                        output[editedPieceKind!!] = ""
+                    }
+                    else {
+                        output[editedPieceKind!!] = output[editedPieceKind!!] + it + FilesManager.NEW_LINE
+                    }
+                }
+            }
+        }
+
+        return output
+    }
+
 }
 
 data class MessageToShowInDialogEvent(val title: String, val message: String)
@@ -162,9 +212,9 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 PositionGeneratorValuesHolder.otherPiecesCount.clear()
                 PositionGeneratorValuesHolder.otherPiecesCount.addAll(OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(
                         intent.extras?.getString(otherPiecesCountKey) ?: ""))
-                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
-                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
-                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
+                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
+                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
+                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
                 isEditingAnExistingFile = true
                 currentEditedFileName = intent.extras?.getString(editedFileNameKey)!!
             } else {
@@ -282,9 +332,9 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         outState?.putString(otherPiecesCountKey,
                 OtherPiecesKindCountListArrayAdapter.stringFromPiecesCount(PositionGeneratorValuesHolder.otherPiecesCount)
         )
-        outState?.putString(otherPiecesGlobalConstraintScriptKey, pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts))
-        outState?.putString(otherPiecesMutualConstraintScriptKey, pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts))
-        outState?.putString(otherPiecesIndexedConstraintScriptKey, pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts))
+        outState?.putString(otherPiecesGlobalConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts))
+        outState?.putString(otherPiecesMutualConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts))
+        outState?.putString(otherPiecesIndexedConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts))
 
         super.onSaveInstanceState(outState)
     }
@@ -303,58 +353,9 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         PositionGeneratorValuesHolder.otherPiecesCount.addAll(
                 OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(savedInstanceState?.getString(otherPiecesCountKey) ?: "")
         )
-        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
-        PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
-        PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
-    }
-
-    private fun pieceKindConstraintMapSerializationString(pieceKindMap: Map<PieceKind, String>): String {
-        val builder = StringBuilder()
-
-        pieceKindMap.keys.forEach {
-            builder.append(FilesManager.PIECE_CONSTRAINT_SEPARATOR)
-            builder.append(FilesManager.NEW_LINE)
-            builder.append(it.toString())
-            builder.append(FilesManager.NEW_LINE)
-            builder.append(FilesManager.PIECE_CONSTRAINT_SEPARATOR)
-            builder.append(FilesManager.NEW_LINE)
-            builder.append(pieceKindMap[it])
-            builder.append(FilesManager.NEW_LINE)
-        }
-
-        return builder.toString()
-    }
-
-    private fun pieceKindConstraintMapDeserializedFromString(serializedMap: String) : MutableMap<PieceKind, String> {
-        if (serializedMap.isEmpty()) return mutableMapOf()
-
-        val lines = serializedMap.split(FilesManager.NEW_LINE)
-        var editedPieceKind: PieceKind? = null
-        var isChangingEditedPieceKind = false
-        val output = mutableMapOf<PieceKind, String>()
-
-        lines.forEach {
-            if (it == FilesManager.PIECE_CONSTRAINT_SEPARATOR){
-                isChangingEditedPieceKind = !isChangingEditedPieceKind
-            }
-            else {
-                if (it != FilesManager.NEW_LINE) {
-                    if (isChangingEditedPieceKind){
-                        val pieceKindRegex = """PieceKind\(pieceType=(\w+), side=(\w+)\)""".toRegex()
-                        val (pieceTypeStr, sideStr) = pieceKindRegex.find(it)!!.destructured
-                        val pieceType = PieceType.valueOf(pieceTypeStr)
-                        val side = Side.valueOf(sideStr)
-                        editedPieceKind = PieceKind(pieceType = pieceType, side = side)
-                        output[editedPieceKind!!] = ""
-                    }
-                    else {
-                        output[editedPieceKind!!] = output[editedPieceKind!!] + it + FilesManager.NEW_LINE
-                    }
-                }
-            }
-        }
-
-        return output
+        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
+        PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
+        PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
     }
 
     fun showAlertDialog(title : String, message: String) {
@@ -406,6 +407,14 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         contentBuilder.append(FilesManager.NEW_LINE)
         contentBuilder.append(OtherPiecesKindCountListArrayAdapter.stringFromPiecesCount(
                 PositionGeneratorValuesHolder.otherPiecesCount))
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
+
+        contentBuilder.append(FilesManager.otherPiecesGlobalHeader)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(
+                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts))
         contentBuilder.append(FilesManager.NEW_LINE)
         contentBuilder.append(FilesManager.NEW_LINE)
 
