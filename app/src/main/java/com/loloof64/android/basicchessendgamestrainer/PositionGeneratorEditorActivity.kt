@@ -187,7 +187,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                         iconId = R.mipmap.ic_action_save,
                         colorId = R.color.position_generator_activity_boom_menu_action_save,
                         listener = PositionGeneratorEditorActivityBoomButtonListener(allFragments, {
-                            val playerKingFragment = it[0] as PlayerKingConstraintEditorFragment
+                            val playerKingFragment = it[PlayerKingConstraintEditorFragmentIndex] as PlayerKingConstraintEditorFragment
                             val allScriptsAreGood =
                                     playerKingFragment.checkIsScriptIsValidAndShowEventualError()
                             if (allScriptsAreGood){

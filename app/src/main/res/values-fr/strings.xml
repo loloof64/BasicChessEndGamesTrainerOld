@@ -154,4 +154,5 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     </string-array>
     <string name="update_constraint">Mettre à jour</string>
     <string name="updated_script">Script mis à jour pour ce type de pièce.</string>
+    <string name="other_pieces_global_constraints_script_error_title">Contraintes globales autres pièces (%s)</string>
 </resources>

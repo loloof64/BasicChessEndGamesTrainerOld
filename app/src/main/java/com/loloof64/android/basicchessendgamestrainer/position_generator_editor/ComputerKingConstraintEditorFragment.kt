@@ -69,9 +69,9 @@ class ComputerKingConstraintEditorFragment : Fragment() {
         )
         val sampleBooleanValues = mapOf("playerHasWhite" to true)
 
-        return ScriptLanguageBuilder.checkIsScriptIsValidAndShowEventualError(
+        return ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
                 script = PositionGeneratorValuesHolder.computerKingConstraintScript,
-                scriptSectionTitleId = R.string.computer_king_constraints,
+                scriptSectionTitle = activity?.getString(R.string.computer_king_constraints) ?: "#[TitleFetchingError]",
                 sampleIntValues = samplesIntValues,
                 sampleBooleanValues = sampleBooleanValues
         )

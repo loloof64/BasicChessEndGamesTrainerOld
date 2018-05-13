@@ -269,16 +269,15 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
         }
     }
 
-    fun checkIsScriptIsValidAndShowEventualError(script: String, scriptSectionTitleId: Int,
-                                                 sampleIntValues: Map<String, Int>,
-                                                 sampleBooleanValues: Map<String, Boolean>): Boolean {
+    fun checkIfScriptIsValidAndShowFirstEventualError(script: String, scriptSectionTitle: String,
+                                                      sampleIntValues: Map<String, Int>,
+                                                      sampleBooleanValues: Map<String, Boolean>): Boolean {
         val scriptIsEmpty = script.isEmpty()
         if (scriptIsEmpty){
             val resources = MyApplication.appContext.resources
-            val title = resources.getString(scriptSectionTitleId)
             val errorMessage = resources.getString(R.string.empty_script_error)
 
-            RxEventBus.send(MessageToShowInDialogEvent(title, errorMessage))
+            RxEventBus.send(MessageToShowInDialogEvent(scriptSectionTitle, errorMessage))
             return true
         }
 
@@ -295,10 +294,8 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
             val messageFormat = resources.getString(R.string.parser_variable_not_affected)
             val message = String.format(messageFormat ?: "<Internal error : could not open format string !>", ex.name)
 
-            val constraintTypeStr = resources.getString(scriptSectionTitleId)
-
             val titleFormat = resources.getString(R.string.parse_error_dialog_title)
-            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
+            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", scriptSectionTitle)
             RxEventBus.send(MessageToShowInDialogEvent(title, message))
 
             false
@@ -306,9 +303,8 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
         catch (ex: ParseCancellationException){
             val message = ex.message ?: "<Internal error : could not get ParseCancellationException message !>"
             val resources = MyApplication.appContext.resources
-            val constraintTypeStr = resources.getString(scriptSectionTitleId)
             val titleFormat = resources.getString(R.string.parse_error_dialog_title)
-            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", constraintTypeStr)
+            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", scriptSectionTitle)
             RxEventBus.send(MessageToShowInDialogEvent(title, message))
             false
         }

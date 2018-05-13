@@ -89,9 +89,9 @@ class KingsMutualConstraintEditorFragment: Fragment() {
         )
         val sampleBooleanValues = mapOf("playerHasWhite" to true)
 
-        return ScriptLanguageBuilder.checkIsScriptIsValidAndShowEventualError(
+        return ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
                 script = PositionGeneratorValuesHolder.kingsMutualConstraintScript,
-                scriptSectionTitleId = R.string.kings_mutual_constraints,
+                scriptSectionTitle = activity?.getString(R.string.kings_mutual_constraints) ?: "#[TitleFetchingError]",
                 sampleIntValues = samplesIntValues,
                 sampleBooleanValues = sampleBooleanValues
         )

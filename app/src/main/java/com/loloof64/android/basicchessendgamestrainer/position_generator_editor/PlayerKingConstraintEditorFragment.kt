@@ -82,9 +82,9 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         )
         val sampleBooleanValues = mapOf("playerHasWhite" to true)
 
-       return ScriptLanguageBuilder.checkIsScriptIsValidAndShowEventualError(
+       return ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
                script = PositionGeneratorValuesHolder.playerKingConstraintScript,
-               scriptSectionTitleId = R.string.player_king_constraints,
+               scriptSectionTitle = activity?.getString(R.string.player_king_constraints) ?: "#[TitleFetchingError]",
                sampleIntValues = samplesIntValues,
                sampleBooleanValues = sampleBooleanValues
        )

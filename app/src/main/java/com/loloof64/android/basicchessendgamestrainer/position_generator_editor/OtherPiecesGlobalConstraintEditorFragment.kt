@@ -28,8 +28,11 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorEditorActivity
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
+import com.loloof64.android.basicchessendgamestrainer.exercise_chooser.PositionConstraints
+import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language.ScriptLanguageBuilder
 import kotlinx.android.synthetic.main.fragment_editing_other_pieces_global_constraint.*
 import java.lang.ref.WeakReference
 
@@ -52,8 +55,41 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
             OtherPiecesGlobalConstraintEditorFieldTextWatcher(parent = this)
         )
 
+        button_check_other_piece_global_constraint.setOnClickListener(CheckScriptButtonOnClickListener(activity as PositionGeneratorEditorActivity,
+            {parentActivity ->
+                if (checkIfAllScriptAreValidAndShowEventualError()) {
+                    val message = parentActivity.resources.getString(R.string.script_valid)
+                    parentActivity.showAlertDialog(title = "", message = message)
+                }
+            }))
+
         updatePieceKindsSpinnerAndLoadFirstScriptIfAny()
     }
+
+    fun checkIfAllScriptAreValidAndShowEventualError(): Boolean {
+        val samplesIntValues = mapOf(
+                "file" to PositionConstraints.FileA,
+                "rank" to PositionConstraints.Rank7,
+                "playerKingFile" to PositionConstraints.FileB,
+                "playerKingRank" to PositionConstraints.Rank1,
+                "computerKingFile" to PositionConstraints.FileD,
+                "computerKingRank" to PositionConstraints.Rank1
+        )
+        val sampleBooleanValues = mapOf("playerHasWhite" to true)
+
+        var allScriptsAreValid = true
+        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.keys.forEach {
+            allScriptsAreValid = allScriptsAreValid && ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
+                    script = PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts[it]!!,
+                    scriptSectionTitle = activity?.getString(R.string.other_pieces_global_constraints_script_error_title, it.toLocalString()) ?: "#[TitleFetchingError]",
+                    sampleIntValues = samplesIntValues,
+                    sampleBooleanValues = sampleBooleanValues
+            )
+        }
+
+        return allScriptsAreValid
+    }
+
 
     private fun updatePieceKindsSpinnerAndLoadFirstScriptIfAny() {
         loadSpinnerTitles()
