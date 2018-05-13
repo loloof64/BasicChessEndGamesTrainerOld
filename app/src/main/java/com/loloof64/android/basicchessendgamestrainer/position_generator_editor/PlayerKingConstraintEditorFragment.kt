@@ -51,7 +51,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         button_check_player_king_constraint.setOnClickListener(CheckScriptButtonOnClickListener(activity as PositionGeneratorEditorActivity,
                 {parentActivity ->
-                    if (checkIsScriptIsValidAndShowEventualError()) {
+                    if (checkIfScriptIsValidAndShowEventualError()) {
                         val message = parentActivity.resources.getString(R.string.script_valid)
                         parentActivity.showAlertDialog(title = "", message = message)
                     }
@@ -74,7 +74,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
         }
     }
 
-    fun checkIsScriptIsValidAndShowEventualError(): Boolean {
+    fun checkIfScriptIsValidAndShowEventualError(): Boolean {
 
         val samplesIntValues = mapOf(
                 "file" to PositionConstraints.FileA,

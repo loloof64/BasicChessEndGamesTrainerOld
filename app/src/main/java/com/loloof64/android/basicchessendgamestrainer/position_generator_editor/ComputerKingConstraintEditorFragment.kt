@@ -38,7 +38,7 @@ class ComputerKingConstraintEditorFragment : Fragment() {
         button_check_computer_king_constraint.setOnClickListener(CheckScriptButtonOnClickListener(
                 activity as PositionGeneratorEditorActivity,
                 {parentActivity ->
-                    if (checkIsScriptIsValidAndShowEventualError()) {
+                    if (checkIfScriptIsValidAndShowEventualError()) {
                         val message = parentActivity.resources.getString(R.string.script_valid)
                         parentActivity.showAlertDialog(title = "", message = message)
                     }
@@ -61,7 +61,7 @@ class ComputerKingConstraintEditorFragment : Fragment() {
         }
     }
 
-    private fun checkIsScriptIsValidAndShowEventualError(): Boolean {
+     fun checkIfScriptIsValidAndShowEventualError(): Boolean {
 
         val samplesIntValues = mapOf(
                 "file" to PositionConstraints.FileA,

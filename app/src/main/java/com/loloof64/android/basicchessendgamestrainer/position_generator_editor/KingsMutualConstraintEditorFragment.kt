@@ -41,7 +41,7 @@ class KingsMutualConstraintEditorFragment: Fragment() {
                 activity as PositionGeneratorEditorActivity,
                 {
                     parentActivity ->
-                    if (checkIsScriptIsValidAndShowEventualError()) {
+                    if (checkIfScriptIsValidAndShowEventualError()) {
                         val message = parentActivity.resources.getString(R.string.script_valid)
                         parentActivity.showAlertDialog(title = "", message = message)
                     }
@@ -79,7 +79,7 @@ class KingsMutualConstraintEditorFragment: Fragment() {
         }
     }
 
-    private fun checkIsScriptIsValidAndShowEventualError(): Boolean {
+    fun checkIfScriptIsValidAndShowEventualError(): Boolean {
 
         val samplesIntValues = mapOf(
                 "playerKingFile" to PositionConstraints.FileA,

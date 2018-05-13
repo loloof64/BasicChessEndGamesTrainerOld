@@ -46,7 +46,6 @@ import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 import java.io.IOException
 import java.lang.ref.WeakReference
-import java.util.logging.Logger
 
 
 object PositionGeneratorValuesHolder {
@@ -188,8 +187,14 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                         colorId = R.color.position_generator_activity_boom_menu_action_save,
                         listener = PositionGeneratorEditorActivityBoomButtonListener(allFragments, {
                             val playerKingFragment = it[PlayerKingConstraintEditorFragmentIndex] as PlayerKingConstraintEditorFragment
-                            val allScriptsAreGood =
-                                    playerKingFragment.checkIsScriptIsValidAndShowEventualError()
+                            val computerKingFragment = it[ComputerKingConstraintEditorFragmentIndex] as ComputerKingConstraintEditorFragment
+                            val mutualKingsFragment = it[KingsMutualConstraintEditorFragmentIndex] as KingsMutualConstraintEditorFragment
+                            val otherPieceGlobalFragment = it[OtherPiecesGlobalConstraintEditorFragmentIndex] as OtherPiecesGlobalConstraintEditorFragment
+                            val allScriptsAreGood = playerKingFragment.checkIfScriptIsValidAndShowEventualError() &&
+                                    computerKingFragment.checkIfScriptIsValidAndShowEventualError() &&
+                                    mutualKingsFragment.checkIfScriptIsValidAndShowEventualError() &&
+                                    otherPieceGlobalFragment.checkIfAllScriptAreValidAndShowEventualError()
+
                             if (allScriptsAreGood){
                                 if (isEditingAnExistingFile){
                                     askIfFileShouldBeOverwritten(currentEditedFileName)
