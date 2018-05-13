@@ -58,15 +58,6 @@ object PositionGeneratorValuesHolder {
     var otherPiecesIndexedConstraintScript = ""
     var resultShouldBeDraw = false
 
-    fun weCanSafelyAddThisPieceKindCount(kindCountToAdd: PieceKindCount): Boolean {
-        if (kindCountToAdd.pieceKind.pieceType == PieceType.King) return false
-        if (otherPieceKindCountAlreadySetFor(kindCountToAdd)) return false
-        if (aboutToAddTooManyPawnsWith(kindCountToAdd) || aboutToAddTooManyQueensWith(kindCountToAdd)) return false
-        if (aSideIsAboutToHaveTooManyPiecesWhenAdding(kindCountToAdd)) return false
-
-        return true
-    }
-
     fun otherPieceKindCountAlreadySetFor(kindCountToAdd: PieceKindCount) : Boolean {
         return otherPiecesCount.any { it.pieceKind == kindCountToAdd.pieceKind }
     }
