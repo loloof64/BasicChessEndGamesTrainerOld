@@ -18,6 +18,7 @@
 
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor.script_language
 
+import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.MessageToShowInDialogEvent
 import com.loloof64.android.basicchessendgamestrainer.R
@@ -275,9 +276,9 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
         val scriptIsEmpty = script.isEmpty()
         if (scriptIsEmpty){
             val resources = MyApplication.appContext.resources
-            val errorMessage = resources.getString(R.string.empty_script_error)
+            val scriptIgnoredMessage = resources.getString(R.string.empty_script_error)
 
-            RxEventBus.send(MessageToShowInDialogEvent(scriptSectionTitle, errorMessage))
+            Toast.makeText(MyApplication.appContext, scriptIgnoredMessage, Toast.LENGTH_LONG).show()
             return true
         }
 

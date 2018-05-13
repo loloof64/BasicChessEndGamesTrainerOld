@@ -106,7 +106,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="cancel">Annuler</string>
     <string name="parse_error_dialog_title">Erreur de script pour %s</string>
     <string name="menu_actions">Actions</string>
-    <string name="empty_script_error">Le script est vide : sera donc ignoré lors de la construction des positions.</string>
+    <string name="empty_script_error">Un script vide est simplement ignoré dans le processus de génération de position.</string>
     <string name="script_errors">Erreurs de scripts</string>
     <string name="correct_scripts_errors_first">Veuillez d\'abord corriger le(s) erreur(s) de script(s).</string>
     <string name="title_output_script_file_name">Nom du fichier de script à produire</string>

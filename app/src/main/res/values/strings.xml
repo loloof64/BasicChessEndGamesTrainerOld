@@ -102,7 +102,7 @@ of endgame.[CR][CR]
     <string name="cancel">Cancel</string>
     <string name="parse_error_dialog_title">Script error for %s</string>
     <string name="menu_actions">Actions</string>
-    <string name="empty_script_error">Script is empty : will be ignored during positions generation.</string>
+    <string name="empty_script_error">An empty script will simply be ignored during position generation process.</string>
     <string name="script_errors">Script errors</string>
     <string name="correct_scripts_errors_first">Please, first correct script(s) error(s).</string>
     <string name="title_output_script_file_name">Output script file name</string>
