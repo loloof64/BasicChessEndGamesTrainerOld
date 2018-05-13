@@ -52,20 +52,6 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
             OtherPiecesGlobalConstraintEditorFieldTextWatcher(parent = this)
         )
 
-        // TODO remove
-        /*
-        button_update_other_piece_global_constraint.setOnClickListener {
-            val currentPieceKindIndex = generator_editor_spinner_other_piece_global_constraint.selectedItemPosition
-            val currentPieceKind =
-                if (currentPieceKindIndex == Spinner.INVALID_POSITION) null
-                else spinnerPiecesKindValues[currentPieceKindIndex]
-            if (currentPieceKind != null) {
-                scriptsByPieceKind[currentPieceKind] = generator_editor_field_other_piece_global_constraint.text.toString()
-                Toast.makeText(activity, R.string.updated_script, Toast.LENGTH_SHORT).show()
-            }
-        }
-        */
-
         updatePieceKindsSpinnerAndLoadFirstScriptIfAny()
     }
 

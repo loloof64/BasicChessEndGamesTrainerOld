@@ -44,22 +44,7 @@ class ComputerKingConstraintEditorFragment : Fragment() {
                     }
                 }))
 
-        //TODO remove anonymous object
-        generator_editor_field_computer_king_constraint.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(str: Editable?) {
-                PositionGeneratorValuesHolder.computerKingConstraintScript = str?.toString() ?:
-                        "<Internal error : could not read updated computer king constraint field>"
-            }
-
-            override fun beforeTextChanged(str: CharSequence?, start: Int, count: Int, after: Int) {
-                // not needed
-            }
-
-            override fun onTextChanged(str: CharSequence?, start: Int, before: Int, count: Int) {
-                // not needed
-            }
-        })
-
+        generator_editor_field_computer_king_constraint.addTextChangedListener(ComputerKingConstraintFragmentTextWatcher())
         generator_editor_field_computer_king_constraint.setText(PositionGeneratorValuesHolder.computerKingConstraintScript)
     }
 
@@ -98,5 +83,20 @@ class ComputerKingConstraintEditorFragment : Fragment() {
         }
 
         const val SCRIPT_KEY = "Script"
+    }
+}
+
+class ComputerKingConstraintFragmentTextWatcher : TextWatcher {
+    override fun afterTextChanged(str: Editable?) {
+        PositionGeneratorValuesHolder.computerKingConstraintScript = str?.toString() ?:
+                "<Internal error : could not read updated computer king constraint field>"
+    }
+
+    override fun beforeTextChanged(str: CharSequence?, start: Int, count: Int, after: Int) {
+        // not needed
+    }
+
+    override fun onTextChanged(str: CharSequence?, start: Int, before: Int, count: Int) {
+        // not needed
     }
 }
