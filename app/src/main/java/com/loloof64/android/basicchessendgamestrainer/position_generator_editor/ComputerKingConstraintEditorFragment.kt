@@ -71,7 +71,7 @@ class ComputerKingConstraintEditorFragment : Fragment() {
 
         return ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
                 script = PositionGeneratorValuesHolder.computerKingConstraintScript,
-                scriptSectionTitle = activity?.getString(R.string.computer_king_constraints) ?: "#[TitleFetchingError]",
+                scriptSectionTitle = MyApplication.appContext.getString(R.string.computer_king_constraints) ?: "#[TitleFetchingError]",
                 sampleIntValues = samplesIntValues,
                 sampleBooleanValues = sampleBooleanValues
         )

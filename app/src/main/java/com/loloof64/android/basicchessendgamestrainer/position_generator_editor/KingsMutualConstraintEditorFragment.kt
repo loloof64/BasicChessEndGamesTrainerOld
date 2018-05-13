@@ -91,7 +91,7 @@ class KingsMutualConstraintEditorFragment: Fragment() {
 
         return ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
                 script = PositionGeneratorValuesHolder.kingsMutualConstraintScript,
-                scriptSectionTitle = activity?.getString(R.string.kings_mutual_constraints) ?: "#[TitleFetchingError]",
+                scriptSectionTitle = MyApplication.appContext.getString(R.string.kings_mutual_constraints) ?: "#[TitleFetchingError]",
                 sampleIntValues = samplesIntValues,
                 sampleBooleanValues = sampleBooleanValues
         )

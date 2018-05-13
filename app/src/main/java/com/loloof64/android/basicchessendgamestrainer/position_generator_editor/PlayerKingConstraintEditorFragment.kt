@@ -84,7 +84,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
 
        return ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
                script = PositionGeneratorValuesHolder.playerKingConstraintScript,
-               scriptSectionTitle = activity?.getString(R.string.player_king_constraints) ?: "#[TitleFetchingError]",
+               scriptSectionTitle = MyApplication.appContext.getString(R.string.player_king_constraints) ?: "#[TitleFetchingError]",
                sampleIntValues = samplesIntValues,
                sampleBooleanValues = sampleBooleanValues
        )

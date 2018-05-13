@@ -28,6 +28,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorEditorActivity
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
@@ -81,7 +82,7 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.keys.forEach {
             allScriptsAreValid = allScriptsAreValid && ScriptLanguageBuilder.checkIfScriptIsValidAndShowFirstEventualError(
                     script = PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts[it]!!,
-                    scriptSectionTitle = activity?.getString(R.string.other_pieces_global_constraints_script_error_title, it.toLocalString()) ?: "#[TitleFetchingError]",
+                    scriptSectionTitle = MyApplication.appContext.getString(R.string.other_pieces_global_constraints_script_error_title, it.toLocalString()) ?: "#[TitleFetchingError]",
                     sampleIntValues = samplesIntValues,
                     sampleBooleanValues = sampleBooleanValues
             )
