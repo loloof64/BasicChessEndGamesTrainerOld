@@ -57,6 +57,7 @@ class PlayerKingConstraintEditorFragment : Fragment() {
                     }
                 }))
 
+        //TODO remove anonymous object
         generator_editor_field_player_king_constraint.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(str: Editable?) {
                 PositionGeneratorValuesHolder.playerKingConstraintScript = str?.toString() ?:
@@ -64,11 +65,11 @@ class PlayerKingConstraintEditorFragment : Fragment() {
             }
 
             override fun beforeTextChanged(str: CharSequence?, start: Int, count: Int, after: Int) {
-
+                // not needed
             }
 
             override fun onTextChanged(str: CharSequence?, start: Int, before: Int, count: Int) {
-
+                // not needed
             }
         })
 

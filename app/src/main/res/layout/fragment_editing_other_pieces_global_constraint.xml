@@ -20,7 +20,8 @@
         android:textStyle="bold"
         android:text="@string/constraint_script"
         android:textSize="@dimen/label_for_fields_size"
-        android:layout_below="@id/generator_editor_spinner_other_piece_global_constraint"/>
+        android:layout_below="@id/generator_editor_spinner_other_piece_global_constraint"
+    />
 
     <Button
         android:id="@+id/button_check_other_piece_global_constraint"
@@ -28,18 +29,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@id/generator_editor_label_other_piece_global_constraint"
-        android:layout_toEndOf="@id/button_update_other_piece_global_constraint"
-        android:layout_below="@id/generator_editor_spinner_other_piece_global_constraint"/>
-
-    <Button
-        android:id="@+id/button_update_other_piece_global_constraint"
-        android:text="@string/update_constraint"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@id/generator_editor_label_other_piece_global_constraint"
         android:layout_toEndOf="@id/generator_editor_label_other_piece_global_constraint"
-        android:layout_below="@id/generator_editor_spinner_other_piece_global_constraint"
-        />
+        android:layout_below="@id/generator_editor_spinner_other_piece_global_constraint"/>
 
     <EditText
         android:id="@+id/generator_editor_field_other_piece_global_constraint"

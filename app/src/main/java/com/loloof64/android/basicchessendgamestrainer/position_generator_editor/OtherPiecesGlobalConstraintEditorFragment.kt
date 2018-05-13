@@ -20,13 +20,14 @@ package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
-import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.PositionGeneratorValuesHolder
 import com.loloof64.android.basicchessendgamestrainer.R
 import kotlinx.android.synthetic.main.fragment_editing_other_pieces_global_constraint.*
@@ -35,7 +36,6 @@ import java.lang.ref.WeakReference
 class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
 
     private var spinnerPiecesKindValues = listOf<PieceKind>()
-    private val scriptsByPieceKind = mutableMapOf<PieceKind, String>()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         return inflater.inflate(R.layout.fragment_editing_other_pieces_global_constraint, container, false)
@@ -43,11 +43,17 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         generator_editor_spinner_other_piece_global_constraint.onItemSelectedListener =
-                OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(this)
+                OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(parent = this)
 
         generator_editor_field_other_piece_global_constraint.text.clear()
         generator_editor_field_other_piece_global_constraint.isEnabled = false
 
+        generator_editor_field_other_piece_global_constraint.addTextChangedListener(
+            OtherPiecesGlobalConstraintEditorFieldTextWatcher(parent = this)
+        )
+
+        // TODO remove
+        /*
         button_update_other_piece_global_constraint.setOnClickListener {
             val currentPieceKindIndex = generator_editor_spinner_other_piece_global_constraint.selectedItemPosition
             val currentPieceKind =
@@ -58,13 +64,14 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
                 Toast.makeText(activity, R.string.updated_script, Toast.LENGTH_SHORT).show()
             }
         }
+        */
 
         updatePieceKindsSpinnerAndLoadFirstScriptIfAny()
     }
 
     private fun updatePieceKindsSpinnerAndLoadFirstScriptIfAny() {
         loadSpinnerTitles()
-        if (scriptsByPieceKind.isNotEmpty()) {
+        if (PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.isNotEmpty()) {
             generator_editor_spinner_other_piece_global_constraint.setSelection(0)
         }
     }
@@ -76,11 +83,11 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
     }
 
     fun deleteScriptAssociatedWithPieceKind(kind: PieceKind){
-        scriptsByPieceKind.remove(kind)
+        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.remove(kind)
     }
 
     fun clearAllScripts(){
-        scriptsByPieceKind.clear()
+        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.clear()
     }
 
     private fun loadSpinnerTitles() {
@@ -101,11 +108,16 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         if (spinnerPiecesKindValues.isNotEmpty()) {
             val selectedItemPosition = generator_editor_spinner_other_piece_global_constraint.selectedItemPosition
             val selectedPieceKind = spinnerPiecesKindValues[selectedItemPosition]
-            val associatedScript = scriptsByPieceKind[selectedPieceKind] ?: ""
+            val associatedScript = PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts[selectedPieceKind] ?: ""
 
             generator_editor_field_other_piece_global_constraint.isEnabled = true
             generator_editor_field_other_piece_global_constraint.setText(associatedScript)
         }
+    }
+
+    fun getEditedPieceKind() : PieceKind? {
+        if (generator_editor_spinner_other_piece_global_constraint.selectedItemPosition == Spinner.INVALID_POSITION) return null
+        return spinnerPiecesKindValues[generator_editor_spinner_other_piece_global_constraint.selectedItemPosition]
     }
 
 }
@@ -121,6 +133,28 @@ class OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(parent: OtherPie
 
     private fun setScriptToCurrent(){
         parentRef.get()?.loadScriptMatchingSpinnerSelection()
+    }
+
+    private val parentRef = WeakReference(parent)
+}
+
+class OtherPiecesGlobalConstraintEditorFieldTextWatcher(parent: OtherPiecesGlobalConstraintEditorFragment) : TextWatcher {
+
+
+    override fun afterTextChanged(s: Editable?) {
+        val editedPieceKind = parentRef.get()?.getEditedPieceKind()
+        if (editedPieceKind != null){
+            PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts[editedPieceKind] = s?.toString()
+                ?: "<Internal error : could not read updated other piece global constraint field>"
+        }
+    }
+
+    override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        // not needed
+    }
+
+    override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+        // not needed
     }
 
     private val parentRef = WeakReference(parent)

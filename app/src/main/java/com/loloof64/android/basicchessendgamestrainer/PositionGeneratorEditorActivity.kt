@@ -46,6 +46,7 @@ import kotlinx.android.synthetic.main.activity_position_generator_editor.*
 import kotlinx.android.synthetic.main.position_generator_editor_list_item.view.*
 import java.io.IOException
 import java.lang.ref.WeakReference
+import java.util.logging.Logger
 
 
 object PositionGeneratorValuesHolder {
@@ -53,9 +54,9 @@ object PositionGeneratorValuesHolder {
     var computerKingConstraintScript = ""
     var kingsMutualConstraintScript = ""
     val otherPiecesCount = mutableListOf<PieceKindCount>()
-    var otherPiecesGlobalConstraintScript = ""
-    var otherPiecesMutualConstraintScript = ""
-    var otherPiecesIndexedConstraintScript = ""
+    var otherPiecesGlobalConstraintScripts = mutableMapOf<PieceKind, String>()
+    var otherPiecesMutualConstraintScripts = mutableMapOf<PieceKind, String>()
+    var otherPiecesIndexedConstraintScripts = mutableMapOf<PieceKind, String>()
     var resultShouldBeDraw = false
 
     fun otherPieceKindCountAlreadySetFor(kindCountToAdd: PieceKindCount) : Boolean {
@@ -140,9 +141,9 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         const val computerKingConstraintScriptKey = "computerKingConstraintScript"
         const val kingsMutualConstraintScriptKey = "kingsMutualConstraintScript"
         const val otherPiecesCountKey = "otherPiecesCount"
-        const val otherPiecesGlobalConstraintScriptKey = "otherPiecesGlobalConstraintScript"
-        const val otherPiecesMutualConstraintScriptKey = "otherPiecesMutualConstraintScript"
-        const val otherPiecesIndexedConstraintScriptKey = "otherPiecesIndexedConstraintScript"
+        const val otherPiecesGlobalConstraintScriptKey = "otherPiecesGlobalConstraintScripts"
+        const val otherPiecesMutualConstraintScriptKey = "otherPiecesMutualConstraintScripts"
+        const val otherPiecesIndexedConstraintScriptKey = "otherPiecesIndexedConstraintScripts"
         const val editedFileNameKey = "editedFileName"
     }
 
@@ -162,9 +163,9 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 PositionGeneratorValuesHolder.otherPiecesCount.clear()
                 PositionGeneratorValuesHolder.otherPiecesCount.addAll(OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(
                         intent.extras?.getString(otherPiecesCountKey) ?: ""))
-                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScript = intent.extras?.getString(otherPiecesGlobalConstraintScriptKey) ?: ""
-                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScript = intent.extras?.getString(otherPiecesMutualConstraintScriptKey) ?: ""
-                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScript = intent.extras?.getString(otherPiecesIndexedConstraintScriptKey) ?: ""
+                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
+                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
+                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
                 isEditingAnExistingFile = true
                 currentEditedFileName = intent.extras?.getString(editedFileNameKey)!!
             } else {
@@ -173,9 +174,9 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 PositionGeneratorValuesHolder.computerKingConstraintScript = ""
                 PositionGeneratorValuesHolder.kingsMutualConstraintScript = ""
                 PositionGeneratorValuesHolder.otherPiecesCount.clear()
-                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScript = ""
-                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScript = ""
-                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScript = ""
+                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = mutableMapOf()
+                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = mutableMapOf()
+                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = mutableMapOf()
             }
 
         val boomMenuButtonPiecesNumber = position_generator_activity_boom_menu_button.piecePlaceEnum.pieceNumber()
@@ -266,7 +267,6 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
     }
 
     override fun onSaveInstanceState(outState: Bundle?) {
-        super.onSaveInstanceState(outState)
         outState?.putBoolean(isEditingAnExistingFileKey, isEditingAnExistingFile)
         outState?.putString(editedFileNameKey, currentEditedFileName)
 
@@ -277,9 +277,11 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         outState?.putString(otherPiecesCountKey,
                 OtherPiecesKindCountListArrayAdapter.stringFromPiecesCount(PositionGeneratorValuesHolder.otherPiecesCount)
         )
-        outState?.putString(otherPiecesGlobalConstraintScriptKey, PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScript)
-        outState?.putString(otherPiecesMutualConstraintScriptKey, PositionGeneratorValuesHolder.otherPiecesMutualConstraintScript)
-        outState?.putString(otherPiecesIndexedConstraintScriptKey, PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScript)
+        outState?.putString(otherPiecesGlobalConstraintScriptKey, pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts))
+        outState?.putString(otherPiecesMutualConstraintScriptKey, pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts))
+        outState?.putString(otherPiecesIndexedConstraintScriptKey, pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts))
+
+        super.onSaveInstanceState(outState)
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
@@ -296,12 +298,59 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         PositionGeneratorValuesHolder.otherPiecesCount.addAll(
                 OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(savedInstanceState?.getString(otherPiecesCountKey) ?: "")
         )
-        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScript = savedInstanceState?.getString(otherPiecesGlobalConstraintScriptKey) ?: ""
-        PositionGeneratorValuesHolder.otherPiecesMutualConstraintScript = savedInstanceState?.getString(otherPiecesMutualConstraintScriptKey) ?: ""
-        PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScript = savedInstanceState?.getString(otherPiecesIndexedConstraintScriptKey) ?: ""
+        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
+        PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
+        PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = pieceKindConstraintMapDeserializedFromString(savedInstanceState?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
     }
 
+    private fun pieceKindConstraintMapSerializationString(pieceKindMap: Map<PieceKind, String>): String {
+        val builder = StringBuilder()
 
+        pieceKindMap.keys.forEach {
+            builder.append(FilesManager.PIECE_CONSTRAINT_SEPARATOR)
+            builder.append(FilesManager.NEW_LINE)
+            builder.append(it.toString())
+            builder.append(FilesManager.NEW_LINE)
+            builder.append(FilesManager.PIECE_CONSTRAINT_SEPARATOR)
+            builder.append(FilesManager.NEW_LINE)
+            builder.append(pieceKindMap[it])
+            builder.append(FilesManager.NEW_LINE)
+        }
+
+        return builder.toString()
+    }
+
+    private fun pieceKindConstraintMapDeserializedFromString(serializedMap: String) : MutableMap<PieceKind, String> {
+        if (serializedMap.isEmpty()) return mutableMapOf()
+
+        val lines = serializedMap.split(FilesManager.NEW_LINE)
+        var editedPieceKind: PieceKind? = null
+        var isChangingEditedPieceKind = false
+        val output = mutableMapOf<PieceKind, String>()
+
+        lines.forEach {
+            if (it == FilesManager.PIECE_CONSTRAINT_SEPARATOR){
+                isChangingEditedPieceKind = !isChangingEditedPieceKind
+            }
+            else {
+                if (it != FilesManager.NEW_LINE) {
+                    if (isChangingEditedPieceKind){
+                        val pieceKindRegex = """PieceKind\(pieceType=(\w+), side=(\w+)\)""".toRegex()
+                        val (pieceTypeStr, sideStr) = pieceKindRegex.find(it)!!.destructured
+                        val pieceType = PieceType.valueOf(pieceTypeStr)
+                        val side = Side.valueOf(sideStr)
+                        editedPieceKind = PieceKind(pieceType = pieceType, side = side)
+                        output[editedPieceKind!!] = ""
+                    }
+                    else {
+                        output[editedPieceKind!!] = output[editedPieceKind!!] + it + FilesManager.NEW_LINE
+                    }
+                }
+            }
+        }
+
+        return output
+    }
 
     fun showAlertDialog(title : String, message: String) {
         val dialog = AlertDialog.Builder(this).create()
@@ -323,37 +372,37 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         val contentBuilder = StringBuilder()
 
         contentBuilder.append(if (PositionGeneratorValuesHolder.resultShouldBeDraw) "1" else "0")
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
 
         contentBuilder.append(FilesManager.playerKingHeader)
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
         contentBuilder.append(PositionGeneratorValuesHolder.playerKingConstraintScript)
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
 
         contentBuilder.append(FilesManager.computerKingHeader)
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
         contentBuilder.append(PositionGeneratorValuesHolder.computerKingConstraintScript)
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
 
         contentBuilder.append(FilesManager.mutualKingsHeader)
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
         contentBuilder.append(PositionGeneratorValuesHolder.kingsMutualConstraintScript)
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
 
         contentBuilder.append(FilesManager.otherPiecesCountHeader)
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
         contentBuilder.append(OtherPiecesKindCountListArrayAdapter.stringFromPiecesCount(
                 PositionGeneratorValuesHolder.otherPiecesCount))
-        contentBuilder.append(FilesManager.newLine)
-        contentBuilder.append(FilesManager.newLine)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
 
         return contentBuilder.toString()
     }

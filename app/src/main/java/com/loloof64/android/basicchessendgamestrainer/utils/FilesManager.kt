@@ -21,8 +21,14 @@ package com.loloof64.android.basicchessendgamestrainer.utils
 import com.loloof64.android.basicchessendgamestrainer.MyApplication
 import java.io.*
 
+fun Char.replicate(times: Int) : String {
+    val builder = StringBuilder()
+    (0..times).forEach { builder.append(this) }
+    return builder.toString()
+}
+
 object FilesManager {
-    const val newLine = "\n"
+    const val NEW_LINE = "\n"
     const val playerKingHeader = "# player king"
     const val computerKingHeader = "# computer king"
     const val mutualKingsHeader = "# kings mutual"
@@ -30,6 +36,7 @@ object FilesManager {
     const val otherPiecesGlobalHeader = "#other pieces global"
     const val parentFolderName = ".."
     const val DRAW_LINE_VALUE = "1"
+    val PIECE_CONSTRAINT_SEPARATOR = '-'.replicate(times = 20)
 
     private val topDirectory = File(MyApplication.appContext.filesDir, "script")
     private var currentDirectory = topDirectory
