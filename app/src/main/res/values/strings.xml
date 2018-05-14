@@ -140,6 +140,7 @@ of endgame.[CR][CR]
     <string name="update_constraint">Update</string>
     <string name="updated_script">Updated script for this piece kind.</string>
     <string name="other_pieces_global_constraints_script_error_title">Other pieces global constraints (%s)</string>
+    <string name="other_pieces_mutual_constraints_script_error_title">Other pieces mutual constraints (%s)</string>
     <string-array name="piece_kind_count_spinner">
         <item>1</item>
         <item>2</item>
