@@ -110,6 +110,7 @@ class CustomExerciseChooserFragment : Fragment() {
                                                         intent.putExtra(PositionGeneratorEditorActivity.computerKingConstraintScriptKey, constraints?.computerKingConstraint ?: "")
                                                         intent.putExtra(PositionGeneratorEditorActivity.kingsMutualConstraintScriptKey, constraints?.kingsMutualConstraint ?: "")
                                                         intent.putExtra(PositionGeneratorEditorActivity.otherPiecesCountKey, constraints?.otherPiecesCountConstraint ?: "")
+                                                        intent.putExtra(PositionGeneratorEditorActivity.otherPiecesGlobalConstraintScriptKey, constraints?.otherPiecesGlobalConstraints ?: "")
                                                         startActivity(intent)
                                                     }
                                                 }
