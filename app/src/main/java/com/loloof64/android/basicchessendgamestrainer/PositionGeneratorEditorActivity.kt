@@ -240,10 +240,12 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                             val computerKingFragment = it[ComputerKingConstraintEditorFragmentIndex] as ComputerKingConstraintEditorFragment
                             val mutualKingsFragment = it[KingsMutualConstraintEditorFragmentIndex] as KingsMutualConstraintEditorFragment
                             val otherPieceGlobalFragment = it[OtherPiecesGlobalConstraintEditorFragmentIndex] as OtherPiecesGlobalConstraintEditorFragment
+                            val otherPieceMutualFragment = it[OtherPiecesMutualConstraintEditorFragmentIndex] as OtherPiecesMutualConstraintEditorFragment
                             val allScriptsAreGood = playerKingFragment.checkIfScriptIsValidAndShowEventualError() &&
                                     computerKingFragment.checkIfScriptIsValidAndShowEventualError() &&
                                     mutualKingsFragment.checkIfScriptIsValidAndShowEventualError() &&
-                                    otherPieceGlobalFragment.checkIfAllScriptAreValidAndShowEventualError()
+                                    otherPieceGlobalFragment.checkIfAllScriptAreValidAndShowEventualError() &&
+                                    otherPieceMutualFragment.checkIfAllScriptAreValidAndShowEventualError()
 
                             if (allScriptsAreGood){
                                 if (isEditingAnExistingFile){
