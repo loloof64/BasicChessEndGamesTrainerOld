@@ -246,6 +246,7 @@ class DeleteButtonClickListener(val pieceKind: PieceKind,
             _, _ ->
             adapterRef.get()?.deleteItem(position)
             positionGeneratorEditorActivity.deleteOtherPieceGlobalConstraintScriptAssociatedWithPieceKind(pieceKind)
+            positionGeneratorEditorActivity.deleteOtherPieceMutualConstraintScriptAssociatedWithPieceKind(pieceKind)
         })
         alertDialogBuilder.setButton(AlertDialog.BUTTON_NEGATIVE, activityRef.get()?.resources?.getString(R.string.cancel), {
             dialog, _ -> dialog.dismiss()

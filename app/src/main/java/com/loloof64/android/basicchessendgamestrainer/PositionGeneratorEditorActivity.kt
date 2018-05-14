@@ -376,6 +376,12 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         otherPiecesGlobalConstraintFrag.deleteScriptAssociatedWithPieceKind(pieceKind)
     }
 
+    fun deleteOtherPieceMutualConstraintScriptAssociatedWithPieceKind(pieceKind: PieceKind) {
+        val otherPiecesMutualConstraintFrag = allFragments[OtherPiecesMutualConstraintEditorFragmentIndex] as
+                OtherPiecesMutualConstraintEditorFragment
+        otherPiecesMutualConstraintFrag.deleteScriptAssociatedWithPieceKind(pieceKind)
+    }
+
     private fun buildFileContent(): String {
         val contentBuilder = StringBuilder()
 
