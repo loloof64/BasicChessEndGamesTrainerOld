@@ -48,22 +48,8 @@ class KingsMutualConstraintEditorFragment: Fragment() {
                 }
         ))
 
-        generator_editor_field_kings_mutual_constraint.addTextChangedListener(object : TextWatcher {
-            override fun afterTextChanged(str: Editable?) {
-                PositionGeneratorValuesHolder.kingsMutualConstraintScript = str?.toString() ?:
-                        "<Internal error : could not read updated player king constraint field>"
-            }
-
-            override fun beforeTextChanged(str: CharSequence?, start: Int, count: Int, after: Int) {
-
-            }
-
-            override fun onTextChanged(str: CharSequence?, start: Int, before: Int, count: Int) {
-
-            }
-        })
-
         generator_editor_field_kings_mutual_constraint.setText(PositionGeneratorValuesHolder.kingsMutualConstraintScript)
+        generator_editor_field_kings_mutual_constraint.addTextChangedListener(KingsMutualConstraintEditorTextWatcher())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -106,4 +92,19 @@ class KingsMutualConstraintEditorFragment: Fragment() {
         const val SCRIPT_KEY = "Script"
     }
 
+}
+
+class KingsMutualConstraintEditorTextWatcher : TextWatcher {
+    override fun afterTextChanged(str: Editable?) {
+        PositionGeneratorValuesHolder.kingsMutualConstraintScript = str?.toString() ?:
+                "<Internal error : could not read updated player king constraint field>"
+    }
+
+    override fun beforeTextChanged(str: CharSequence?, start: Int, count: Int, after: Int) {
+
+    }
+
+    override fun onTextChanged(str: CharSequence?, start: Int, before: Int, count: Int) {
+
+    }
 }

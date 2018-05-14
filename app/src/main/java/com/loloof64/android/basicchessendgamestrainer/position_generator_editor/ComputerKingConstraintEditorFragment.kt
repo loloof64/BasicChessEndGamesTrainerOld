@@ -44,8 +44,8 @@ class ComputerKingConstraintEditorFragment : Fragment() {
                     }
                 }))
 
-        generator_editor_field_computer_king_constraint.addTextChangedListener(ComputerKingConstraintFragmentTextWatcher())
         generator_editor_field_computer_king_constraint.setText(PositionGeneratorValuesHolder.computerKingConstraintScript)
+        generator_editor_field_computer_king_constraint.addTextChangedListener(ComputerKingConstraintFragmentTextWatcher())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {

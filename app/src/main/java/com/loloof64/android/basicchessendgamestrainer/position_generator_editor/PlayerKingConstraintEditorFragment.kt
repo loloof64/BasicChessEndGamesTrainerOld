@@ -57,8 +57,8 @@ class PlayerKingConstraintEditorFragment : Fragment() {
                     }
                 }))
 
-        generator_editor_field_player_king_constraint.addTextChangedListener(PlayerKingConstraintFragmentTextWatcher())
         generator_editor_field_player_king_constraint.setText(PositionGeneratorValuesHolder.playerKingConstraintScript)
+        generator_editor_field_player_king_constraint.addTextChangedListener(PlayerKingConstraintFragmentTextWatcher())
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
