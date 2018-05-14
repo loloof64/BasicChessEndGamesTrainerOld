@@ -486,8 +486,6 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 .setTitle(R.string.confirm_cancel_script_editing_title)
                 .setMessage(R.string.confirm_cancel_script_editing_message)
                 .setPositiveButton(R.string.OK, {dialog: DialogInterface?, _: Int ->
-                    val otherPiecesGlobalConstraintEditorFragment = allFragments[OtherPiecesGlobalConstraintEditorFragmentIndex] as OtherPiecesGlobalConstraintEditorFragment
-                    otherPiecesGlobalConstraintEditorFragment.clearAllScripts()
                     dialog?.dismiss()
                     finish()
                 })

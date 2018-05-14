@@ -109,10 +109,6 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.remove(kind)
     }
 
-    fun clearAllScripts(){
-        PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.clear()
-    }
-
     private fun loadSpinnerTitles() {
         val pieceTypesStrings = resources.getStringArray(R.array.piece_type_spinner)
         val sideStrings = resources.getStringArray(R.array.player_computer_spinner)
