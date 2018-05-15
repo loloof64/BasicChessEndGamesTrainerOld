@@ -396,18 +396,6 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         dialog.show()
     }
 
-    fun deleteOtherPieceGlobalConstraintScriptAssociatedWithPieceKind(pieceKind: PieceKind) {
-        val otherPiecesGlobalConstraintFrag = allFragments[OtherPiecesGlobalConstraintEditorFragmentIndex] as
-                OtherPiecesGlobalConstraintEditorFragment
-        otherPiecesGlobalConstraintFrag.deleteScriptAssociatedWithPieceKind(pieceKind)
-    }
-
-    fun deleteOtherPieceMutualConstraintScriptAssociatedWithPieceKind(pieceKind: PieceKind) {
-        val otherPiecesMutualConstraintFrag = allFragments[OtherPiecesMutualConstraintEditorFragmentIndex] as
-                OtherPiecesMutualConstraintEditorFragment
-        otherPiecesMutualConstraintFrag.deleteScriptAssociatedWithPieceKind(pieceKind)
-    }
-
     private fun clearAllScriptFields(){
         supportFragmentManager.beginTransaction()
                 .replace(R.id.container, allFragments[PlayerKingConstraintEditorFragmentIndex])
@@ -556,6 +544,27 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                     dialog?.dismiss()
                 })
                 .show()
+    }
+
+    fun clearAllOtherPiecesSpecificScriptFields() {
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[OtherPiecesGlobalConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[OtherPiecesGlobalConstraintEditorFragmentIndex] as OtherPiecesGlobalConstraintEditorFragment).clearScriptField()
+
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[OtherPiecesMutualConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[OtherPiecesMutualConstraintEditorFragmentIndex] as OtherPiecesMutualConstraintEditorFragment).clearScriptField()
+
+        //TODO add for OtherPiecesIndexedScriptFragment
+
+        /*
+        We gracefully return to the current screen.
+         */
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[OtherPiecesCountConstraintEditorFragmentIndex])
+                .commitNow()
     }
 
 

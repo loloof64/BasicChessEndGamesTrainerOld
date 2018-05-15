@@ -95,10 +95,6 @@ class OtherPiecesMutualConstraintEditorFragment : Fragment() {
         }
     }
 
-    fun deleteScriptAssociatedWithPieceKind(kind: PieceKind){
-        PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts.remove(kind)
-    }
-
     private fun loadSpinnerTitles() {
         val pieceTypesStrings = resources.getStringArray(R.array.piece_type_spinner)
         val sideStrings = resources.getStringArray(R.array.player_computer_spinner)
