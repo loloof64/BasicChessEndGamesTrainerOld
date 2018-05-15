@@ -84,6 +84,10 @@ class KingsMutualConstraintEditorFragment: Fragment() {
 
     }
 
+    fun clearScriptField() {
+        generator_editor_field_kings_mutual_constraint.text.clear()
+    }
+
     companion object {
         fun newInstance(): KingsMutualConstraintEditorFragment {
             return KingsMutualConstraintEditorFragment()

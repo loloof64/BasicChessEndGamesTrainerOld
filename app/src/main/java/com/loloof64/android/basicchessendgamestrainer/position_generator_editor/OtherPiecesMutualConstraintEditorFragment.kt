@@ -129,7 +129,9 @@ class OtherPiecesMutualConstraintEditorFragment : Fragment() {
         return spinnerPiecesKindValues[generator_editor_spinner_other_piece_mutual_constraint.selectedItemPosition]
     }
 
-
+    fun clearScriptField() {
+        generator_editor_field_other_piece_mutual_constraint.text.clear()
+    }
 
     companion object {
         fun newInstance(): OtherPiecesMutualConstraintEditorFragment {

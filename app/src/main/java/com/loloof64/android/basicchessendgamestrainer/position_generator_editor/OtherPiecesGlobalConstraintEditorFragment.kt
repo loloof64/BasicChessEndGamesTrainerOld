@@ -139,6 +139,10 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
         return spinnerPiecesKindValues[generator_editor_spinner_other_piece_global_constraint.selectedItemPosition]
     }
 
+    fun clearScriptField() {
+        generator_editor_field_other_piece_global_constraint.text.clear()
+    }
+
 }
 
 class OtherPiecesGlobalConstraintEditorSpinnerSelectionListener(parent: OtherPiecesGlobalConstraintEditorFragment):

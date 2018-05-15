@@ -58,6 +58,17 @@ object PositionGeneratorValuesHolder {
     var otherPiecesIndexedConstraintScripts = mutableMapOf<PieceKind, String>()
     var resultShouldBeDraw = false
 
+    fun clear(){
+        playerKingConstraintScript = ""
+        computerKingConstraintScript = ""
+        kingsMutualConstraintScript = ""
+        otherPiecesCount.clear()
+        otherPiecesGlobalConstraintScripts.clear()
+        otherPiecesMutualConstraintScripts.clear()
+        otherPiecesIndexedConstraintScripts.clear()
+        resultShouldBeDraw = false
+    }
+
     fun otherPieceKindCountAlreadySetFor(kindCountToAdd: PieceKindCount) : Boolean {
         return otherPiecesCount.any { it.pieceKind == kindCountToAdd.pieceKind }
     }
@@ -141,6 +152,20 @@ object PositionGeneratorValuesHolder {
         return output
     }
 
+    override fun toString(): String {
+        return """PositionGeneratorValuesHolder(
+            playerKing => $playerKingConstraintScript
+            computerKing => $computerKingConstraintScript
+            kingsMutual => $kingsMutualConstraintScript
+            otherPiecesCount => $otherPiecesCount
+            otherPiecesGlobal => $otherPiecesGlobalConstraintScripts
+            otherPiecesMutual => $otherPiecesMutualConstraintScripts
+            otherPiecesIndexed => $otherPiecesIndexedConstraintScripts
+            drawish => $resultShouldBeDraw
+            )
+            """
+    }
+
 }
 
 data class MessageToShowInDialogEvent(val title: String, val message: String)
@@ -172,6 +197,7 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         val OtherPiecesGlobalConstraintEditorFragmentIndex = 4
         val OtherPiecesMutualConstraintEditorFragmentIndex = 5
         val OtherPiecesIndexedConstraintEditorFragmentIndex = 6
+        val SetIfResultShouldBeDrawFragmentIndex = 7
 
         val allFragments = arrayOf(
                 PlayerKingConstraintEditorFragment.newInstance(),
@@ -382,6 +408,40 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         otherPiecesMutualConstraintFrag.deleteScriptAssociatedWithPieceKind(pieceKind)
     }
 
+    private fun clearAllScriptFields(){
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[PlayerKingConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[PlayerKingConstraintEditorFragmentIndex] as PlayerKingConstraintEditorFragment).clearScriptField()
+
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[ComputerKingConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[ComputerKingConstraintEditorFragmentIndex] as ComputerKingConstraintEditorFragment).clearScriptField()
+
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[KingsMutualConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[KingsMutualConstraintEditorFragmentIndex] as KingsMutualConstraintEditorFragment).clearScriptField()
+
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[OtherPiecesGlobalConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[OtherPiecesGlobalConstraintEditorFragmentIndex] as OtherPiecesGlobalConstraintEditorFragment).clearScriptField()
+
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[OtherPiecesMutualConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[OtherPiecesMutualConstraintEditorFragmentIndex] as OtherPiecesMutualConstraintEditorFragment).clearScriptField()
+
+        //TODO add for OtherPiecesIndexedScriptFragment
+
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[SetIfResultShouldBeDrawFragmentIndex])
+                .commitNow()
+        (allFragments[SetIfResultShouldBeDrawFragmentIndex] as SetIfResultShouldBeDrawFragment).resetChoice()
+    }
+
     private fun buildFileContent(): String {
         val contentBuilder = StringBuilder()
 
@@ -486,6 +546,9 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 .setTitle(R.string.confirm_cancel_script_editing_title)
                 .setMessage(R.string.confirm_cancel_script_editing_message)
                 .setPositiveButton(R.string.OK, {dialog: DialogInterface?, _: Int ->
+                    // The order of both following instructions may be important
+                    clearAllScriptFields()
+                    PositionGeneratorValuesHolder.clear()
                     dialog?.dismiss()
                     finish()
                 })

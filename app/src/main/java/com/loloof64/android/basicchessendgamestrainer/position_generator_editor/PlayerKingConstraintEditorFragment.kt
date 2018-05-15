@@ -90,6 +90,10 @@ class PlayerKingConstraintEditorFragment : Fragment() {
        )
     }
 
+    fun clearScriptField() {
+        generator_editor_field_player_king_constraint.text.clear()
+    }
+
     companion object {
         fun newInstance(): PlayerKingConstraintEditorFragment {
             return PlayerKingConstraintEditorFragment()

@@ -50,6 +50,10 @@ class SetIfResultShouldBeDrawFragment : Fragment() {
         }
     }
 
+    fun resetChoice() {
+        result_should_be_draw_button.isChecked = false
+    }
+
     companion object {
         fun newInstance(): SetIfResultShouldBeDrawFragment {
             return SetIfResultShouldBeDrawFragment()

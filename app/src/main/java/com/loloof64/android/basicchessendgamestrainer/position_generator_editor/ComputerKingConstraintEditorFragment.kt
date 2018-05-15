@@ -77,6 +77,10 @@ class ComputerKingConstraintEditorFragment : Fragment() {
         )
     }
 
+    fun clearScriptField() {
+        generator_editor_field_computer_king_constraint.text.clear()
+    }
+
     companion object {
         fun newInstance(): ComputerKingConstraintEditorFragment {
             return ComputerKingConstraintEditorFragment()

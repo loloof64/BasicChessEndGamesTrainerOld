@@ -13,7 +13,6 @@ class OtherPiecesIndexedConstraintEditorFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_editing_other_pieces_indexed_constraint, container, false)
     }
 
-
     companion object {
         fun newInstance(): OtherPiecesIndexedConstraintEditorFragment {
             return OtherPiecesIndexedConstraintEditorFragment()
