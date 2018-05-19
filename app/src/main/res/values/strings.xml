@@ -141,6 +141,7 @@ of endgame.[CR][CR]
     <string name="updated_script">Updated script for this piece kind.</string>
     <string name="other_pieces_global_constraints_script_error_title">Other pieces global constraints (%s)</string>
     <string name="other_pieces_mutual_constraints_script_error_title">Other pieces mutual constraints (%s)</string>
+    <string name="class_cast_exception_error_dialog_message">Please check that you don\'t use integer expression instead of boolean expression, and vice-versa.</string>
     <string-array name="piece_kind_count_spinner">
         <item>1</item>
         <item>2</item>

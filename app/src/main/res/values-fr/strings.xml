@@ -141,6 +141,7 @@ de générer une nouvelle position pour le même type de fin de partie.[CR][CR][
     <string name="adding_too_many_pieces">Un joueur dispose d\'un maximum de 16 pièces sur un échiquier (dont le roi) !</string>
     <string name="confirm_delete_piece_kind_count_title">Confirmer la suppression ?</string>
     <string name="confirm_delete_piece_kind_count_message">Confirmer la suppression pour %s ? (Il se peut que des scripts soient associés à ce type)</string>
+    <string name="class_cast_exception_error_dialog_message">Veuillez vérifier que vous n\'utilisez pas d\'expression entière à place d\'expression booléenne et inversement.</string>
     <string-array name="player_computer_spinner">
         <item>Joueur</item>
         <item>Ordinateur</item>

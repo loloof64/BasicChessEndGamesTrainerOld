@@ -309,6 +309,15 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
             RxEventBus.send(MessageToShowInDialogEvent(title, message))
             false
         }
+        catch (ex: ClassCastException){
+            val resources = MyApplication.appContext.resources
+            val message = MyApplication.appContext.resources?.getString(R.string.class_cast_exception_error_dialog_message)
+                    ?:  "<Internal error : could not get ClassCastException message !>"
+            val titleFormat = resources.getString(R.string.parse_error_dialog_title)
+            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", scriptSectionTitle)
+            RxEventBus.send(MessageToShowInDialogEvent(title, message))
+            false
+        }
     }
 
 }
