@@ -143,7 +143,7 @@ object PositionGeneratorValuesHolder {
                         output[editedPieceKind!!] = ""
                     }
                     else {
-                        output[editedPieceKind!!] = output[editedPieceKind!!] + it + FilesManager.NEW_LINE
+                        if (editedPieceKind != null) output[editedPieceKind!!] = output[editedPieceKind!!] + it + FilesManager.NEW_LINE
                     }
                 }
             }
@@ -224,35 +224,36 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        if (intent.extras?.getBoolean(isEditingAnExistingFileKey) == true) {
+            PositionGeneratorValuesHolder.resultShouldBeDraw = intent.extras?.getBoolean(resultShouldBeDrawKey) ?: false
+            PositionGeneratorValuesHolder.playerKingConstraintScript = intent.extras?.getString(playerKingConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.computerKingConstraintScript = intent.extras?.getString(computerKingConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.kingsMutualConstraintScript = intent.extras?.getString(kingsMutualConstraintScriptKey) ?: ""
+            PositionGeneratorValuesHolder.otherPiecesCount.clear()
+            PositionGeneratorValuesHolder.otherPiecesCount.addAll(OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(
+                    intent.extras?.getString(otherPiecesCountKey) ?: ""))
+            PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
+            PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
+            PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
+            isEditingAnExistingFile = true
+            currentEditedFileName = intent.extras?.getString(editedFileNameKey)!!
+        } else {
+            PositionGeneratorValuesHolder.resultShouldBeDraw = false
+            PositionGeneratorValuesHolder.playerKingConstraintScript = ""
+            PositionGeneratorValuesHolder.computerKingConstraintScript = ""
+            PositionGeneratorValuesHolder.kingsMutualConstraintScript = ""
+            PositionGeneratorValuesHolder.otherPiecesCount.clear()
+            PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = mutableMapOf()
+            PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = mutableMapOf()
+            PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = mutableMapOf()
+        }
+
         setContentView(R.layout.activity_position_generator_editor)
 
         setSupportActionBar(toolbar)
         supportActionBar?.setDisplayShowTitleEnabled(false)
-
-
-            if (intent.extras?.getBoolean(isEditingAnExistingFileKey) == true) {
-                PositionGeneratorValuesHolder.resultShouldBeDraw = intent.extras?.getBoolean(resultShouldBeDrawKey) ?: false
-                PositionGeneratorValuesHolder.playerKingConstraintScript = intent.extras?.getString(playerKingConstraintScriptKey) ?: ""
-                PositionGeneratorValuesHolder.computerKingConstraintScript = intent.extras?.getString(computerKingConstraintScriptKey) ?: ""
-                PositionGeneratorValuesHolder.kingsMutualConstraintScript = intent.extras?.getString(kingsMutualConstraintScriptKey) ?: ""
-                PositionGeneratorValuesHolder.otherPiecesCount.clear()
-                PositionGeneratorValuesHolder.otherPiecesCount.addAll(OtherPiecesKindCountListArrayAdapter.getPiecesCountFromString(
-                        intent.extras?.getString(otherPiecesCountKey) ?: ""))
-                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesGlobalConstraintScriptKey) ?: "")
-                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesMutualConstraintScriptKey) ?: "")
-                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = PositionGeneratorValuesHolder.pieceKindConstraintMapDeserializedFromString(intent.extras?.getString(otherPiecesIndexedConstraintScriptKey) ?: "")
-                isEditingAnExistingFile = true
-                currentEditedFileName = intent.extras?.getString(editedFileNameKey)!!
-            } else {
-                PositionGeneratorValuesHolder.resultShouldBeDraw = false
-                PositionGeneratorValuesHolder.playerKingConstraintScript = ""
-                PositionGeneratorValuesHolder.computerKingConstraintScript = ""
-                PositionGeneratorValuesHolder.kingsMutualConstraintScript = ""
-                PositionGeneratorValuesHolder.otherPiecesCount.clear()
-                PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts = mutableMapOf()
-                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts = mutableMapOf()
-                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts = mutableMapOf()
-            }
 
         val boomMenuButtonPiecesNumber = position_generator_activity_boom_menu_button.piecePlaceEnum.pieceNumber()
         (0 until boomMenuButtonPiecesNumber).forEach {pieceIndex ->
