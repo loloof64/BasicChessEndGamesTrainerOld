@@ -27,11 +27,11 @@ import com.loloof64.android.basicchessendgamestrainer.utils.*
 import java.lang.Math.abs
 import java.util.logging.Logger
 
-val MIN_MATE_SCORE = 1000
-val MIN_DRAW_SCORE = 10
-val MIN_KNOWN_WIN = 250
+const val MIN_MATE_SCORE = 1000
+const val MIN_DRAW_SCORE = 10
+const val MIN_KNOWN_WIN = 250
 
-val default_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n"
+const val default_position = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1\n"
 
 data class PromotionInfo(val startFile: Int, val startRank: Int,
                          val endFile: Int, val endRank: Int)
@@ -336,6 +336,8 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                 _relatedPosition.modifyPositionByDoingMove(move, promotionPieceType = promotionPieceType)
                 val fenAfterMove = _relatedPosition.toFEN()
 
+                val moveNumberAfterMoveCommit = getMoveNumber()
+
                 val moveToHighlight = MoveToHighlight(
                         startFile = move.from.file,
                         startRank = move.from.rank,
@@ -354,8 +356,15 @@ class PlayableAgainstComputerBoardComponent(context: Context, attrs: AttributeSe
                 }
                 else {
                     with(context as PlayingActivity){
-                        if (isWhiteTurnBeforeMove) addPositionInMovesList(moveNumberBeforeMoveCommit.toString(), "",
-                                MoveToHighlight(-1,-1,-1,-1))
+                        if (isWhiteTurnBeforeMove) {
+                            val moveNumberToAdd = if (_blackStartedTheGame) {
+                                moveNumberAfterMoveCommit
+                            } else {
+                                moveNumberBeforeMoveCommit
+                            }
+                            addPositionInMovesList(moveNumberToAdd.toString(), "",
+                                    MoveToHighlight(-1,-1,-1,-1))
+                        }
                         addPositionInMovesList(
                                 san = moveFan,
                                 fen = fenAfterMove,

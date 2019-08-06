@@ -55,31 +55,31 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     private fun findColor(colorResId: Int): Int = resources.getColor(colorResId)
 
     companion object {
-        val currentPositionkey = "CurrentPosition"
-        val playerHasWhiteKey = "PlayerHasWhite"
-        val gameFinishedKey = "GameFinished"
-        val lastExerciseKey = "LastExercise"
-        val playerGoalIDKey = "PlayerGoalID"
-        val playerGoalInAlertModeKey = "PlayerGoalInAlertMode"
-        val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
-        val usingCustomGeneratorConstraintsKey = "IsUsingCustomGeneratorConstraints"
-        val predefinedGeneratorIndexKey = "PredefinedGeneratorIndex"
-        val adapterSanItemsKey = "AdapterSanItems"
-        val adapterFenItemsKey = "AdapterFenItems"
-        val startedToWriteMovesKey = "StartedToWriteMoves"
-        val moveToHighlightFromFileKey = "MoveToHighlightFromFile"
-        val moveToHighlightFromRankKey = "MoveToHighlightFromRank"
-        val moveToHighlightToFileKey = "MoveToHighlightToFile"
-        val moveToHighlightToRankKey = "MoveToHighlightToRank"
-        val switchingPositionAllowedKey = "SwitchingPositionAllowed"
-        val registedHighlitedMovesStartFilesKey = "RegistedHighlitedMovesStartFiles"
-        val registedHighlitedMovesStartRanksKey = "RegistedHighlitedMovesStartRanks"
-        val registedHighlitedMovesEndFilesKey = "RegistedHighlitedMovesEndFiles"
-        val registedHighlitedMovesEndRanksKey = "RegistedHighlitedMovesEndRanks"
-        val selectedNavigationItemKey = "SelectedNavigationItem"
-        val blacksAreDownKey = "BlacksAreDown"
+        const val currentPositionkey = "CurrentPosition"
+        const val playerHasWhiteKey = "PlayerHasWhite"
+        const val gameFinishedKey = "GameFinished"
+        const val lastExerciseKey = "LastExercise"
+        const val playerGoalIDKey = "PlayerGoalID"
+        const val playerGoalInAlertModeKey = "PlayerGoalInAlertMode"
+        const val waitingForPlayerGoalKey = "WaitingForPlayerGoal"
+        const val usingCustomGeneratorConstraintsKey = "IsUsingCustomGeneratorConstraints"
+        const val predefinedGeneratorIndexKey = "PredefinedGeneratorIndex"
+        const val adapterSanItemsKey = "AdapterSanItems"
+        const val adapterFenItemsKey = "AdapterFenItems"
+        const val startedToWriteMovesKey = "StartedToWriteMoves"
+        const val moveToHighlightFromFileKey = "MoveToHighlightFromFile"
+        const val moveToHighlightFromRankKey = "MoveToHighlightFromRank"
+        const val moveToHighlightToFileKey = "MoveToHighlightToFile"
+        const val moveToHighlightToRankKey = "MoveToHighlightToRank"
+        const val switchingPositionAllowedKey = "SwitchingPositionAllowed"
+        const val registedHighlitedMovesStartFilesKey = "RegistedHighlitedMovesStartFiles"
+        const val registedHighlitedMovesStartRanksKey = "RegistedHighlitedMovesStartRanks"
+        const val registedHighlitedMovesEndFilesKey = "RegistedHighlitedMovesEndFiles"
+        const val registedHighlitedMovesEndRanksKey = "RegistedHighlitedMovesEndRanks"
+        const val selectedNavigationItemKey = "SelectedNavigationItem"
+        const val blacksAreDownKey = "BlacksAreDown"
 
-        val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+        const val standardFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     }
 
     private var usingCustomGenerator = false
@@ -324,9 +324,9 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.quit_exercise_confirmation_title)
                 .setMessage(R.string.quit_exercise_confirmation_message)
-                .setPositiveButton(R.string.yes, {_, _ ->
+                .setPositiveButton(R.string.yes){_, _ ->
                     super.onBackPressed()
-                })
+                }
                 .setNegativeButton(R.string.no, null)
                 .show()
     }
