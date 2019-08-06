@@ -22,12 +22,12 @@ import android.annotation.SuppressLint
 import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.support.v7.app.AlertDialog
-import android.support.v7.view.menu.MenuBuilder
-import android.support.v7.view.menu.MenuPopupHelper
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.PopupMenu
+import androidx.fragment.app.Fragment
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.view.menu.MenuBuilder
+import androidx.appcompat.view.menu.MenuPopupHelper
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.appcompat.widget.PopupMenu
 import android.view.*
 import android.widget.EditText
 import com.loloof64.android.basicchessendgamestrainer.*
@@ -91,7 +91,7 @@ class CustomExerciseChooserFragment : Fragment() {
                                 }
                                 else -> {
                                     val concernedView = parentFragment.layoutManager.findViewByPosition(position)
-                                    val popupMenu = PopupMenu(parentFragment.activity!!, concernedView)
+                                    val popupMenu = PopupMenu(parentFragment.activity!!, concernedView!!)
                                     popupMenu.menuInflater.inflate(R.menu.custom_exercise_item_popum_menu, popupMenu.menu)
                                     popupMenu.setOnMenuItemClickListener(CustomExerciseChooserFragmentPopupMenuItemListener(
                                             parentFragment = parentFragment,
@@ -117,7 +117,7 @@ class CustomExerciseChooserFragment : Fragment() {
                                             }
                                     ))
 
-                                    val menuHelper = MenuPopupHelper(parentFragment.activity!!, popupMenu.menu as MenuBuilder, concernedView)
+                                    val menuHelper = MenuPopupHelper(parentFragment.activity!!, popupMenu.menu as MenuBuilder, concernedView!!)
                                     menuHelper.setForceShowIcon(true)
                                     menuHelper.show()
                                 }

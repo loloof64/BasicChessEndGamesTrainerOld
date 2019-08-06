@@ -20,7 +20,7 @@ package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
 import android.app.Activity
 import android.app.AlertDialog
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

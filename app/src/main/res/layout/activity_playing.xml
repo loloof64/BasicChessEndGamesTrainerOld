@@ -72,7 +72,7 @@
         android:contentDescription="@string/forward_in_history"
         android:id="@+id/playing_board_history_forward"/>
 
-    <android.support.v7.widget.RecyclerView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/moves_list_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

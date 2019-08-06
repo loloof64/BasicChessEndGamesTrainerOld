@@ -85,7 +85,7 @@ object EngineInteraction {
         if (scoreRegex.containsMatchIn(outputString)) {
                 val scoreMatcher = scoreRegex.find(outputString)
                 val scoreType = scoreMatcher?.groups?.get(1)?.value
-                val scoreValue = scoreMatcher?.groups?.get(2)?.value
+                val scoreValue = scoreMatcher?.groups?.get(2)?.value ?: ""
                 runOnUI{
                     when (scoreType){
                         "cp" -> uciObserver.consumeScore(Integer.parseInt(scoreValue))

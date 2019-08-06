@@ -18,9 +18,9 @@
 
 package com.loloof64.android.basicchessendgamestrainer
 
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -29,9 +29,9 @@ import android.widget.AdapterView.OnItemSelectedListener
 import android.widget.ArrayAdapter
 import android.content.Context
 import android.content.DialogInterface
-import android.support.v7.widget.ThemedSpinnerAdapter
+import androidx.appcompat.widget.ThemedSpinnerAdapter
 import android.content.res.Resources.Theme
-import android.support.v7.app.AlertDialog
+import androidx.appcompat.app.AlertDialog
 import android.widget.EditText
 import android.widget.Toast
 import com.loloof64.android.basicchessendgamestrainer.position_generator_editor.*

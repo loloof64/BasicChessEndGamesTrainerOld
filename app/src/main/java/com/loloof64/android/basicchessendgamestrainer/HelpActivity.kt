@@ -19,7 +19,7 @@
 package com.loloof64.android.basicchessendgamestrainer
 
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_help.*
 
 class HelpActivity : AppCompatActivity() {
@@ -31,7 +31,7 @@ class HelpActivity : AppCompatActivity() {
         setSupportActionBar(help_activity_toolbar)
 
         help_text_view.text = resources.getString(R.string.help)
-                .replace("[CR]", System.getProperty("line.separator"))
+                .replace("[CR]", System.getProperty("line.separator") ?: "\n")
                 .replace("[TAB]", "    ")
     }
 }

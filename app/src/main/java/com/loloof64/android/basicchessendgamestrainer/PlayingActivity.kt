@@ -23,10 +23,10 @@ import android.content.Intent
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.os.Bundle
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.TypedValue
 import android.view.Menu
 import android.view.MenuItem
@@ -43,9 +43,9 @@ import java.lang.ref.WeakReference
 import java.util.*
 
 class SpaceLeftAndRightItemDecorator(private val space: Int): RecyclerView.ItemDecoration(){
-    override fun getItemOffsets(outRect: Rect?, view: View?, parent: RecyclerView?, state: RecyclerView.State?) {
-        outRect?.left = space
-        outRect?.right = space
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
+        outRect.left = space
+        outRect.right = space
     }
 }
 
@@ -155,7 +155,7 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
         super.onRestoreInstanceState(savedInstanceState)
         if (savedInstanceState != null) {
-            playingBoard.reloadPosition(fen = savedInstanceState.getString(currentPositionkey),
+            playingBoard.reloadPosition(fen = savedInstanceState.getString(currentPositionkey)!!,
                     playerHasWhite = savedInstanceState.getBoolean(playerHasWhiteKey),
                     gameFinished = savedInstanceState.getBoolean(gameFinishedKey),
                     waitingForPlayerGoal = savedInstanceState.getBoolean(waitingForPlayerGoalKey),
@@ -176,13 +176,13 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
             val highlightEndFiles = savedInstanceState.getIntArray(registedHighlitedMovesEndFilesKey)
             val highlightEndRanks = savedInstanceState.getIntArray(registedHighlitedMovesEndRanksKey)
 
-            val highlightStart = highlightStartFiles zip highlightStartRanks
-            val highlightEnd = highlightEndFiles zip highlightEndRanks
+            val highlightStart = highlightStartFiles!! zip highlightStartRanks!!
+            val highlightEnd = highlightEndFiles!! zip highlightEndRanks!!
             val highlights = (highlightStart zip highlightEnd).map { (start, end) -> MoveToHighlight(
                     start.first, start.second, end.first, end.second) }
-            val adapterItems = (sanItems zip fenItems) zip highlights
+            val adapterItems = (sanItems!! zip fenItems!!) zip highlights
 
-            listAdapter.items = adapterItems.map { (a, b) ->
+            listAdapter.items = adapterItems .map { (a, b) ->
                 RowInput(a.first, a.second, b)
             }.toTypedArray()
             listAdapter.switchingPosition = savedInstanceState.getBoolean(switchingPositionAllowedKey)
@@ -246,10 +246,10 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.restarting_exercise_alert_title)
                 .setMessage(R.string.restarting_exercise_alert_message)
-                .setPositiveButton(R.string.yes, {_, _ ->
+                .setPositiveButton(R.string.yes){_, _ ->
                     val exercise = lastExercise
                     if (exercise != null) newGame(exercise)
-                })
+                }
                 .setNegativeButton(R.string.no, null)
                 .show()
     }
@@ -259,9 +259,9 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setTitle(R.string.new_exercise_alert_title)
                 .setMessage(R.string.new_exercise_alert_message)
-                .setPositiveButton(R.string.yes, {_, _ ->
+                .setPositiveButton(R.string.yes){_, _ ->
                     newGame(generatePosition())
-                })
+                }
                 .setNegativeButton(R.string.no, null)
                 .show()
     }

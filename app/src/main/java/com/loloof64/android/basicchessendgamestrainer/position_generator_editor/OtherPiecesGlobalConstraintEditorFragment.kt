@@ -19,7 +19,7 @@
 package com.loloof64.android.basicchessendgamestrainer.position_generator_editor
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
@@ -113,7 +113,7 @@ class OtherPiecesGlobalConstraintEditorFragment : Fragment() {
             "${pieceTypesStrings[it.pieceType.ordinal]} ${sideStrings[it.side.ordinal]}"
         }.toTypedArray()
 
-        val spinnerAdapter = ArrayAdapter<String>(activity, android.R.layout.simple_spinner_item, otherPiecesKinds)
+        val spinnerAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_item, otherPiecesKinds)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
         generator_editor_spinner_other_piece_global_constraint.adapter = spinnerAdapter

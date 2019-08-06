@@ -23,7 +23,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Rect
 import android.graphics.Typeface
-import android.support.graphics.drawable.VectorDrawableCompat
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat
 import android.util.AttributeSet
 import android.view.View
 import com.loloof64.android.basicchessendgamestrainer.R
