@@ -133,14 +133,11 @@ object EngineInteraction {
 
     private val stockfishName by lazy {
         @Suppress("DEPRECATION")
-        val suffix = when(Build.CPU_ABI){
-            "armeabi-v7a" -> "arm7"
-            "arm64-v8a" -> "arm8"
-            "x86" -> "x86"
-            "x86_64" -> "x86_64"
+        when(Build.CPU_ABI){
+            "armeabi-v7a" -> "stockfish-10-armv7"
+            "arm64-v8a" -> "stockfish-10-arm64v8"
             else -> throw IllegalArgumentException("Unsupported cpu !")
         }
-        "Stockfish.$suffix"
     }
 
     private val localStockfishPath by lazy {

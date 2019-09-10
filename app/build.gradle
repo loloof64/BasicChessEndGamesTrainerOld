@@ -3,6 +3,14 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+    signingConfigs {
+        release {
+            storeFile file('/home/laurent-bernabe/Documents/Programmation/keystores/android/basic_chess_endgames.keystore.jks')
+            keyAlias = 'loloof64KS'
+            storePassword 'T8261Wb9o|@Zds8r'
+            keyPassword '.7uLd%_.8:D!;3l'
+        }
+    }
     compileSdkVersion 29
     defaultConfig {
         applicationId "com.loloof64.android.basicchessendgamestrainer"
@@ -12,6 +20,7 @@ android {
         versionName "1.0.10"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables.useSupportLibrary = true
+        signingConfig signingConfigs.release
     }
     buildTypes {
         release {
@@ -28,7 +37,7 @@ dependencies {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     testImplementation 'junit:junit:4.12'

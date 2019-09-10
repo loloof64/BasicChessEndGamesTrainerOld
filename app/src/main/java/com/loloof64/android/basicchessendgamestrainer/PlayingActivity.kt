@@ -123,33 +123,33 @@ class PlayingActivity : AppCompatActivity(), PromotionPieceChooserDialogFragment
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
+    override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        outState?.putString(currentPositionkey, playingBoard.toFEN())
-        outState?.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
-        outState?.putBoolean(gameFinishedKey, playingBoard.gameFinished())
-        outState?.putString(lastExerciseKey, lastExercise)
-        outState?.putInt(playerGoalIDKey, playerGoalTextId)
-        outState?.putBoolean(playerGoalInAlertModeKey, playerGoalInAlertMode)
-        outState?.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
-        outState?.putStringArray(adapterSanItemsKey, listAdapter.items.map { it.san }.toTypedArray())
-        outState?.putStringArray(adapterFenItemsKey, listAdapter.items.map { it.relatedFen }.toTypedArray())
-        outState?.putBoolean(startedToWriteMovesKey, playingBoard.hasStartedToWriteMoves())
-        outState?.putInt(moveToHighlightFromFileKey, playingBoard.getMoveToHighlightFromFile() ?: -1)
-        outState?.putInt(moveToHighlightFromRankKey, playingBoard.getMoveToHighlightFromRank() ?: -1)
-        outState?.putInt(moveToHighlightToFileKey, playingBoard.getMoveToHighlightToFile() ?: -1)
-        outState?.putInt(moveToHighlightToRankKey, playingBoard.getMoveToHighlightToRank() ?: -1)
-        outState?.putBoolean(switchingPositionAllowedKey, listAdapter.switchingPosition)
-        outState?.putIntArray(registedHighlitedMovesStartFilesKey,
+        outState.putString(currentPositionkey, playingBoard.toFEN())
+        outState.putBoolean(playerHasWhiteKey, playingBoard.playerHasWhite())
+        outState.putBoolean(gameFinishedKey, playingBoard.gameFinished())
+        outState.putString(lastExerciseKey, lastExercise)
+        outState.putInt(playerGoalIDKey, playerGoalTextId)
+        outState.putBoolean(playerGoalInAlertModeKey, playerGoalInAlertMode)
+        outState.putBoolean(waitingForPlayerGoalKey, playingBoard.isWaitingForPlayerGoal())
+        outState.putStringArray(adapterSanItemsKey, listAdapter.items.map { it.san }.toTypedArray())
+        outState.putStringArray(adapterFenItemsKey, listAdapter.items.map { it.relatedFen }.toTypedArray())
+        outState.putBoolean(startedToWriteMovesKey, playingBoard.hasStartedToWriteMoves())
+        outState.putInt(moveToHighlightFromFileKey, playingBoard.getMoveToHighlightFromFile() ?: -1)
+        outState.putInt(moveToHighlightFromRankKey, playingBoard.getMoveToHighlightFromRank() ?: -1)
+        outState.putInt(moveToHighlightToFileKey, playingBoard.getMoveToHighlightToFile() ?: -1)
+        outState.putInt(moveToHighlightToRankKey, playingBoard.getMoveToHighlightToRank() ?: -1)
+        outState.putBoolean(switchingPositionAllowedKey, listAdapter.switchingPosition)
+        outState.putIntArray(registedHighlitedMovesStartFilesKey,
                 listAdapter.items.map { it.moveToHighlight?.startFile ?: -1 }.toIntArray())
-        outState?.putIntArray(registedHighlitedMovesStartRanksKey,
+        outState.putIntArray(registedHighlitedMovesStartRanksKey,
                 listAdapter.items.map { it.moveToHighlight?.startRank ?: -1 }.toIntArray())
-        outState?.putIntArray(registedHighlitedMovesEndFilesKey,
+        outState.putIntArray(registedHighlitedMovesEndFilesKey,
                 listAdapter.items.map { it.moveToHighlight?.endFile ?: -1 }.toIntArray())
-        outState?.putIntArray(registedHighlitedMovesEndRanksKey,
+        outState.putIntArray(registedHighlitedMovesEndRanksKey,
                 listAdapter.items.map { it.moveToHighlight?.endRank ?: -1 }.toIntArray())
-        outState?.putInt(selectedNavigationItemKey, listAdapter.selectedNavigationItem)
-        outState?.putBoolean(blacksAreDownKey, playingBoard.areBlackDown())
+        outState.putInt(selectedNavigationItemKey, listAdapter.selectedNavigationItem)
+        outState.putBoolean(blacksAreDownKey, playingBoard.areBlackDown())
     }
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle?) {

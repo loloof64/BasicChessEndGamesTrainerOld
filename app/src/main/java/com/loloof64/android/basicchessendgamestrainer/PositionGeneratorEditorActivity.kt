@@ -350,20 +350,20 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
         super.onStop()
     }
 
-    override fun onSaveInstanceState(outState: Bundle?) {
-        outState?.putBoolean(isEditingAnExistingFileKey, isEditingAnExistingFile)
-        outState?.putString(editedFileNameKey, currentEditedFileName)
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(isEditingAnExistingFileKey, isEditingAnExistingFile)
+        outState.putString(editedFileNameKey, currentEditedFileName)
 
-        outState?.putBoolean(resultShouldBeDrawKey, PositionGeneratorValuesHolder.resultShouldBeDraw)
-        outState?.putString(playerKingConstraintScriptKey, PositionGeneratorValuesHolder.playerKingConstraintScript)
-        outState?.putString(computerKingConstraintScriptKey, PositionGeneratorValuesHolder.computerKingConstraintScript)
-        outState?.putString(kingsMutualConstraintScriptKey, PositionGeneratorValuesHolder.kingsMutualConstraintScript)
-        outState?.putString(otherPiecesCountKey,
+        outState.putBoolean(resultShouldBeDrawKey, PositionGeneratorValuesHolder.resultShouldBeDraw)
+        outState.putString(playerKingConstraintScriptKey, PositionGeneratorValuesHolder.playerKingConstraintScript)
+        outState.putString(computerKingConstraintScriptKey, PositionGeneratorValuesHolder.computerKingConstraintScript)
+        outState.putString(kingsMutualConstraintScriptKey, PositionGeneratorValuesHolder.kingsMutualConstraintScript)
+        outState.putString(otherPiecesCountKey,
                 OtherPiecesKindCountListArrayAdapter.stringFromPiecesCount(PositionGeneratorValuesHolder.otherPiecesCount)
         )
-        outState?.putString(otherPiecesGlobalConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts))
-        outState?.putString(otherPiecesMutualConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts))
-        outState?.putString(otherPiecesIndexedConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts))
+        outState.putString(otherPiecesGlobalConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts))
+        outState.putString(otherPiecesMutualConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts))
+        outState.putString(otherPiecesIndexedConstraintScriptKey, PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts))
 
         super.onSaveInstanceState(outState)
     }
