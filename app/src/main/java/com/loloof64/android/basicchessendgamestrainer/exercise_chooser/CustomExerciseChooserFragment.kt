@@ -223,6 +223,12 @@ class CustomExerciseChooserFragment : Fragment() {
         fun String?.doesNotStartOtherPiecesMutualConstraintOrEndFile(): Boolean =
                 this != null && this != FilesManager.otherPiecesMutualHeader
 
+        fun String?.doesNotStartOtherPiecesIndexedConstraintOrEndFile(): Boolean =
+                this != null && this != FilesManager.otherPiecesIndexedHeader
+
+        fun String?.isNotEndOfFile(): Boolean =
+                this != null
+
         val exerciseFile = FilesManager.getCurrentDirectoryFiles().find { !it.isDirectory && it.name == exerciseNameWithExtension }
         if (exerciseFile != null){
             val playerKingConstraintBuilder = StringBuilder()
@@ -230,6 +236,8 @@ class CustomExerciseChooserFragment : Fragment() {
             val kingsMutualConstraintBuilder = StringBuilder()
             val otherPiecesCountBuilder = StringBuilder()
             val otherPiecesGlobalBuilder = StringBuilder()
+            val otherPiecesMutualBuilder = StringBuilder()
+            val otherPiecesIndexedBuilder = StringBuilder()
             var resultShouldBeDraw = false
 
             BufferedReader(FileReader(exerciseFile)).use {
@@ -287,7 +295,25 @@ class CustomExerciseChooserFragment : Fragment() {
                         otherPiecesGlobalBuilder.append(currentLine)
                         otherPiecesGlobalBuilder.append('\n')
                     }
-                } while (currentLine.doesNotStartKingsMutualConstraintOrEndFile())
+                } while (currentLine.doesNotStartOtherPiecesMutualConstraintOrEndFile())
+
+                // filling other pieces mutual constraint string
+                do {
+                    currentLine = it.readLine()
+                    if (currentLine.doesNotStartOtherPiecesIndexedConstraintOrEndFile()) {
+                        otherPiecesMutualBuilder.append(currentLine)
+                        otherPiecesMutualBuilder.append('\n')
+                    }
+                } while (currentLine.doesNotStartOtherPiecesIndexedConstraintOrEndFile())
+
+                // filling other pieces indexed constraint string
+                do {
+                    currentLine = it.readLine()
+                    if (currentLine.isNotEndOfFile()) {
+                        otherPiecesIndexedBuilder.append(currentLine)
+                        otherPiecesIndexedBuilder.append('\n')
+                    }
+                } while (currentLine.isNotEndOfFile())
             }
 
             return PositionGeneratorConstraintsScripts(

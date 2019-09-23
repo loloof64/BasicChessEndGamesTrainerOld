@@ -35,6 +35,7 @@ object FilesManager {
     const val otherPiecesCountHeader = "# other pieces count"
     const val otherPiecesGlobalHeader = "#other pieces global"
     const val otherPiecesMutualHeader = "#other pieces mutual"
+    const val otherPiecesIndexedHeader = "#other pieces indexed"
     const val parentFolderName = ".."
     const val DRAW_LINE_VALUE = "1"
     val PIECE_CONSTRAINT_SEPARATOR = '-'.replicate(times = 20)

@@ -84,7 +84,7 @@ object PositionGeneratorValuesHolder {
     }
 
     fun aSideIsAboutToHaveTooManyPiecesWhenAdding(kindCountToAdd: PieceKindCount) : Boolean {
-        val futurePieceCountState = PositionGeneratorValuesHolder.otherPiecesCount.toMutableList()
+        val futurePieceCountState = otherPiecesCount.toMutableList()
         futurePieceCountState.add(kindCountToAdd)
         val playerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Player }.map { it.count }.sum()
         val computerPiecesCount = futurePieceCountState.filter { it.pieceKind.side == Side.Computer }.map { it.count }.sum()
@@ -93,7 +93,7 @@ object PositionGeneratorValuesHolder {
     }
 
     fun aSideIsAboutToHaveTooManyPiecesWhenModifying(kindCountToModifyIndex: Int, newCount: Int) : Boolean {
-        val futurePieceCountState = PositionGeneratorValuesHolder.otherPiecesCount.toMutableList()
+        val futurePieceCountState = otherPiecesCount.toMutableList()
         val oldPieceKindCount = futurePieceCountState[kindCountToModifyIndex]
         val newPieceKindCount = oldPieceKindCount.copy(count = newCount)
         futurePieceCountState[kindCountToModifyIndex] = newPieceKindCount
@@ -477,6 +477,25 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts))
         contentBuilder.append(FilesManager.NEW_LINE)
         contentBuilder.append(FilesManager.NEW_LINE)
+
+        contentBuilder.append(FilesManager.otherPiecesMutualHeader)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(
+                PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts
+        ))
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
+
+        contentBuilder.append(FilesManager.otherPiecesIndexedHeader)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(PositionGeneratorValuesHolder.pieceKindConstraintMapSerializationString(
+                PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts
+        ))
+        contentBuilder.append(FilesManager.NEW_LINE)
+        contentBuilder.append(FilesManager.NEW_LINE)
+
 
         return contentBuilder.toString()
     }
