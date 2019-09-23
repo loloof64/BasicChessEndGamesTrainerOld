@@ -247,7 +247,7 @@ class DeleteButtonClickListener(val pieceKind: PieceKind,
             adapterRef.get()?.deleteItem(position)
             PositionGeneratorValuesHolder.otherPiecesGlobalConstraintScripts.remove(pieceKind)
             PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts.remove(pieceKind)
-            //TODO add for otherPieceIndexedScripts
+            PositionGeneratorValuesHolder.otherPiecesIndexedConstraintScripts.remove(pieceKind)
 
             if (PositionGeneratorValuesHolder.otherPiecesCount.isEmpty()) {
                 positionGeneratorEditorActivity.clearAllOtherPiecesSpecificScriptFields()

@@ -423,7 +423,10 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 .commitNow()
         (allFragments[OtherPiecesMutualConstraintEditorFragmentIndex] as OtherPiecesMutualConstraintEditorFragment).clearScriptField()
 
-        //TODO add for OtherPiecesIndexedScriptFragment
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[OtherPiecesIndexedConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[OtherPiecesIndexedConstraintEditorFragmentIndex] as OtherPiecesIndexedConstraintEditorFragment).clearScriptField()
 
         supportFragmentManager.beginTransaction()
                 .replace(R.id.container, allFragments[SetIfResultShouldBeDrawFragmentIndex])
@@ -558,7 +561,10 @@ class PositionGeneratorEditorActivity : AppCompatActivity() {
                 .commitNow()
         (allFragments[OtherPiecesMutualConstraintEditorFragmentIndex] as OtherPiecesMutualConstraintEditorFragment).clearScriptField()
 
-        //TODO add for OtherPiecesIndexedScriptFragment
+        supportFragmentManager.beginTransaction()
+                .replace(R.id.container, allFragments[OtherPiecesIndexedConstraintEditorFragmentIndex])
+                .commitNow()
+        (allFragments[OtherPiecesIndexedConstraintEditorFragmentIndex] as OtherPiecesIndexedConstraintEditorFragment).clearScriptField()
 
         /*
         We gracefully return to the current screen.

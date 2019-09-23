@@ -30,6 +30,8 @@ import com.loloof64.android.basicchessendgamestrainer.utils.RxEventBus
 import org.antlr.v4.runtime.CharStreams
 import org.antlr.v4.runtime.CommonTokenStream
 import org.antlr.v4.runtime.misc.ParseCancellationException
+import java.util.logging.Level
+import java.util.logging.Logger
 
 data class GenericExprVariable(val name: String, val value: ScriptLanguageGenericExpr)
 
@@ -74,7 +76,7 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
         val parser = ScriptLanguageParser(tokens)
         parser.errorHandler = PositionConstraintBailErrorStrategy()
         val tree = parser.scriptLanguage()
-        ScriptLanguageBuilder.clearVariables()
+        clearVariables()
         return ScriptLanguageBuilder.visit(tree) as ScriptLanguageBooleanExpr
     }
 
@@ -88,7 +90,7 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
 
             val resources = MyApplication.appContext.resources
 
-            val variables = ScriptLanguageBuilder.getVariables()
+            val variables = getVariables()
             // We must evaluate all variables before evaluating the final script expression
             variables.forEach {
                 when (it.value) {
@@ -283,7 +285,7 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
         }
 
         return try {
-            ScriptLanguageBuilder.checkIfScriptStringIsValid(
+            checkIfScriptStringIsValid(
                     scriptString = script,
                     sampleIntValues = sampleIntValues,
                     sampleBooleanValues = sampleBooleanValues
@@ -293,11 +295,12 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
         catch (ex: VariableIsNotAffectedException) {
             val resources = MyApplication.appContext.resources
             val messageFormat = resources.getString(R.string.parser_variable_not_affected)
-            val message = String.format(messageFormat ?: "<Internal error : could not open format string !>", ex.name)
+            val message = String.format(messageFormat, ex.name)
 
             val titleFormat = resources.getString(R.string.parse_error_dialog_title)
-            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", scriptSectionTitle)
+            val title = String.format(titleFormat, scriptSectionTitle)
             RxEventBus.send(MessageToShowInDialogEvent(title, message))
+            Logger.getLogger("BasicChessEndgames").log(Level.WARNING, ex.localizedMessage)
 
             false
         }
@@ -305,8 +308,9 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
             val message = ex.message ?: "<Internal error : could not get ParseCancellationException message !>"
             val resources = MyApplication.appContext.resources
             val titleFormat = resources.getString(R.string.parse_error_dialog_title)
-            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", scriptSectionTitle)
+            val title = String.format(titleFormat, scriptSectionTitle)
             RxEventBus.send(MessageToShowInDialogEvent(title, message))
+            Logger.getLogger("BasicChessEndgames").log(Level.WARNING, ex.localizedMessage)
             false
         }
         catch (ex: ClassCastException){
@@ -314,8 +318,9 @@ object ScriptLanguageBuilder : ScriptLanguageBaseVisitor<ScriptLanguageGenericEx
             val message = MyApplication.appContext.resources?.getString(R.string.class_cast_exception_error_dialog_message)
                     ?:  "<Internal error : could not get ClassCastException message !>"
             val titleFormat = resources.getString(R.string.parse_error_dialog_title)
-            val title = String.format(titleFormat ?: "<Internal error : could not open localized title string !>", scriptSectionTitle)
+            val title = String.format(titleFormat, scriptSectionTitle)
             RxEventBus.send(MessageToShowInDialogEvent(title, message))
+            Logger.getLogger("BasicChessEndgames").log(Level.WARNING, ex.localizedMessage)
             false
         }
     }

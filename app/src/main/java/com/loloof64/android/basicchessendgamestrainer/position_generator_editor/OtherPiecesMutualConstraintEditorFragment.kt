@@ -160,7 +160,7 @@ class OtherPiecesMutualConstraintEditorFieldTextWatcher(parent: OtherPiecesMutua
         val editedPieceKind = parentRef.get()?.getEditedPieceKind()
         if (editedPieceKind != null){
             PositionGeneratorValuesHolder.otherPiecesMutualConstraintScripts[editedPieceKind] = s?.toString()
-                    ?: "<Internal error : could not read updated other piece global constraint field>"
+                    ?: "<Internal error : could not read updated other piece mutual constraint field>"
         }
     }
 
